@@ -72,7 +72,8 @@ def collect_options():
         list_tree(INSTALL_WORKING_DIR, 'po') + list_tree(INSTALL_DATA_DIR, 'mo')
 
     packages = ['pootle'] + ['pootle.' + pkg for pkg in find_packages('pootle')] + \
-            find_packages('local_apps') + find_packages('external_apps')
+        ['local_apps.' + pkg for pkg in find_packages('local_apps')] + \
+        ['external_apps.' + pkg for pkg in find_packages('external_apps')] 
     package_data = {
         '': ['*.html', '*.txt', '*.xml', '*.css', '*.js'],
         'pootle_app': expand_tree_globs('local_apps/pootle_app', ['templates'], ['*.html']),
