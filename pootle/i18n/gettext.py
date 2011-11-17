@@ -36,16 +36,16 @@ def _format_translation(message, vars=None):
     return message
 
 def ugettext(message, vars=None):
-    return _format_translation(translation.real_ugettext(message), vars)
+    return _format_translation(translation.trans_real.ugettext(message), vars)
 
 def gettext(message, vars=None):
-    return _format_translation(translation.real_gettext(message), vars)
+    return _format_translation(translation.trans_real.gettext(message), vars)
 
 def ungettext(singular, plural, number, vars=None):
-    return _format_translation(translation.real_ungettext(singular, plural, number), vars)
+    return _format_translation(translation.trans_real.ungettext(singular, plural, number), vars)
 
 def ngettext(singular, plural, number, vars=None):
-    return _format_translation(translation.real_ngettext(singular, plural, number), vars)
+    return _format_translation(translation.trans_real.ngettext(singular, plural, number), vars)
 
 def tr_lang(language_name):
     """translate language name"""
