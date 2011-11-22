@@ -14,12 +14,12 @@ class TaskConfig(models.Model):
     max_assignments = models.PositiveIntegerField(_('Max number of Assignments'))
     title = models.CharField(_('Question Form Title'), max_length=255)
     description = models.TextField(_('Question Form Description'))
-    reward = models.DecimalField(_('Reward Per Answer'), decimal_places=1, max_digits=2)
-    bonus = models.DecimalField(_('Bonus'), decimal_places=1, max_digits=2)
-    
+    reward = models.DecimalField(_('Reward Per Answer'), decimal_places=2, max_digits=3)
+    bonus = models.DecimalField(_('Bonus'), decimal_places=2, max_digits=3)
+
     class Meta:
         ordering = ["name"]
-    
+
     def __unicode__(self):
         return self.name
 
@@ -29,7 +29,7 @@ HAS_ERRORS = -1
 PENDING = 0
 IN_PROGRESS = 1
 FINISHED = 2
-TASKITEM_STATUSES = ( 
+TASKITEM_STATUSES = (
     (DISPOSED, 'Disposed'),
     (CANCELLED, 'Cancelled'),
     (HAS_ERRORS, 'Has errors'),
@@ -42,7 +42,7 @@ class TaskItem(models.Model):
     A model that represents the HIT and is mapped to an object that understands
     the task details
     """
-    # Task data 
+    # Task data
     name = models.CharField(_('Task Name'), max_length=255)
     config = models.ForeignKey(TaskConfig)
     creation_date = models.DateTimeField(_('Creation Date'),
@@ -58,9 +58,9 @@ class TaskItem(models.Model):
 
     class Meta:
         ordering = ["name"]
-    
+
     def __unicode__(self):
-        return self.name    
+        return self.name
 
 
 # TODO Use requesterannotation instead
@@ -81,12 +81,12 @@ class TaskAttribute(models.Model):
     def __unicode__(self):
         return u'%s:%s' % (self.task_item.id, self.key)
 
-#PENDING = 0 
+#PENDING = 0
 ASSIGNABLE = 1
 REVIEWABLE = 2
 REVIEWING = 3
 DISPOSED = 4
-HIT_STATUSES = ( 
+HIT_STATUSES = (
     (PENDING, 'Pending'),
     (ASSIGNABLE, 'Assignable'),
     (REVIEWABLE, 'Reviewable'),
@@ -142,15 +142,13 @@ class AssignmentItem(models.Model):
                                  default=PENDING)
     hit = models.ForeignKey(HITItem)
     worker_id = models.CharField(_('Worker Id'), max_length=50, null=True, blank=True)
-    wages_paid = models.DecimalField(_('Wages Paid'), decimal_places=1, max_digits=2, default='0.0')
+    wages_paid = models.DecimalField(_('Wages Paid'), decimal_places=2, max_digits=3, default='0.0')
 
     class Meta:
         ordering = ["accept_time"]
-    
+
     def __unicode__(self):
         if self.assignment_id == None:
             return u'-1'
         else:
             return self.assignment_id
-
-
