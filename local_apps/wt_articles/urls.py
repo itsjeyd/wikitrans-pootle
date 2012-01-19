@@ -7,11 +7,11 @@ from wt_articles.forms import *
 urlpatterns = patterns('wt_articles.views',
     ### Articles related stuff
     url(r'^$', 'landing', name="articles_landing"),
-    
+
     # Export projects
     url(r'^source/export/project/(?P<aid>\d+)', 'create_pootle_project', name="create_pootle_project"),
     url(r'^source/delete/project/(?P<aid>\d+)', 'delete_pootle_project', name="delete_pootle_project"),
-    
+
     # Export articles
     url(r'^source/export/po/(?P<aid>\d+)', 'source_to_po', name="source_to_po"),
 
@@ -39,5 +39,6 @@ urlpatterns = patterns('wt_articles.views',
     url(r'^translate/languages/add/(?P<aid>\d+)', 'add_target_languages', name="add_target_languages"),
 
     ### Translation request related stuff
-    url(r'^request/', 'request_article', name="request_article")
+    url(r'^request/', 'request_article', name="request_article"),
+    url(r'^update/', 'update_articles')
 )
