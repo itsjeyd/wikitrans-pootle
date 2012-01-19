@@ -3,8 +3,6 @@ from django.core.management.base import NoArgsCommand
 from wikipydia import query_text_rendered
 from wt_articles.models import ArticleOfInterest
 from wt_articles.models import SourceArticle
-from wt_articles.models import TranslationRequest
-from wt_articles import DEFAULT_TRANNY
 
 class Command(NoArgsCommand):
     help = "Updates the texts for wikipedia articles of interest"
