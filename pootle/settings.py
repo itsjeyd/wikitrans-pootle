@@ -148,14 +148,13 @@ INSTALLED_APPS = (
     'djblets.siteconfig',
     'djblets.util',
     'contact_form_i18n',
-    
+
     'uni_form',
-    
+
     'wt_languages',
     'wt_translation',
     'wt_articles',
     'wt_managing',
-    'mturk_manager'
 )
 
 AUTH_PROFILE_MODULE = "pootle_profile.PootleProfile"
