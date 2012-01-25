@@ -24,7 +24,6 @@ django-avatar>=1.0.3
 django-gravatar>=0.1.0
 django-piston>=0.2.2
 
-boto>=1.9b
 pyango_view>=0.1
 wikipydia>=0.1.4
 goopytrans>=0.1.1
