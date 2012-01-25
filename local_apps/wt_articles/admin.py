@@ -1,6 +1,7 @@
-from wt_articles.models import ArticleOfInterest, TranslationRequest, FeaturedTranslation
+from wt_articles.models import ArticleOfInterest, FeaturedTranslation
 from wt_articles.models import SourceArticle, SourceSentence
 from wt_articles.models import TranslatedArticle, TranslatedSentence
+from wt_articles.models import TranslationRequest
 from django.contrib import admin
 
 class ArticleOfInterestAdmin(admin.ModelAdmin):
