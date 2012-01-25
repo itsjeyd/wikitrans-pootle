@@ -26,6 +26,7 @@
 	    <tr>
 				<th>Title</th>
 			    <th>Import Date</th>
+                <th>Revision ID</th>
 			    <th>Source Language</th>
 			    <th>Fix</th>
 			    <th>Target Languages</th>
@@ -39,6 +40,7 @@
 		    <tr class="{% cycle odd,even %}">
 			<td><b><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></b></td>
 					    <td nowrap>{{ article.timestamp|date:"d F Y" }}</td>
+                        <td nowrap>{{ article.doc_id }}</td>
 					    <td>{{ article.language }}</td>
 					    <td><a href="{{ article.get_fix_url }}">{% trans "Fix Article" %}</a></td>
 					    {% if translatable %}
