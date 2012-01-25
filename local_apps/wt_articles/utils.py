@@ -9,7 +9,7 @@ from wt_languages.models import LanguageCompetancy
 from wt_articles.models import SourceArticle, SourceSentence, TranslatedArticle, TranslatedSentence
 
 from wt_articles import GOOGLE,APERTIUM
-from wt_articles import MECHANICAL_TURK,HUMAN,DEFAULT_TRANNY
+from wt_articles import HUMAN,DEFAULT_TRANNY
 
 class Translator:
     """
@@ -63,7 +63,7 @@ def sentences_as_html_span(sentences):
     # span_sentences = [ format_span(s.segment_id, s.text) for s in sentences ]
     for s in sentences:
         s.text = format_span(s.segment_id, s.text)
-        
+
     html = sentences_as_html(sentences)
     return html
 
@@ -80,7 +80,7 @@ def all_translated_articles():
 def all_articles():
     source_articles = all_source_articles()
     translated_articles = all_translated_articles()
-    
+
     return translated_articles.union(source_articles)
 
 def _user_compatible_articles(user, article_model, language_direction):
@@ -90,7 +90,7 @@ def _user_compatible_articles(user, article_model, language_direction):
 
     languages.add(profile.native_language)
     languages.add(profile.display_language)
-    
+
     articles = set(article_model.objects.filter(language__in=languages))
     return articles
 
@@ -111,7 +111,7 @@ def target_pairs_by_user(user, source):
                             user.languagecompetancy_set.exclude(translation_options=SOURCE_LANGUAGE)])
     # Exclude identical source/target pairs
     target_languages.discard(source)
-    
+
     st_pair_builder = lambda t: (t, '%s-%s' % (source, t))
     pairs = map(st_pair_builder, target_languages)
     return pairs
