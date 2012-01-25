@@ -1,6 +1,6 @@
 from wt_articles.models import ArticleOfInterest, TranslationRequest, FeaturedTranslation
 from wt_articles.models import SourceArticle, SourceSentence
-from wt_articles.models import TranslatedArticle, TranslatedSentence, MTurkTranslatedSentence
+from wt_articles.models import TranslatedArticle, TranslatedSentence
 from django.contrib import admin
 
 class ArticleOfInterestAdmin(admin.ModelAdmin):
@@ -29,11 +29,7 @@ class TranslatedSentenceAdmin(admin.ModelAdmin):
 
 class FeaturedTranslationAdmin(admin.ModelAdmin):
     list_display = ('article','featured_date',)
-    
-class MTurkTranslatedSentenceAdmin(TranslatedArticleAdmin):
-    list_display = ('segment_id','translation_date','text', 'approved',)
-    search_fields = ('segment_id','translation_date','text', 'approved',)
-    
+
 admin.site.register(ArticleOfInterest, ArticleOfInterestAdmin)
 admin.site.register(TranslationRequest, TranslationRequestAdmin)
 admin.site.register(SourceArticle, SourceArticleAdmin)
@@ -41,4 +37,3 @@ admin.site.register(SourceSentence, SourceSentenceAdmin)
 admin.site.register(TranslatedArticle, TranslatedArticleAdmin)
 admin.site.register(TranslatedSentence, TranslatedSentenceAdmin)
 admin.site.register(FeaturedTranslation, FeaturedTranslationAdmin)
-admin.site.register(MTurkTranslatedSentence, MTurkTranslatedSentenceAdmin)

@@ -22,7 +22,6 @@ from datetime import datetime
 import polib
 import logging
 
-from mturk_manager.models import AssignmentItem
 from urllib import quote_plus, unquote_plus
 
 import re
@@ -525,12 +524,3 @@ def latest_featured_article():
         return ft[0]
     else:
         return None
-
-class MTurkTranslatedSentence(TranslatedSentence):
-    assignment = models.ForeignKey(AssignmentItem)
-
-    class Meta:
-        ordering = ('-segment_id',)
-
-    def __unicode__(self):
-        return u'%s' % (self.id)
