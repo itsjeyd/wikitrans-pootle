@@ -25,8 +25,6 @@ import logging
 from mturk_manager.models import AssignmentItem
 from urllib import quote_plus, unquote_plus
 
-from urllib import quote_plus, unquote_plus
-
 import re
 from aifc import Error
 
