@@ -339,12 +339,12 @@ def request_article(request,
                 article_of_interest.save()
                 article_dict = query_text_rendered(title,
                                                    language=title_language.code)
-                source_article = SourceArticle(title=title,
-                                               language=title_language,
-                                               source_text=article_dict['html'],
-                                               timestamp=datetime.now(),
-                                               doc_id=article_dict['revid'])
-                source_article.save()
+                # source_article = SourceArticle(title=title,
+                #                                language=title_language,
+                #                                source_text=article_dict['html'],
+                #                                timestamp=datetime.now(),
+                #                                doc_id=article_dict['revid'])
+                # source_article.save()
 
                 request_form = form_class()
                 return {"article_requested": True,
