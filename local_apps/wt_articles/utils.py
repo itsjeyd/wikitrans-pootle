@@ -68,7 +68,7 @@ def sentences_as_html_span(sentences):
     return html
 
 def _all_articles(article_model):
-    articles = set(article_model.objects.order_by('title'))
+    articles = article_model.objects.order_by('title')
     return articles
 
 def all_source_articles():
