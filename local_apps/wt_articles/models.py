@@ -67,8 +67,10 @@ class SourceArticle(models.Model):
             super(SourceArticle, self).save()
             # find all paragraphs
             for p in soup.findAll('p'):
-                only_p = p.findAll(text=True)
-                p_text = ''.join(only_p)
+                import re
+                p_text = ''.join([x.string for x in p.findAll(text=True)
+                                  if not re.match('[\[\]\\d]+$',
+                                                  x.string)])
                 # split all sentences in the paragraph
 
                 sentences = sentence_splitter(p_text.strip())
