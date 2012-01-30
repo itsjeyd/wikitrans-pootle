@@ -31,7 +31,6 @@ pyyaml>=3.09
 nltk==2.0b7
 werkzeug>=0.5.1
 polib==0.5.3
-mwlib>=0.8
 cython>=0.11
 BeautifulSoup>=3.0
 apyrtium>=0.1
