@@ -90,19 +90,19 @@ def project_language_index(request, project_code):
     request.permissions = get_matching_permissions(get_profile(request.user), project.directory)
     if not check_permission('view', request):
         raise PermissionDenied
-    
+
     # Check for form post (MT request)
     if request.method == "POST":
         # TODO: This is not the correct way to handle one of many forms. How do I do it better?
         # TODO: This is not save against injection attacks.
-        
+
         # translation_request_form = TranslationRequestForm(None, request.POST)
         # Get the project
         translator = MachineTranslator.objects.get(pk = request.POST['translator'])
         translation_project = TranslationProject.objects.get(
                                     pk = request.POST['translation_project'])
         translator.create_translation_request(translation_project)
-        
+
         return HttpResponseRedirect("?translator=%s&project=%s" % (translator, translation_project))
 
     translation_projects = project.translationproject_set.all()
