@@ -111,9 +111,9 @@ class SourceArticle(models.Model):
             SourceSentence.delete(sentence)
 
     def get_absolute_url(self):
-        url = '/articles/source/%s/%s/%s' % (self.language.code,
-                                             quote_plus(self.title.encode('utf-8')),
-                                             self.id)
+        url = '/wikitrans/articles/source/%s/%s/%s' % (self.language.code,
+                                                       quote_plus(self.title.encode('utf-8')),
+                                                       self.id)
         return iri_to_uri(url)
 
     def get_relative_url(self, lang_string=None):
@@ -125,7 +125,7 @@ class SourceArticle(models.Model):
         return iri_to_uri(url)
 
     def get_fix_url(self):
-        url = '/articles/fix/%s' % self.id
+        url = '/wikitrans/articles/fix/%s' % self.id
 
         return iri_to_uri(url)
 
