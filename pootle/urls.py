@@ -43,13 +43,13 @@ urlpatterns = patterns('',
     # direct download of translation files
     (r'^export/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.PODIRECTORY}),
     # documentation
-    (r'^docs/(?P<docfile>.*)$', 'django.views.generic.simple.direct_to_template', {'template': "docs.html"}),
+    (r'^wikitrans/docs/(?P<docfile>.*)$', 'django.views.generic.simple.direct_to_template', {'template': "docs.html"}),
     # External Apps
     (r'^contact/', include('contact_form_i18n.urls')),
     (r'^accounts/', include('pootle_profile.urls')),
     (r'^wikitrans/articles/', include('wt_articles.urls')),
     # Pootle urls
-    (r'^projects/', include('pootle_project.urls')),
+    (r'^wikitrans/projects/', include('pootle_project.urls')),
     (r'', include('pootle_notifications.urls')),
     (r'', include('pootle_terminology.urls')),
     (r'', include('pootle_store.urls')),
