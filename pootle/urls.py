@@ -47,7 +47,7 @@ urlpatterns = patterns('',
     # External Apps
     (r'^contact/', include('contact_form_i18n.urls')),
     (r'^accounts/', include('pootle_profile.urls')),
-    (r'^articles/', include('wt_articles.urls')),
+    (r'^wikitrans/articles/', include('wt_articles.urls')),
     # Pootle urls
     (r'^projects/', include('pootle_project.urls')),
     (r'', include('pootle_notifications.urls')),
