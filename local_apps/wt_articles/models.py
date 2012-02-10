@@ -44,7 +44,8 @@ class SourceArticle(models.Model):
     timestamp = models.DateTimeField(_('Import Date'), default=datetime.now())
     doc_id = models.CharField(_('Document ID'), max_length=512)
     source_text = models.TextField(_('Source Text'))
-    sentences_processed = models.BooleanField(_('Sentences Processed', default=False))
+    sentences_processed = models.BooleanField(_('Sentences Processed',
+                                                default=False))
     pootle_project = models.ForeignKey(Project, null=True)
 
     def __unicode__(self):
@@ -70,13 +71,16 @@ class SourceArticle(models.Model):
 
                 sentences = sentence_splitter(p_text.strip())
                 # TODO: remove bad sentences that were missed above
-                sentences = [s for s in sentences if not re.match("^\**\[\d+\]\**$", s)]
+                sentences = [s for s in sentences if \
+                                 not re.match("^\**\[\d+\]\**$", s)]
 
                 for sentence in sentences:
                     # Clean up bad spaces (&#160;)
                     sentence = sentence.replace("&#160;", " ")
 
-                    s = SourceSentence(article=self, text=sentence, segment_id=segment_id)
+                    s = SourceSentence(article=self,
+                                       text=sentence,
+                                       segment_id=segment_id)
                     segment_id += 1
                     s.save()
                 s.end_of_paragraph = True
@@ -106,9 +110,10 @@ class SourceArticle(models.Model):
             SourceSentence.delete(sentence)
 
     def get_absolute_url(self):
-        url = '/wikitrans/articles/source/%s/%s/%s' % (self.language.code,
-                                                       quote_plus(self.title.encode('utf-8')),
-                                                       self.id)
+        url = ('/wikitrans/articles/source/%s/%s/%s' %
+               (self.language.code,
+                quote_plus(self.title.encode('utf-8')),
+                self.id))
         return iri_to_uri(url)
 
     def get_relative_url(self, lang_string=None):
@@ -156,7 +161,8 @@ class SourceArticle(models.Model):
         for sentence in self.sourcesentence_set.order_by('segment_id'):
             poEntry = polib.POEntry(
                 occurrences = [('segment_id', sentence.segment_id)],
-                tcomment = "sentence",  # TODO: Check to see if it's a sentence or a header
+                tcomment = "sentence",  # TODO: Check to see if it's a
+                                        # sentence or a header
                 msgid = sentence.text
             )
 
@@ -184,7 +190,9 @@ class SourceArticle(models.Model):
             if i > 0 and len(sentences[i].strip()) == 0:
                 source_sentences[segment_id-1].end_of_paragraph = True
             else:
-                s = SourceSentence(article=self, text=sentences[i].strip(), segment_id=segment_id)
+                s = SourceSentence(article=self,
+                                   text=sentences[i].strip(),
+                                   segment_id=segment_id)
 
                 source_sentences.append(s)
                 segment_id += 1
@@ -227,8 +235,9 @@ class SourceArticle(models.Model):
 
     def create_pootle_project(self):
         '''
-        Creates a project to be used in Pootle. A templates language is created and a .pot
-        template is generated from the SourceSentences in the article.
+        Creates a project to be used in Pootle. A templates language
+        is created and a .pot template is generated from the
+        SourceSentences in the article.
         '''
         import logging
         from django.utils.encoding import smart_str
@@ -250,19 +259,22 @@ class SourceArticle(models.Model):
         # PO filetype
 
         project.source_language = source_language
-      # Save the project
+        # Save the project
         project.save()
 
         templates_language = Language.objects.get_by_natural_key('templates')
 
         # Check to see if the templates language exists. If not, add it.
-        if len(project.translationproject_set.filter(language=templates_language)) == 0:
+        if len(project.translationproject_set.filter(language=
+                                                     templates_language)) == 0:
             project.add_language(templates_language)
             project.save()
 
         #code copied for wt_articles
         logging.debug ( "project saved")
-        # 2. Export the article to .po and store in the templates "translation project". This will be used to generate translation requests for other languages.
+        # 2. Export the article to .po and store in the templates
+        # "translation project". This will be used to generate
+        # translation requests for other languages.
         templatesProject = project.get_template_translationproject()
         po = self.sentences_to_po()
         poFilePath = "%s/article.pot" % (templatesProject.abs_real_path)
@@ -279,7 +291,9 @@ class SourceArticle(models.Model):
 
         # Log the changes
         newstats = templatesProject.getquickstats()
-        post_template_update.send(sender=templatesProject, oldstats=oldstats, newstats=newstats)
+        post_template_update.send(sender=templatesProject,
+                                  oldstats=oldstats,
+                                  newstats=newstats)
 
         # Add a reference to the project in the SourceArticle
         self.pootle_project = project
@@ -291,7 +305,8 @@ class SourceArticle(models.Model):
         """
         Gets a handle of the Pootle project, if it exists.
         """
-        # First, check to see if the project is already bound to the SourceArticle
+        # First, check to see if the project is already bound to the
+        # SourceArticle
         if self.pootle_project == None:
             # Otherwise, look it up
             queryset = Project.objects.filter(code = self.get_project_code())
@@ -306,12 +321,14 @@ class SourceArticle(models.Model):
 
     def get_target_languages(self):
         """
-        Gets the languages of the translation projects (excluding templates) under the corresponding Pootle project.
+        Gets the languages of the translation projects (excluding
+        templates) under the corresponding Pootle project.
         """
         try:
-            translation_projects = self.get_pootle_project().translationproject_set.exclude(
-                                                language__code = "templates")
-            return Language.objects.filter(id__in = [tp.language.id for tp in translation_projects])
+            translation_projects = self.get_pootle_project().translationproject_set.exclude(language__code="templates")
+            return Language.objects.filter(id__in=
+                                           [tp.language.id for tp in
+                                            translation_projects])
         except Exception:
             return []
 
@@ -349,21 +366,25 @@ class SourceArticle(models.Model):
 
     def get_create_pootle_project_url(self):
         """
-        Gets the url for the page which creates a new Pootle project out of a source article
+        Gets the url for the page which creates a new Pootle project
+        out of a source article
         """
         url = '/wikitrans/articles/source/export/project/%s' % self.id
         return iri_to_uri(url)
 
     def get_delete_pootle_project_url(self):
         """
-        Gets the url for the page which deletes the Pootle project associated with the source article.
+        Gets the url for the page which deletes the Pootle project
+        associated with the source article.
         """
         url = '/wikitrans/articles/source/delete/project/%s' % self.id
         return iri_to_uri(url)
 
     def has_translation_request(self, target_language, translator):
-        return self.translationrequest_set.filter(target_language=target_language,
-                                                  translator=translator).exists()
+        return self.translationrequest_set.filter(target_language=
+                                                  target_language,
+                                                  translator=
+                                                  translator).exists()
 
     def create_translation_request(self, target_language, translator):
         # Try to create the translation request. An exception may be thrown.
@@ -425,7 +446,9 @@ class TranslatedSentence(models.Model):
     segment_id = models.IntegerField(_('Segment ID'))
     source_sentence = models.ForeignKey(SourceSentence)
     text = models.CharField(_('Translated Text'), blank=True, max_length=2048)
-    translated_by = models.CharField(_('Translated by'), blank=True, max_length=255)
+    translated_by = models.CharField(_('Translated by'),
+                                     blank=True,
+                                     max_length=255)
     language = models.ForeignKey(Language, db_index=True)
     translation_date = models.DateTimeField(_('Import Date'))
     approved = models.BooleanField(_('Approved'), default=False)
@@ -440,7 +463,8 @@ class TranslatedSentence(models.Model):
 
 class TranslatedArticle(models.Model):
     article = models.ForeignKey(SourceArticle)
-    parent = models.ForeignKey('self', blank=True, null=True, related_name='parent_set')
+    parent = models.ForeignKey('self', blank=True, null=True,
+                               related_name='parent_set')
     title = models.CharField(_('Title'), max_length=255)
     timestamp = models.DateTimeField(_('Timestamp'))
     language = models.ForeignKey(Language, db_index=True)
@@ -448,16 +472,21 @@ class TranslatedArticle(models.Model):
     approved = models.BooleanField(_('Approved'), default=False)
 
     def set_sentences(self, translated_sentences):
-        source_sentences = self.article.sourcesentence_set.order_by('segment_id')
+        source_sentences = self.article.sourcesentence_set.order_by('segment' \
+                                                                        '_id')
         source_segment_ids = [s.segment_id for s in source_sentences]
         translated_segment_ids = [s.segment_id for s in translated_sentences]
         if len(source_segment_ids) != len(translated_segment_ids):
-            raise ValueError('Number of translated sentences doesn\'t match number of source sentences')
+            raise ValueError('Number of translated sentences doesn\'t match ' \
+                                 'number of source sentences')
         if source_segment_ids != translated_segment_ids:
             ValueError('Segment id lists do not match')
-        translated_article_list = [ts.source_sentence.article for ts in translated_sentences]
-        if len(translated_article_list) != 1 and translated_article_list[0] != self.article:
-            raise ValueError('Not all translated sentences derive from the source article')
+        translated_article_list = [ts.source_sentence.article for ts in \
+                                       translated_sentences]
+        if (len(translated_article_list) != 1 and
+            translated_article_list[0] != self.article):
+            raise ValueError('Not all translated sentences derive from the ' \
+                                 'source article')
         for ts in translated_sentences:
             self.sentences.add(ts)
 
@@ -469,9 +498,10 @@ class TranslatedArticle(models.Model):
         source_lang = self.article.language.code
         target_lang = self.language.code
         lang_pair = "%s-%s" % (source_lang, target_lang)
-        url = '/articles/translated/%s/%s/%s' % (lang_pair,
-                                                 quote_plus(self.title.encode('utf-8')),
-                                                 self.id)
+        url = ('/articles/translated/%s/%s/%s' %
+               (lang_pair,
+                quote_plus(self.title.encode('utf-8')),
+                self.id)
         return iri_to_uri(url)
 
     def get_relative_url(self):
@@ -482,7 +512,6 @@ class TranslatedArticle(models.Model):
                             quote_plus(self.title.encode('utf-8')),
                             self.id)
         return iri_to_uri(url)
-
 
 
 class FeaturedTranslation(models.Model):
