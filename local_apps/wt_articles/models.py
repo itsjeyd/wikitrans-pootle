@@ -31,9 +31,6 @@ else:
 
 class ArticleOfInterest(models.Model):
     title = models.CharField(_('Title'), max_length=255)
-#    title_language = models.CharField(_('Title language'),
-#                                      max_length=2,
-#                                      choices=LANGUAGE_CHOICES)
     title_language = models.ForeignKey(Language, db_index=True)
 
     def __unicode__(self):
@@ -41,11 +38,7 @@ class ArticleOfInterest(models.Model):
 
 class SourceArticle(models.Model):
     title = models.CharField(_('Title'), max_length=255)
-#    language = models.CharField(_('Source Language'),
-#                                max_length=2,
-#                                choices=LANGUAGE_CHOICES)
     language = models.ForeignKey(Language, db_index=True)
-    #version = models.IntegerField(_('Version')) # @@@ try django-versioning
     timestamp = models.DateTimeField(_('Import Date'), default=datetime.now())
     doc_id = models.CharField(_('Document ID'), max_length=512)
     source_text = models.TextField(_('Source Text'))
@@ -253,7 +246,6 @@ class SourceArticle(models.Model):
         project.fullname = u"%s:%s" % (self.language.code, self.title)
         project.code = project.fullname.replace(" ", "_").replace(":", "_")
         # PO filetype
-        #project.localfiletype = "po" # filetype_choices[0]
 
         project.source_language = source_language
       # Save the project
@@ -262,7 +254,6 @@ class SourceArticle(models.Model):
         templates_language = Language.objects.get_by_natural_key('templates')
 
         # Check to see if the templates language exists. If not, add it.
-        #if not project.language_exists(templates_language):
         if len(project.translationproject_set.filter(language=templates_language)) == 0:
             project.add_language(templates_language)
             project.save()
@@ -398,9 +389,6 @@ class SourceSentence(models.Model):
 
 class TranslationRequest(models.Model):
     article = models.ForeignKey(SourceArticle)
-#    target_language = models.CharField(_('Target Language'),
-#                                       max_length=2,
-#                                       choices=LANGUAGE_CHOICES)
     target_language = models.ForeignKey(Language, db_index=True)
     date = models.DateTimeField(_('Request Date'))
     translator = models.ForeignKey(MachineTranslator)
@@ -425,27 +413,14 @@ class TranslationRequest(models.Model):
         """
         pass
 
-#    def save(self):
-#        """
-#        A temporary extension of the save method, because unique_together isn't accepting
-#        translator as a valid field.
-#        """
-#        if self.article.has_translation_request(self.target_language, self.translator):
-#            raise RuntimeException("A translation request already exists for article %s.") % self.article
-#
-#        # Call the super.save()
-#        super(TranslationRequest, self).save()
-
     class Meta:
         unique_together = ("article", "target_language", "translator")
-        # unique_together = ("article", "target_language") #, "translator")
 
 class TranslatedSentence(models.Model):
     segment_id = models.IntegerField(_('Segment ID'))
     source_sentence = models.ForeignKey(SourceSentence)
     text = models.CharField(_('Translated Text'), blank=True, max_length=2048)
     translated_by = models.CharField(_('Translated by'), blank=True, max_length=255)
-#    language = models.CharField(_('Language'), blank=True, max_length=2)
     language = models.ForeignKey(Language, db_index=True)
     translation_date = models.DateTimeField(_('Import Date'))
     approved = models.BooleanField(_('Approved'), default=False)
@@ -462,11 +437,7 @@ class TranslatedArticle(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True, related_name='parent_set')
     title = models.CharField(_('Title'), max_length=255)
     timestamp = models.DateTimeField(_('Timestamp'))
-#    language = models.CharField(_('Language'),
-#                                max_length=2,
-#                                choices=LANGUAGE_CHOICES)
     language = models.ForeignKey(Language, db_index=True)
-#    language = models.ForeignKey(Language, db_index=True)
     sentences = models.ManyToManyField(TranslatedSentence)
     approved = models.BooleanField(_('Approved'), default=False)
 
