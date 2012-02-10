@@ -29,12 +29,14 @@ if "notification" in settings.INSTALLED_APPS:
 else:
     notification = None
 
+
 class ArticleOfInterest(models.Model):
     title = models.CharField(_('Title'), max_length=255)
     title_language = models.ForeignKey(Language, db_index=True)
 
     def __unicode__(self):
         return u"%s :: %s" % (self.title, self.title_language)
+
 
 class SourceArticle(models.Model):
     title = models.CharField(_('Title'), max_length=255)
@@ -372,6 +374,7 @@ class SourceArticle(models.Model):
 
         translation_request.save()
 
+
 class SourceSentence(models.Model):
     article = models.ForeignKey(SourceArticle)
     text = models.CharField(_('Sentence Text'), max_length=2048)
@@ -386,6 +389,7 @@ class SourceSentence(models.Model):
 
     def save(self):
         super(SourceSentence, self).save()
+
 
 class TranslationRequest(models.Model):
     article = models.ForeignKey(SourceArticle)
@@ -416,6 +420,7 @@ class TranslationRequest(models.Model):
     class Meta:
         unique_together = ("article", "target_language", "translator")
 
+
 class TranslatedSentence(models.Model):
     segment_id = models.IntegerField(_('Segment ID'))
     source_sentence = models.ForeignKey(SourceSentence)
@@ -431,6 +436,7 @@ class TranslatedSentence(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.id)
+
 
 class TranslatedArticle(models.Model):
     article = models.ForeignKey(SourceArticle)
@@ -476,6 +482,7 @@ class TranslatedArticle(models.Model):
                             quote_plus(self.title.encode('utf-8')),
                             self.id)
         return iri_to_uri(url)
+
 
 
 class FeaturedTranslation(models.Model):
