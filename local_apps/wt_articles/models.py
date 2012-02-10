@@ -501,7 +501,7 @@ class TranslatedArticle(models.Model):
         url = ('/articles/translated/%s/%s/%s' %
                (lang_pair,
                 quote_plus(self.title.encode('utf-8')),
-                self.id)
+                self.id))
         return iri_to_uri(url)
 
     def get_relative_url(self):
