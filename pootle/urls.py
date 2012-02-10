@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     (r'^wikitrans/docs/(?P<docfile>.*)$', 'django.views.generic.simple.direct_to_template', {'template': "docs.html"}),
     # External Apps
     (r'^contact/', include('contact_form_i18n.urls')),
-    (r'^accounts/', include('pootle_profile.urls')),
+    (r'^wikitrans/accounts/', include('pootle_profile.urls')),
     (r'^wikitrans/articles/', include('wt_articles.urls')),
     # Pootle urls
     (r'^wikitrans/projects/', include('pootle_project.urls')),
