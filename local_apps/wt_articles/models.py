@@ -336,7 +336,7 @@ class SourceArticle(models.Model):
         """
         Gets the url corresponding to the Pootle project.
         """
-        url = '/projects/%s/' % self.get_project_code()
+        url = '/wikitrans/projects/%s/' % self.get_project_code()
 
         return iri_to_uri(url)
 
@@ -358,14 +358,14 @@ class SourceArticle(models.Model):
         """
         Gets the url for the page which creates a new Pootle project out of a source article
         """
-        url = '/articles/source/export/project/%s' % self.id
+        url = '/wikitrans/articles/source/export/project/%s' % self.id
         return iri_to_uri(url)
 
     def get_delete_pootle_project_url(self):
         """
         Gets the url for the page which deletes the Pootle project associated with the source article.
         """
-        url = '/articles/source/delete/project/%s' % self.id
+        url = '/wikitrans/articles/source/delete/project/%s' % self.id
         return iri_to_uri(url)
 
     def has_translation_request(self, target_language, translator):
