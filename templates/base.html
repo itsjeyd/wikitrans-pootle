@@ -63,7 +63,7 @@
                             <li class="menubaritem"><a href='{{ "/wikitrans/projects/"|l }}'>{% trans "Projects" %}</a></li>
                             <li class="menubaritem"><a href='{{ "/wikitrans/docs/index.html"|l }}'>{% trans "Help" %}</a></li>
                             {% if user.is_superuser %}
-                            <li class="menubaritem"><a href='{{ "/admin/"|l }}'>{% trans "Admin" %}</a></li>
+                            <li class="menubaritem"><a href='{{ "/wikitrans/admin/"|l }}'>{% trans "Admin" %}</a></li>
                             {% endif %}
                             {% if user.is_authenticated %}
                             <li class="menubaritem"><a href='{% filter l %}/accounts/{{ user.username }}/{% endfilter %} '>{% trans "My Account" %}</a></li>
