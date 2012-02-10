@@ -61,7 +61,7 @@ def get_last_action(translation_project):
         return ''
 
 def make_language_item(request, source_language, translation_project):
-    href = '/%s/%s/' % (translation_project.language.code, translation_project.project.code)
+    href = '/wikitrans/%s/%s/' % (translation_project.language.code, translation_project.project.code)
     projectstats = add_percentages(translation_project.getquickstats())
     mt_request_form = TranslationRequestForm(translation_project, initial={'translation_project': translation_project})
     info = {
