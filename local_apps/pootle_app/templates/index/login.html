@@ -8,7 +8,7 @@
 {% block content %}
 <div id="login" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
     <h2>{% trans 'Login to Pootle' %}</h2>
-    <form method="post" action='{{ "/accounts/login/"|l }}' 
+    <form method="post" action='{{ "/wikitrans/accounts/login/"|l }}'
       name="loginform" id="loginform">
     {% if form.errors %}
     <div id="site-message">
@@ -28,7 +28,7 @@
 
 {% if settings.CAN_REGISTER %}
 <h2 class="registerlink">{% trans "Don't have an account yet?" %}
-    <a href='{{ "/accounts/register"|l }}' title="{% trans 'Register.' %}">{% trans 'Register.' %}</a>
+    <a href='{{ "/wikitrans/accounts/register"|l }}' title="{% trans 'Register.' %}">{% trans 'Register.' %}</a>
 </h2>
 {% endif %}
 {% endblock content %}
