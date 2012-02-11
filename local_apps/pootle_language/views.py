@@ -49,7 +49,7 @@ def get_last_action(translation_project):
 
 def make_project_item(translation_project):
     project = translation_project.project
-    href = translation_project.pootle_path
+    href = '/wikitrans' + translation_project.pootle_path
     projectstats = add_percentages(translation_project.getquickstats())
     info = {
         'code': project.code,
