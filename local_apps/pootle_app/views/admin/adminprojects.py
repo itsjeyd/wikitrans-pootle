@@ -71,6 +71,6 @@ def view(request):
     model_args['title'] = _("Projects")
     model_args['formid'] = "projects"
     model_args['submitname'] = "changeprojects"
-    link = '/projects/%s/admin.html'
+    link = '/wikitrans/projects/%s/admin.html'
     return util.edit(request, 'admin/admin_general_projects.html', Project, model_args, link,
               form=ProjectForm, exclude='description', can_delete=True)
