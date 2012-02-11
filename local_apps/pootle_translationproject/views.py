@@ -189,7 +189,7 @@ def tp_admin_files(request, translation_project):
         'directory': translation_project.directory,
         }
     link = lambda instance: '<a href="%s/translate">%s</a>' % (
-        l(instance.pootle_path), instance.pootle_path[len(translation_project.pootle_path):])
+        l('/wikitrans' + instance.pootle_path), instance.pootle_path[len(translation_project.pootle_path):])
 
     return util.edit(request, 'translation_project/tp_admin_files.html', Store, model_args,
                      link, linkfield='pootle_path', queryset=queryset,
