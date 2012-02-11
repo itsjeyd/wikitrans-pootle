@@ -2,7 +2,7 @@
 {% load i18n baseurl %}
 
 {% block title %}{{ block.super }}: {% trans "Register" %}{% endblock %}
- 
+
 {% block content %}
 <div id="register" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
     <h2>{% trans "Register a New Pootle Account" %}</h2>
@@ -38,7 +38,7 @@
 </div>
 
 <h2 class="loginlink">{% trans "Already have an account?" %}
-    <a href='{{ "/accounts/login/"|l }}' title="{% trans "Log In." %}">{% trans "Log In." %}</a>
+    <a href='{{ "/wikitrans/accounts/login/"|l }}' title="{% trans "Log In." %}">{% trans "Log In." %}</a>
 </h2>
 {% endblock %}
 
