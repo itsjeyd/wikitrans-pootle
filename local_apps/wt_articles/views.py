@@ -109,7 +109,7 @@ def article_search(request, template_name="wt_articles/article_list.html"):
     }, context_instance=RequestContext(request))
 
 
-@login_required
+@login_required(login_url='/wikitrans/accounts/login/')
 def article_list(request, template_name="wt_articles/article_list.html"):
     # TODO: Request user-compatible articles; for now, we show all articles, since we are merging with Pootle.
     # articles = user_compatible_articles(request.user)
