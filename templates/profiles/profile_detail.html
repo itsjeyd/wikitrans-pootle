@@ -50,7 +50,7 @@
         {% endfor %}
     {% else %}
         {% ifequal user profile.user %}
-        <p><a href='{{ "/accounts/edit/"|l }}'>{% trans "No languages or projects selected. Choose yours now." %}</a></p>
+        <p><a href='{{ "/wikitrans/accounts/edit/"|l }}'>{% trans "No languages or projects selected. Choose yours now." %}</a></p>
         {% else %}
         {% trans "This user has not selected languages or projects yet." %}
         {% endifequal %}
@@ -79,6 +79,3 @@
 {% include "admin/rss_widget.html" %}
 {% endifequal %}{% endif %}
 {% endblock %}
-
-
-
