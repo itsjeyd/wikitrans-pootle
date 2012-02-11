@@ -30,6 +30,6 @@ def view(request):
     model_args['title'] = _("Languages")
     model_args['submitname'] = "changelanguages"
     model_args['formid'] = "languages"
-    link = '/%s/admin.html'
+    link = '/wikitrans/%s/admin.html'
     return util.edit(request, 'admin/admin_general_languages.html', Language, model_args, link,
                      form=MyLanguageAdminForm, can_delete=True)
