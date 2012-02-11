@@ -162,7 +162,7 @@ def download_link(request, path_obj):
             tooltip = _('Download file')
 
         return {
-            'href': '%s/download/' % path_obj.pootle_path,
+            'href': '%s/download/' % ('/wikitrans' + path_obj.pootle_path),
             'text': text,
             'title': tooltip,
             }

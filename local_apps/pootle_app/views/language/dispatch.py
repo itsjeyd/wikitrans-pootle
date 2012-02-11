@@ -71,7 +71,7 @@ def translate(request, path, **kwargs):
 
 def show_directory(request, directory_path, **kwargs):
     params = ProjectIndexState(request.GET, **kwargs).encode()
-    return url_manip.make_url(directory_path, params)
+    return url_manip.make_url('/wikitrans' + directory_path, params)
 
 def translation_project_admin(translation_project):
     return translation_project.directory.pootle_path + 'admin.html'
@@ -83,24 +83,29 @@ def open_translation_project(request, language_code, project_code):
     return '/%s/%s/' % (language_code, project_code)
 
 def download_zip(request, path_obj):
+    wt_prefix = '/wikitrans'
     if path_obj.is_dir:
-        current_folder = path_obj.pootle_path
+        current_folder = wt_prefix + path_obj.pootle_path
     else:
-        current_folder = path_obj.parent.pootle_path
+        current_folder = wt_prefix + path_obj.parent.pootle_path
     # FIXME: ugly URL, django.core.urlresolvers.reverse() should work
     archive_name = "%sexport/zip" % current_folder
     return archive_name
 
 def export(request, pootle_path, format):
-    return '%s/export/%s' % (pootle_path, format)
+    return '%s/export/%s' % ('/wikitrans' + pootle_path, format)
 
 def commit(request, path_obj):
     params = ProjectIndexState(request.GET).encode()
-    return  url_manip.make_url(path_obj.pootle_path + '/commit', params)
+    return  url_manip.make_url('/wikitrans'+
+                               path_obj.pootle_path +
+                               '/commit', params)
 
 def update(request, path_obj):
     params = ProjectIndexState(request.GET).encode()
-    return  url_manip.make_url(path_obj.pootle_path + '/update', params)
+    return  url_manip.make_url('/wikitrans' +
+                               path_obj.pootle_path +
+                               '/update', params)
 
 def terminology(request, path_obj):
     translation_project = path_obj.get_translationproject()
