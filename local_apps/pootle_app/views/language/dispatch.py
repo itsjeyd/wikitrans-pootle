@@ -63,10 +63,11 @@ def translate(request, path, **kwargs):
     # when the user clicks submit/skip/suggest on a translation
     # unit. But otherwise the store name is the last component of the
     # path name and we don't need to pass the 'store' GET variable.
+    wt_prefix = '/wikitrans'
     if path[-1] == '/':
-        path = path + 'translate.html'
+        path = wt_prefix + path + 'translate.html'
     else:
-        path = path + '/translate/'
+        path = wt_prefix + path + '/translate/'
     return url_manip.make_url(path, params.encode())
 
 def show_directory(request, directory_path, **kwargs):

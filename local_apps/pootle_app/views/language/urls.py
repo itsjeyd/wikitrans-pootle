@@ -22,7 +22,7 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('pootle_app.views.language.view',
-    (r'^(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/(?P<dir_path>(.*/)*)translate.html$',
+    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/(?P<dir_path>(.*/)*)translate.html$',
      'translate'),
     (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/(?P<file_path>.*)/commit$',
      'commit_file'),
