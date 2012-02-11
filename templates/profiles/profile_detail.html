@@ -29,7 +29,7 @@
         {% for language in profile.getquicklinks %}
         <dl class="languagelist">
             <dt class="language">
-                <a href="{% filter l %}/wikitrans/{{ language.code }}/{% endfilter %}">{{ language.name }}</a>
+                <a href="/wikitrans{% filter l %}/{{ language.code }}/{% endfilter %}">{{ language.name }}</a>
                 {% ifequal user profile.user %}
                 {% if language.islangadmin %}
                     <span class="adminlink">(<a href="{% filter l %}/{{ language.code }}/admin.html{% endfilter %}">{% trans "Admin" %}</a>)</span>
@@ -38,7 +38,7 @@
             </dt>
             {% for project in language.projects %}
             <dd>
-            <a href="{% filter l %}/wikitrans/{{ language.code }}/{{ project.code }}/{% endfilter %}">{{ project.name }}</a>
+            <a href="/wikitrans{% filter l %}/{{ language.code }}/{{ project.code }}/{% endfilter %}">{{ project.name }}</a>
             {% ifequal user profile.user %}
             {% if project.isprojectadmin %}
                 <span class="adminlink">(<a href="{% filter l %}/{{ language.code }}/{{ project.code }}/admin_permissions.html{% endfilter %}">{% trans "Permissions" %}</a> | <a href="{% filter l %}/{{ language.code }}/{{ project.code }}/admin_files.html{% endfilter %}">{% trans "Files" %}</a>)</span>
