@@ -3,24 +3,24 @@
 <div id="submenu" lang="{{ LANGUAGE_CODE }}">
     <div id="submenu-tabs">
         {% ifequal user profile.user %}
-        <a href='{% filter l %}/accounts/{{ user.username }} {% endfilter %}' class="dashboard" title="{% trans 'Overview of your account' %}">{% trans "Dashboard" %}</a>
-        <a href='{{ "/articles/list/"|l }}' class="articles" title="{% trans 'Manage articles' %}">{% trans "Articles" %}</a>
-        <a href='{{ "/articles/request_translation/"|l }}' class="request" title="{% trans 'Request an article' %}">{% trans "Request" %}</a>
-        <a href='{{ "/accounts/edit/"|l }}' class="settings" title="{% trans 'Configure your translation preferences' %}">{% trans "Settings" %}</a>
-        <a href='{{ "/accounts/personal/edit/"|l }}' class="profile" title="{% trans 'Change your personal information' %}">{% trans "Profile" %}</a>
-        <a href='{{ "/accounts/password/change/"|l }}' class="password" title="{% trans 'Change your password' %}">{% trans "Password" %}</a>
+        <a href='{% filter l %}/wikitrans/accounts/{{ user.username }} {% endfilter %}' class="dashboard" title="{% trans 'Overview of your account' %}">{% trans "Dashboard" %}</a>
+        <a href='{{ "/wikitrans/articles/list/"|l }}' class="articles" title="{% trans 'Manage articles' %}">{% trans "Articles" %}</a>
+        <a href='{{ "/wikitrans/articles/request_translation/"|l }}' class="request" title="{% trans 'Request an article' %}">{% trans "Request" %}</a>
+        <a href='{{ "/wikitrans/accounts/edit/"|l }}' class="settings" title="{% trans 'Configure your translation preferences' %}">{% trans "Settings" %}</a>
+        <a href='{{ "/wikitrans/accounts/personal/edit/"|l }}' class="profile" title="{% trans 'Change your personal information' %}">{% trans "Profile" %}</a>
+        <a href='{{ "/wikitrans/accounts/password/change/"|l }}' class="password" title="{% trans 'Change your password' %}">{% trans "Password" %}</a>
         {% endifequal %}
         {% comment %}
         Oh yeah, Django doesn't allow if a == b or not c expressions,
         so we are forced to do this stupid things.
         {% endcomment %}
         {% if not profile.user %}
-        <a href='{% filter l %}/accounts/{{ user.username }} {% endfilter %}' class="dashboard" title="{% trans 'Overview of your account' %}">{% trans "Dashboard" %}</a>
-        <a href='{{ "/articles/list/"|l }}' class="articles" title="{% trans 'Manage articles' %}">{% trans "Articles" %}</a>
-        <a href='{{ "/articles/request_translation/"|l }}' class="request" title="{% trans 'Request an article' %}">{% trans "Request" %}</a>
-        <a href='{{ "/accounts/edit/"|l }}' class="settings" title="{% trans 'Configure your translation preferences' %}">{% trans "Settings" %}</a>
-        <a href='{{ "/accounts/personal/edit/"|l }}' class="profile" title="{% trans 'Change your personal information' %}">{% trans "Profile" %}</a>
-        <a href='{{ "/accounts/password/change/"|l }}' class="password" title="{% trans 'Change your password' %}">{% trans "Password" %}</a>
+        <a href='{% filter l %}/wikitrans/accounts/{{ user.username }} {% endfilter %}' class="dashboard" title="{% trans 'Overview of your account' %}">{% trans "Dashboard" %}</a>
+        <a href='{{ "/wikitrans/articles/list/"|l }}' class="articles" title="{% trans 'Manage articles' %}">{% trans "Articles" %}</a>
+        <a href='{{ "/wikitrans/articles/request_translation/"|l }}' class="request" title="{% trans 'Request an article' %}">{% trans "Request" %}</a>
+        <a href='{{ "/wikitrans/accounts/edit/"|l }}' class="settings" title="{% trans 'Configure your translation preferences' %}">{% trans "Settings" %}</a>
+        <a href='{{ "/wikitrans/accounts/personal/edit/"|l }}' class="profile" title="{% trans 'Change your personal information' %}">{% trans "Profile" %}</a>
+        <a href='{{ "/wikitrans/accounts/password/change/"|l }}' class="password" title="{% trans 'Change your password' %}">{% trans "Password" %}</a>
         {% endif %}
     </div>
 </div>
