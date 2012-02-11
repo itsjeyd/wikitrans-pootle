@@ -184,7 +184,7 @@ def project_admin(request, project_code):
                              'name': current_project.fullname}
     model_args['formid'] = "translation-projects"
     model_args['submitname'] = "changetransprojects"
-    link = lambda instance: '<a href="%s">%s</a>' % (l(instance.pootle_path + 'admin_permissions.html'), instance.language)
+    link = lambda instance: '<a href="/wikitrans%s">%s</a>' % (l(instance.pootle_path + 'admin_permissions.html'), instance.language)
     return util.edit(request, 'project/project_admin.html', TranslationProject, model_args, link, linkfield="language",
                      queryset=queryset, can_delete=True, form=TranslationProjectForm, formset=TranslationProjectFormSet)
 
