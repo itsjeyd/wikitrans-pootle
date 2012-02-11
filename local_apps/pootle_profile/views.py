@@ -82,7 +82,7 @@ def edit_personal_info(request):
 def redirect_after_login(request):
     redirect_to = request.REQUEST.get(auth.REDIRECT_FIELD_NAME, None)
     if not redirect_to or '://' in redirect_to or ' ' in redirect_to:
-        redirect_to = iri_to_uri('/accounts/%s/' % urlquote(request.user.username))
+        redirect_to = iri_to_uri('/wikitrans/accounts/%s/' % urlquote(request.user.username))
     return redirect(redirect_to)
 
 def language_list(request):
