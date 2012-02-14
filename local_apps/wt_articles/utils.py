@@ -1,15 +1,20 @@
-from goopytrans import translate as gtranslate
-from apyrtium import translate as atranslate
 import nltk.data
 
 from django.utils.safestring import SafeUnicode
 
-from wt_languages.models import TARGET_LANGUAGE, SOURCE_LANGUAGE, BOTH
-from wt_languages.models import LanguageCompetancy
-from wt_articles.models import SourceArticle, SourceSentence, TranslatedArticle, TranslatedSentence
+from apyrtium import translate as atranslate
+from goopytrans import translate as gtranslate
 
-from wt_articles import GOOGLE,APERTIUM
-from wt_articles import HUMAN,DEFAULT_TRANNY
+from wt_articles.models import SourceArticle
+from wt_articles.models import SourceSentence
+from wt_articles.models import TranslatedArticle
+from wt_articles.models import TranslatedSentence
+from wt_articles import APERTIUM
+from wt_articles import GOOGLE
+from wt_languages.models import LanguageCompetancy
+from wt_languages.models import SOURCE_LANGUAGE
+from wt_languages.models import TARGET_LANGUAGE
+
 
 class Translator:
     """
@@ -60,7 +65,6 @@ def sentences_as_html(sentences):
 
 def sentences_as_html_span(sentences):
     format_span = lambda sid, text: u"<span id='ss_%d'>%s</span>" % (sid, text)
-    # span_sentences = [ format_span(s.segment_id, s.text) for s in sentences ]
     for s in sentences:
         s.text = format_span(s.segment_id, s.text)
 
@@ -86,7 +90,8 @@ def all_articles():
 def _user_compatible_articles(user, article_model, language_direction):
     profile = user.get_profile()
     languages = set([lc.language for lc in
-                     user.languagecompetancy_set.exclude(translation_options=language_direction)])
+                     user.languagecompetancy_set.exclude(translation_options=
+                                                         language_direction)])
 
     languages.add(profile.native_language)
     languages.add(profile.display_language)
