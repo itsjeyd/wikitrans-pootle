@@ -30,7 +30,7 @@
             {% for item in languages %}
 	    {% ifnotequal item.total 0 %}
             <tr class="{% cycle 'even' 'odd' %}">
-                <td class="language"><a href="{% filter l %}/{{ item.code }}/{% endfilter %}">{{ item.name }}</a></td>
+                <td class="language"><a href="/wikitrans{% filter l %}/{{ item.code }}/{% endfilter %}">{{ item.name }}</a></td>
                 <td>
                     <div class="sortkey">{{ item.transper }}</div>
                     <div class="graph" title="{{ item.completed_title }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
@@ -42,7 +42,7 @@
                         <div class="untranslated" style="{% if LANGUAGE_BIDI %}right{% else %}left{% endif %}: {{ item.transper|add:item.fuzzyper }}px; width: {{ item.untransper }}px"></div>
                         {% endif %}
                     </div>
-                </td> 
+                </td>
                 <td>{{ item.lastactivity }}</td>
             </tr>
 	    {% endifnotequal %}
@@ -76,7 +76,7 @@
                         <div class="untranslated" style="{% if LANGUAGE_BIDI %}right{% else %}left{% endif %}: {{ item.transper|add:item.fuzzyper }}px; width: {{ item.untransper }}px"></div>
                         {% endif %}
                     </div>
-                </td> 
+                </td>
                 <td>{{ item.lastactivity }}</td>
             </tr>
             {% endfor %}
