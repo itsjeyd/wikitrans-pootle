@@ -508,7 +508,7 @@ def add_target_languages(request, aid, template_name="wt_articles/add_target_lan
                 languages = target_language_form.cleaned_data['languages']
 
                 article.add_target_languages(languages)
-                return HttpResponseRedirect('/articles/list')
+                return HttpResponseRedirect('/wikitrans/articles/list')
         else:
             target_language_form = AddTargetLanguagesForm(article)
 

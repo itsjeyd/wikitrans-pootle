@@ -50,7 +50,7 @@
 					    	<select id="ddlTargets_{{ article.id }}">
 					    		<option id="_blank"></option>
 					    		{% for language in article.get_target_languages %}
-					    		<option id="{{ language.code }}" onclick="location.href='/{{ language.code }}/{{ article.get_project_code }}/'">{{ language }}</option>
+					    		<option id="{{ language.code }}" onclick="location.href='/wikitrans/{{ language.code }}/{{ article.get_project_code }}/'">{{ language }}</option>
 					    		{% endfor %}
 					    		<option id="_divider">--------</option>
 					    		<option id="_add" onclick="location.href='{{ article.get_add_target_language_url }}'">Add Language</option>

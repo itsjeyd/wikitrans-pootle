@@ -361,7 +361,7 @@ class SourceArticle(models.Model):
         """
         Gets the url that allows the user to add additional target languages.
         """
-        url = '/articles/translate/languages/add/%s' % self.id
+        url = '/wikitrans/articles/translate/languages/add/%s' % self.id
         return iri_to_uri(url)
 
     def get_create_pootle_project_url(self):
