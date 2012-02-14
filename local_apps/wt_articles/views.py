@@ -48,6 +48,7 @@ if "notification" in settings.INSTALLED_APPS:
 else:
     notification = None
 
+
 def landing(request, template_name="wt_articles/landing.html"):
     featured_translation = latest_featured_article()
     featured_text = u'No translations are featured'
@@ -62,7 +63,8 @@ def landing(request, template_name="wt_articles/landing.html"):
     }, context_instance=RequestContext(request))
 
 
-def show_source(request, title, source, aid=None, template_name="wt_articles/show_article.html"):
+def show_source(request, title, source, aid=None,
+                template_name="wt_articles/show_article.html"):
     title = unquote_plus(title)
 
     if aid != None:
@@ -80,7 +82,9 @@ def show_source(request, title, source, aid=None, template_name="wt_articles/sho
         "article_text": article_text,
     }, context_instance=RequestContext(request))
 
-def show_translated(request, title, source, target, aid=None, template_name="wt_articles/show_article.html"):
+
+def show_translated(request, title, source, target, aid=None,
+                    template_name="wt_articles/show_article.html"):
     title = unquote_plus(title)
     if aid != None:
         ta_set = TranslatedArticle.objects.filter(id=aid)
@@ -97,6 +101,7 @@ def show_translated(request, title, source, target, aid=None, template_name="wt_
         "article_text": article_text,
     }, context_instance=RequestContext(request))
 
+
 def article_search(request, template_name="wt_articles/article_list.html"):
     if request.method == "POST" and request.POST.has_key('search'):
         name = request.POST['search']
@@ -111,8 +116,9 @@ def article_search(request, template_name="wt_articles/article_list.html"):
 
 @login_required(login_url='/wikitrans/accounts/login/')
 def article_list(request, template_name="wt_articles/article_list.html"):
-    # TODO: Request user-compatible articles; for now, we show all articles, since we are merging with Pootle.
-    # articles = user_compatible_articles(request.user)
+    # TODO: Request user-compatible articles; for now, we show all
+    # articles, since we are merging with Pootle. articles =
+    # user_compatible_articles(request.user)
     articles = all_source_articles()
     from django.utils.encoding import smart_unicode
 
@@ -122,8 +128,10 @@ def article_list(request, template_name="wt_articles/article_list.html"):
     return render_to_response(template_name, content_dict,
                               context_instance=RequestContext(request))
 
+
 @login_required
-def fix_article_list(request, template_name="wt_articles/fix_article_list.html"):
+def fix_article_list(request,
+                     template_name="wt_articles/fix_article_list.html"):
     articles = user_compatible_articles(request.user)
     from django.utils.encoding import smart_unicode
 
@@ -131,8 +139,10 @@ def fix_article_list(request, template_name="wt_articles/fix_article_list.html")
         "articles": articles,
     }, context_instance=RequestContext(request))
 
+
 @login_required
-def translatable_list(request, template_name="wt_articles/article_list.html"):
+def translatable_list(request,
+                      template_name="wt_articles/article_list.html"):
     import copy
     user = request.user
     source_articles = user_compatible_source_articles(request.user)
@@ -142,7 +152,8 @@ def translatable_list(request, template_name="wt_articles/article_list.html"):
         for pair in lang_pairs:
             article = copy.deepcopy(sa)
             article.target = pair[0]
-            article.link = u'/articles/translate/new/%s' % (article.get_relative_url(pair[1]))
+            article.link = (u'/articles/translate/new/%s' %
+                            (article.get_relative_url(pair[1])))
             articles.append(article)
 
     return render_to_response(template_name, {
@@ -150,8 +161,10 @@ def translatable_list(request, template_name="wt_articles/article_list.html"):
         "translatable": True,
     }, context_instance=RequestContext(request))
 
+
 @login_required
-def posteditable_list(request, template_name="wt_articles/article_list.html"):
+def posteditable_list(request,
+                      template_name="wt_articles/article_list.html"):
     import copy
     user = request.user
     target_articles = user_compatible_target_articles(request.user)
@@ -161,7 +174,8 @@ def posteditable_list(request, template_name="wt_articles/article_list.html"):
         for pair in lang_pairs:
             article = copy.deepcopy(ta)
             article.target = pair[0]
-            article.link = u'/articles/translate/postedit/%s' % (article.get_relative_url())
+            article.link = (u'/articles/translate/postedit/%s' %
+                            (article.get_relative_url()))
             articles.append(article)
 
     return render_to_response(template_name, {
@@ -169,11 +183,13 @@ def posteditable_list(request, template_name="wt_articles/article_list.html"):
         "translatable": True,
     }, context_instance=RequestContext(request))
 
+
 @login_required
-def translate_from_scratch(request, source, target, title, aid, template_name="wt_articles/translate_form.html"):
+def translate_from_scratch(request, source, target, title, aid,
+                           template_name="wt_articles/translate_form.html"):
     """
-    Loads a source article by provided article id (aid) and generates formsets
-    to contain each sentence in the requested translation.
+    Loads a source article by provided article id (aid) and generates
+    formsets to contain each sentence in the requested translation.
     """
     sa_set = SourceArticle.objects.filter(id=aid)
     if len(sa_set) < 1:
@@ -183,7 +199,8 @@ def translate_from_scratch(request, source, target, title, aid, template_name="w
                                   context_instance=RequestContext(request))
     article = sa_set[0]
     ss_list = article.sourcesentence_set.all()
-    TranslatedSentenceSet = formset_factory(TranslatedSentenceMappingForm, extra=0)
+    TranslatedSentenceSet = formset_factory(TranslatedSentenceMappingForm,
+                                            extra=0)
 
     if request.method == "POST":
         formset = TranslatedSentenceSet(request.POST, request.FILES)
@@ -199,7 +216,7 @@ def translate_from_scratch(request, source, target, title, aid, template_name="w
                                         translated_by=request.user.username,
                                         translation_date=datetime.now(),
                                         language=target,
-                                        best=True, ### TODO figure something better out
+                                        best=True,
                                         end_of_paragraph=ss.end_of_paragraph)
                 ts_list.append(ts)
             ta.article = ss.article
@@ -223,12 +240,14 @@ def translate_from_scratch(request, source, target, title, aid, template_name="w
         "title": article.title,
     }, context_instance=RequestContext(request))
 
+
 @login_required
-def translate_post_edit(request, source, target, title, aid, template_name="wt_articles/translate_form.html"):
+def translate_post_edit(request, source, target, title, aid,
+                        template_name="wt_articles/translate_form.html"):
     """
-    Loads a translated article by its article id (aid) and generates formsets
-    with the source article and translated sentence. It then generates a new
-    translated article out of the input from the user
+    Loads a translated article by its article id (aid) and generates
+    formsets with the source article and translated sentence. It then
+    generates a new translated article out of the input from the user
     """
     ta_set = TranslatedArticle.objects.filter(id=aid)
     if len(ta_set) < 1:
@@ -239,35 +258,11 @@ def translate_post_edit(request, source, target, title, aid, template_name="wt_a
     translated_article = ta_set[0]
     ts_list = translated_article.sentences.all()
     ss_list = translated_article.article.sourcesentence_set.all()
-    TranslatedSentenceSet = formset_factory(TranslatedSentenceMappingForm, extra=0)
+    TranslatedSentenceSet = formset_factory(TranslatedSentenceMappingForm,
+                                            extra=0)
 
     if request.method == "POST":
         formset = TranslatedSentenceSet(request.POST, request.FILES)
-#        if formset.is_valid():
-#            ts_list = []
-#            ta = TranslatedArticle()
-#            for form in formset.forms:
-#                ss = form.cleaned_data['source_sentence']
-#                text = form.cleaned_data['text']
-#                ts = TranslatedSentence(segment_id=ss.segment_id,
-#                                        source_sentence=ss,
-#                                        text=text,
-#                                        translated_by=request.user.username,
-#                                        translation_date=datetime.now(),
-#                                        language=target,
-#                                        best=True, ### TODO figure something better out
-#                                        end_of_paragraph=ss.end_of_paragraph)
-#                ts_list.append(ts)
-#            ta.article = ss.article
-#            ta.title = ss.article.title
-#            ta.timestamp = datetime.now()
-#            ta.language = target
-#            ta.save()
-#            for ts in ts_list:
-#                ts.save()
-#            ta.sentences = ts_list
-#            ta.save()
-#            return HttpResponseRedirect(ta.get_absolute_url())
     else:
         initial_ts_set = [{'text': s.text} for s in ts_list]
         formset = TranslatedSentenceSet(initial=initial_ts_set)
@@ -282,7 +277,8 @@ def translate_post_edit(request, source, target, title, aid, template_name="wt_a
 
 
 @login_required
-def fix_article(request, aid, form_class=DummyFixArticleForm, template_name="wt_articles/fix_article.html"):
+def fix_article(request, aid, form_class=DummyFixArticleForm,
+                template_name="wt_articles/fix_article.html"):
     """
     aid in this context is the source article id
     """
@@ -312,16 +308,20 @@ def fix_article(request, aid, form_class=DummyFixArticleForm, template_name="wt_
 
             return HttpResponseRedirect(article.get_absolute_url())
     else:
-        # TODO: For some reason, FixArticleForm worked in the original WikiTrans, but is no longer working when merged with Pootle.
-        # fix_form = form_class(instance=article, initial={'sentences': article.sentences_to_lines()})
-
-        dummy_fix_form = DummyFixArticleForm(initial={'sentences': article.sentences_to_lines(), 'title': article.title})
+        # TODO: For some reason, FixArticleForm worked in the original
+        # WikiTrans, but is no longer working when merged with Pootle.
+        # fix_form = form_class(instance=article,
+        # initial = {'sentences': article.sentences_to_lines()}
+        dummy_fix_form = DummyFixArticleForm(initial=
+                                             {'sentences':
+                                                  article.sentences_to_lines(),
+                                              'title': article.title})
 
     return render_to_response(template_name, {
         "article": article,
-        # "fix_form": fix_form
         "fix_form": dummy_fix_form
     }, context_instance=RequestContext(request))
+
 
 @login_required
 def request_article(request,
@@ -339,13 +339,6 @@ def request_article(request,
                 article_of_interest.save()
                 article_dict = query_text_rendered(title,
                                                    language=title_language.code)
-                # source_article = SourceArticle(title=title,
-                #                                language=title_language,
-                #                                source_text=article_dict['html'],
-                #                                timestamp=datetime.now(),
-                #                                doc_id=article_dict['revid'])
-                # source_article.save()
-
                 request_form = form_class()
                 return {"article_requested": True,
                         "request_form": request_form}
@@ -354,8 +347,10 @@ def request_article(request,
         return {"article_requested": False,
                 "request_form": request_form}
 
+
 @login_required
-def source_to_po(request, aid, template_name="wt_articles/source_export_po.html"):
+def source_to_po(request, aid,
+                 template_name="wt_articles/source_export_po.html"):
     """
     aid in this context is the source article id
     """
@@ -376,68 +371,11 @@ def source_to_po(request, aid, template_name="wt_articles/source_export_po.html"
         "title": article.title
     }, context_instance=RequestContext(request))
 
-# # Deprecated. Added to SourceArticle class in models.py.
-#def _source_to_pootle_project(article):
-#    import logging
-#    from django.utils.encoding import smart_str
-#    from pootle_app.models.signals import post_template_update
-#
-#
-#    # Fetch the source_language
-#    sl_set = Language.objects.filter(code = article.language)
-#
-#    if len(sl_set) < 1:
-#        return false
-#
-#    source_language = sl_set[0]
-#
-#     # Construct the project
-#    project = Project()
-#    project.fullname = u"%s:%s" % (article.language, article.title)
-#    project.code = project.fullname.replace(" ", "_").replace(":", "_")
-#    # PO filetype
-#    #project.localfiletype = "po" # filetype_choices[0]
-#
-#    project.source_language = source_language
-#  # Save the project
-#    project.save()
-#
-#    templates_language = Language.objects.filter(code='templates')[0]
-#
-#    # Check to see if the templates language exists. If not, add it.
-#    #if not project.language_exists(templates_language):
-#    if len(TranslationProject.objects.filter(language = templates_language, id=project.id)) == 0:
-#        project.add_language(templates_language)
-#        project.save()
-#
-#    #code copied for wr_articles
-#    logging.debug ( "project saved")
-#    # Export the article to .po and store in the templates "translation project". This will be used to generate translation requests for other languages.
-#    templatesProject = project.get_template_translationproject()
-#    po = article.sentences_to_po()
-#    poFilePath = "%s/article.pot" % (templatesProject.abs_real_path)
-#
-#    oldstats = templatesProject.getquickstats()
-#
-#    # Write the file
-#    with open(poFilePath, 'w') as f:
-#        f.write(smart_str(po.__str__()))
-#
-#    # Force the project to scan for changes.
-#    templatesProject.scan_files()
-#    templatesProject.update(conservative=False)
-#
-#    # Log the changes
-#    newstats = templatesProject.getquickstats()
-#    post_template_update.send(sender=templatesProject, oldstats=oldstats, newstats=newstats)
-#
-#
-#
-#    return project
 
 @login_required
 def delete_pootle_project(request, aid):
-# TODO: Display notification on page that the project has been deleted.
+# TODO: Display notification on page that the project has been
+# deleted.
     """
     Deletes a pootle Project by id (aid).
     """
@@ -454,10 +392,12 @@ def delete_pootle_project(request, aid):
     # Display the article list.
     return article_list(request)
 
+
 @login_required
 def create_pootle_project(request, aid):
-# TODO: Display notification on page that the project has been created.
-# def create_pootle_project(request, aid, template_name="wt_articles/source_export_project.html"):
+# TODO: Display notification on page that the project has been
+# created. def create_pootle_project(request, aid,
+# template_name="wt_articles/source_export_project.html"):
     """
     Converts an article to a Pootle project by id (aid).
     """
@@ -474,17 +414,10 @@ def create_pootle_project(request, aid):
     # Display the article list
     return article_list(request)
 
-#    if no_match or project == False:
-#        return render_to_response(template_name,
-#                                  {"no_match": True},
-#                                  context_instance=RequestContext(request))
-#    else:
-#        return render_to_response(template_name,
-#                                  {"project_name": project.fullname},
-#                                  context_instance=RequestContext(request))
 
 @login_required
-def add_target_languages(request, aid, template_name="wt_articles/add_target_languages.html"):
+def add_target_languages(request, aid,
+                         template_name="wt_articles/add_target_languages.html"):
     """
     Adds one or more target language translations to a source article.
     """
@@ -515,6 +448,7 @@ def add_target_languages(request, aid, template_name="wt_articles/add_target_lan
         content_dict['target_language_form'] = target_language_form
     return render_to_response(template_name, content_dict,
                               context_instance=RequestContext(request))
+
 
 def update_articles(request):
     import os
