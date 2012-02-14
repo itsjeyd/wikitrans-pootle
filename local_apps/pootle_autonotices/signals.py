@@ -38,15 +38,15 @@ def new_object(created, message, parent):
 def new_language(sender, instance, created=False, raw=False, **kwargs):
     if raw:
         return
-    message = 'New language <a href="%s">%s</a> created.' % (instance.get_absolute_url(), instance.fullname)
+    message = 'New language <a href="/wikitrans%s">%s</a> created.' % (instance.get_absolute_url(), instance.fullname)
     new_object(created, message, instance.directory.parent)
 
 def new_project(sender, instance, created=False, raw=False, **kwargs):
     if raw:
         return
-    message = 'New project <a href="%s">%s</a> created.' % (instance.get_absolute_url(), instance.fullname)
+    message = 'New project <a href="/wikitrans%s">%s</a> created.' % (instance.get_absolute_url(), instance.fullname)
     new_object(created, message, parent=Directory.objects.root)
-    
+
 def delete_project(sender, instance, created=False, raw=False, **kwargs):
     if raw:
 		return
@@ -61,7 +61,7 @@ def new_user(sender, instance, created=False, raw=False, **kwargs):
     # installing Pootle
 
     try:
-        message = 'New user <a href="%s">%s</a> registered.' % (instance.get_profile().get_absolute_url(), instance.username)
+        message = 'New user <a href="/wikitrans%s">%s</a> registered.' % (instance.get_profile().get_absolute_url(), instance.username)
         new_object(created, message, parent=Directory.objects.root)
     except:
         pass
@@ -69,11 +69,11 @@ def new_user(sender, instance, created=False, raw=False, **kwargs):
 def new_translationproject(sender, instance, created=False, raw=False, **kwargs):
     if raw:
         return
-    message = 'New project <a href="%s">%s</a> added to language <a href="%s">%s</a>.' % (
+    message = 'New project <a href="/wikitrans%s">%s</a> added to language <a href="/wikitrans%s">%s</a>.' % (
         instance.get_absolute_url(), instance.project.fullname,
         instance.language.get_absolute_url(), instance.language.fullname)
     new_object(created, message, instance.language.directory)
-    message = 'New language <a href="%s">%s</a> added to project <a href="%s">%s</a>.' % (
+    message = 'New language <a href="/wikitrans%s">%s</a> added to project <a href="/wikitrans%s">%s</a>.' % (
         instance.get_absolute_url(), instance.language.fullname,
         instance.project.get_absolute_url(), instance.project.fullname)
     new_object(created, message, instance.project.directory)
@@ -93,7 +93,7 @@ def unit_updated(sender, instance, raw=False, **kwargs):
             # by the end of this we will be 100%
             translation_project = store.translation_project
             directory = translation_project.directory
-            message = '<a href="%s">%s</a> fully translated</a> <br />' % (store.get_absolute_url(), store.name)
+            message = '<a href="%s">/wikitrans%s</a> fully translated</a> <br />' % (store.get_absolute_url(), store.name)
             quickstats = translation_project.getquickstats()
             quickstats['translated'] += 1
             if dbcopy.isfuzzy():
@@ -109,7 +109,7 @@ def updated_from_template(sender, oldstats, newstats, **kwargs):
     if oldstats == newstats:
         # nothing changed, no need to report
         return
-    message = 'Updated <a href="%s">%s</a> to latest template <br />' % (sender.get_absolute_url(), sender.fullname)
+    message = 'Updated <a href="/wikitrans%s">%s</a> to latest template <br />' % (sender.get_absolute_url(), sender.fullname)
     message += stats_message("Before update", oldstats) + " <br />"
     message += stats_message("After update", newstats) + " <br />"
     new_object(True, message, sender.directory)
@@ -125,7 +125,7 @@ def updated_from_version_control(sender, oldstats, remotestats, newstats, **kwar
         # nothing changed, no need to report
         return
 
-    message = 'Updated <a href="%s">%s</a> from version control <br />' % (sender.get_absolute_url(), sender.fullname)
+    message = 'Updated <a href="/wikitrans%s">%s</a> from version control <br />' % (sender.get_absolute_url(), sender.fullname)
     message += stats_message("Before update", oldstats) + " <br />"
     if not remotestats == newstats:
         message += stats_message("Remote copy", remotestats) + " <br />"
@@ -133,7 +133,7 @@ def updated_from_version_control(sender, oldstats, remotestats, newstats, **kwar
     new_object(True, message, directory)
 
 def committed_to_version_control(sender, store, stats, user, success, **kwargs):
-    message = '<a href="%s">%s</a> committed <a href="%s">%s</a> to version control' % (
+    message = '<a href="/wikitrans%s">%s</a> committed <a href="/wikitrans%s">%s</a> to version control' % (
         user.get_absolute_url(), user.username,
         store.get_absolute_url(), store.pootle_path)
     message = stats_message(message, stats)
@@ -151,11 +151,11 @@ def file_uploaded(sender, oldstats, user, newstats, archive, **kwargs):
         return
 
     if archive:
-        message = '<a href="%s">%s</a> uploaded an archive to <a href="%s">%s</a> <br />' % (
+        message = '<a href="/wikitrans%s">%s</a> uploaded an archive to <a href="/wikitrans%s">%s</a> <br />' % (
             get_profile(user).get_absolute_url(), user.username,
             sender.get_absolute_url(), sender.fullname)
     else:
-        message = '<a href="%s">%s</a> uploaded a file to <a href="%s">%s</a> <br />' % (
+        message = '<a href="/wikitrans%s">%s</a> uploaded a file to <a href="/wikitrans%s">%s</a> <br />' % (
             get_profile(user).get_absolute_url(), user.username,
             sender.get_absolute_url(), sender.fullname)
 
@@ -169,7 +169,7 @@ def file_uploaded(sender, oldstats, user, newstats, archive, **kwargs):
 def user_joined_project(sender, instance, action, reverse, model, pk_set, **kwargs):
     if action == 'post_add' and not reverse:
         for project in instance.projects.filter(pk__in=pk_set).iterator():
-            message = 'user <a href="%s">%s</a> joined project <a href="%s">%s</a>' % (
+            message = 'user <a href="/wikitrans%s">%s</a> joined project <a href="/wikitrans%s">%s</a>' % (
                 instance.get_absolute_url(), instance.user.username,
                 project.get_absolute_url(), project.fullname)
             new_object(True, message, project.directory)
@@ -177,7 +177,7 @@ def user_joined_project(sender, instance, action, reverse, model, pk_set, **kwar
 def user_joined_language(sender, instance, action, reverse, model, pk_set, **kwargs):
     if action == 'post_add' and not reverse:
         for project in instance.languages.filter(pk__in=pk_set).iterator():
-            message = 'user <a href="%s">%s</a> joined language <a href="%s">%s</a>' % (
+            message = 'user <a href="/wikitrans%s">%s</a> joined language <a href="/wikitrans%s">%s</a>' % (
                 instance.get_absolute_url(), instance.user.username,
                 project.get_absolute_url(), project.fullname)
             new_object(True, message, project.directory)
