@@ -9,11 +9,14 @@ urlpatterns = patterns('wt_articles.views',
     url(r'^$', 'landing', name="articles_landing"),
 
     # Export projects
-    url(r'^source/export/project/(?P<aid>\d+)', 'create_pootle_project', name="create_pootle_project"),
-    url(r'^source/delete/project/(?P<aid>\d+)', 'delete_pootle_project', name="delete_pootle_project"),
+    url(r'^source/export/project/(?P<aid>\d+)', 'create_pootle_project',
+        name="create_pootle_project"),
+    url(r'^source/delete/project/(?P<aid>\d+)', 'delete_pootle_project',
+        name="delete_pootle_project"),
 
     # Export articles
-    url(r'^source/export/po/(?P<aid>\d+)', 'source_to_po', name="source_to_po"),
+    url(r'^source/export/po/(?P<aid>\d+)', 'source_to_po',
+        name="source_to_po"),
 
     url(r'^source/(?P<source>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
         'show_source', name="articles_show_source"),
@@ -36,7 +39,8 @@ urlpatterns = patterns('wt_articles.views',
         'translate_from_scratch', name="translate_from_scratch"),
     url(r'^translate/postedit/(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
         'translate_post_edit', name="translate_post_edit"),
-    url(r'^translate/languages/add/(?P<aid>\d+)', 'add_target_languages', name="add_target_languages"),
+    url(r'^translate/languages/add/(?P<aid>\d+)', 'add_target_languages',
+        name="add_target_languages"),
 
     ### Translation request related stuff
     url(r'^request/', 'request_article', name="request_article"),
