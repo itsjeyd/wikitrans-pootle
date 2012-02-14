@@ -139,4 +139,4 @@ def login(request):
 def logout(request):
     from django.contrib.auth import logout
     logout(request)
-    return redirect('/')
+    return redirect('/wikitrans/')
