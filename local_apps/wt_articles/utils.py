@@ -5,12 +5,12 @@ from django.utils.safestring import SafeUnicode
 from apyrtium import translate as atranslate
 from goopytrans import translate as gtranslate
 
+from wt_articles import GOOGLE
+from wt_articles import APERTIUM
 from wt_articles.models import SourceArticle
 from wt_articles.models import SourceSentence
 from wt_articles.models import TranslatedArticle
 from wt_articles.models import TranslatedSentence
-from wt_articles import APERTIUM
-from wt_articles import GOOGLE
 from wt_languages.models import LanguageCompetancy
 from wt_languages.models import SOURCE_LANGUAGE
 from wt_languages.models import TARGET_LANGUAGE
