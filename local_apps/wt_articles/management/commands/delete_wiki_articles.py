@@ -1,9 +1,7 @@
-from django.core.management.base import NoArgsCommand, CommandError
-from datetime import datetime
-from wikipydia import query_text_rendered, query_text_raw
+from django.core.management.base import NoArgsCommand
 
-from wt_articles.models import ArticleOfInterest, SourceArticle, TranslationRequest
-from wt_articles import DEFAULT_TRANNY
+from wt_articles.models import SourceArticle
+
 
 class Command(NoArgsCommand):
     help = "Delete all articles"
@@ -12,6 +10,5 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         articles_of_interest = SourceArticle.objects.all()
-        for article in articles_of_interest:                        
+        for article in articles_of_interest:
             article.delete()
-            
