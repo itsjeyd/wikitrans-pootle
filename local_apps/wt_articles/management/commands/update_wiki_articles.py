@@ -13,15 +13,12 @@ class Command(NoArgsCommand):
         articles_of_interest = ArticleOfInterest.objects.all()
         for article in articles_of_interest:
             # don't import articles we already have
-            # if SourceArticle.objects.filter(title__exact='%s' % article.title,
-            #                                 language=article.title_language):
-            #     continue
-            article_dict = query_text_rendered(article.title,
-                                               language=article.title_language.code)
-            # don't import articles we already have
-            if SourceArticle.objects.filter(doc_id__exact='%s' % article_dict['revid'],
+            if SourceArticle.objects.filter(title__exact='%s' % article.title,
                                             language=article.title_language):
                 continue
+            article_dict = query_text_rendered(
+                article.title,
+                language=article.title_language.code)
             try:
                 source_article = SourceArticle(title=article.title,
                                                language=article.title_language,
