@@ -63,7 +63,6 @@ class SourceArticle(models.Model):
             super(SourceArticle, self).save()
             # find all paragraphs
             for p in soup.findAll('p'):
-                import re
                 p_text = ''.join([x.string for x in p.findAll(text=True)
                                   if not re.match('[\[\]\\d]+$',
                                                   x.string)])
