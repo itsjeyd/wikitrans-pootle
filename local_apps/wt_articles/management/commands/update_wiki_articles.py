@@ -20,11 +20,13 @@ class Command(NoArgsCommand):
                 article.title,
                 language=article.title_language.code)
             try:
-                source_article = SourceArticle(title=article.title,
-                                               language=article.title_language,
-                                               source_text=article_dict['html'],
-                                               timestamp=datetime.now(),
-                                               doc_id=article_dict['revid'])
+                source_article = SourceArticle(
+                    title=article.title,
+                    language=article.title_language,
+                    source_text=article_dict['html'],
+                    timestamp=datetime.now(),
+                    doc_id=article_dict['revid']
+                    )
                 source_article.save()
             except Exception as e:
                 print "Looks like we have an exception of type %s" % type(e)
