@@ -53,38 +53,44 @@ class SourceArticle(models.Model):
 
     def save(self, manually_splitting=False, source_sentences=()):
         if not self.sentences_processed and not manually_splitting:
-            # Tokenize the HTML that is fetched from a wiki article
             sentences = list()
             segment_id = 0
             soup = BeautifulSoup(self.source_text)
             sentence_splitter = determine_splitter(self.language.code)
-            # initial save for foreign key based saves to work
-            # save should occur after sent_detector is loaded
             super(SourceArticle, self).save()
-            # find all paragraphs
-            for p in soup.findAll('p'):
-                p_text = ''.join([x.string for x in p.findAll(text=True)
-                                  if not re.match('[\[\]\\d]+$',
-                                                  x.string)])
-                # split all sentences in the paragraph
 
-                sentences = sentence_splitter(p_text.strip())
-                # TODO: remove bad sentences that were missed above
-                sentences = [s for s in sentences if \
-                                 not re.match("^\**\[\d+\]\**$", s)]
-
-                for sentence in sentences:
-                    # Clean up bad spaces (&#160;)
-                    sentence = sentence.replace("&#160;", " ")
-
-                    s = SourceSentence(article=self,
-                                       text=sentence,
-                                       segment_id=segment_id)
-                    segment_id += 1
+            for t in soup.findAll(re.compile('^[ph]')):
+                if re.match('p', t.name):
+                    p_text = ''.join([x.string for x in t.findAll(text=True)
+                                      if not re.match('[\[\]\\d]+$',
+                                                      x.string)])
+                    sentences = sentence_splitter(p_text.strip())
+                    for sentence in sentences:
+                        sentence = sentence.replace("&#160;", " ")
+                        s = SourceSentence(article=self,
+                                           text=sentence,
+                                           segment_id=segment_id)
+                        segment_id += 1
+                        s.save()
+                    s.end_of_paragraph = True
                     s.save()
-                s.end_of_paragraph = True
-                s.save()
+
+                elif re.match('h', t.name):
+                    headline = t.findAll(attrs={'class': 'mw-headline'})
+                    print 'Found headline!'
+                    if headline:
+                        h = headline[0].string
+                    else:
+                        h = t.string
+                    s = SourceSentence(article=self,
+                                       text=h,
+                                       segment_id=segment_id)
+                    s.end_of_paragraph = True
+                    s.save()
+                    segment_id += 1
+
             self.sentences_processed = True
+
         else:
             for sentence in source_sentences:
                 sentence.save()
