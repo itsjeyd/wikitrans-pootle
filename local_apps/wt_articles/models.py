@@ -68,7 +68,8 @@ class SourceArticle(models.Model):
                         sentence = sentence.replace("&#160;", " ")
                         s = SourceSentence(article=self,
                                            text=sentence,
-                                           segment_id=segment_id)
+                                           segment_id=segment_id,
+                                           is_heading=False)
                         segment_id += 1
                         s.save()
                     s.end_of_paragraph = True
@@ -83,8 +84,9 @@ class SourceArticle(models.Model):
                         h = t.string
                     s = SourceSentence(article=self,
                                        text=h,
-                                       segment_id=segment_id)
-                    s.end_of_paragraph = True
+                                       segment_id=segment_id,
+                                       is_heading=True,
+                                       heading_level=int(t.name[-1]))
                     s.save()
                     segment_id += 1
 
@@ -405,6 +407,8 @@ class SourceSentence(models.Model):
     text = models.CharField(_('Sentence Text'), max_length=2048)
     segment_id = models.IntegerField(_('Segment ID'))
     end_of_paragraph = models.BooleanField(_('Paragraph closer'))
+    is_heading = models.BooleanField(_('Heading'))
+    heading_level = models.IntegerField(_('Heading Level'))
 
     class Meta:
         ordering = ('segment_id','article')
