@@ -64,15 +64,16 @@ def sentences_as_html(sentences):
     return html
 
 def sentences_as_html_span(sentences):
-    format_span = lambda sid, text: u"<span id='ss_%d'>%s</span>" % (sid, text)
-    format_h = lambda text: u'<h3>%s</h3>' % text
-    prev_s = None
+    format_span = lambda sid, text: u"<span id='ss_%d'>%s</span>" % (sid,
+                                                                     text)
+    format_h = lambda text, level: u'<h%d>%s</h%d>' % (level+1,
+                                                       text,
+                                                       level+1)
     for s in sentences:
-        if prev_s and prev_s.end_of_paragraph and s.end_of_paragraph:
-            s.text = format_h(s.text)
+        if s.is_heading:
+            s.text = format_h(s.text, s.heading_level)
         else:
             s.text = format_span(s.segment_id, s.text)
-        prev_s = s
 
     html = sentences_as_html(sentences)
     return html
