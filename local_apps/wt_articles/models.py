@@ -53,12 +53,11 @@ class SourceArticle(models.Model):
 
     def save(self, manually_splitting=False, source_sentences=()):
         if not self.sentences_processed and not manually_splitting:
-            sentences = list()
-            segment_id = 0
             soup = BeautifulSoup(self.source_text)
             sentence_splitter = determine_splitter(self.language.code)
             super(SourceArticle, self).save()
 
+            segment_id = 0
             for t in soup.findAll(re.compile('^[ph]')):
                 if re.match('p', t.name):
                     p_text = ''.join([x.string for x in t.findAll(text=True)
