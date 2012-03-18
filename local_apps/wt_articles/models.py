@@ -69,7 +69,8 @@ class SourceArticle(models.Model):
                         s = SourceSentence(article=self,
                                            text=sentence,
                                            segment_id=segment_id,
-                                           is_heading=False)
+                                           is_heading=False,
+                                           heading_level=0)
                         segment_id += 1
                         s.save()
                     s.end_of_paragraph = True
@@ -77,7 +78,6 @@ class SourceArticle(models.Model):
 
                 elif re.match('h', t.name):
                     headline = t.findAll(attrs={'class': 'mw-headline'})
-                    print 'Found headline!'
                     if headline:
                         h = headline[0].string
                     else:
