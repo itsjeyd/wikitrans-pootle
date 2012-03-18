@@ -5,6 +5,9 @@ sudo apt-get install python-setuptools python-dev build-essential
 sudo easy_install pip
 sudo pip install --upgrade pip
 
+sudo apt-get install translate-toolkit
+sudo apt-get install python-protobuf
+
 # Install django
 sudo pip install django
 
@@ -26,8 +29,3 @@ python nltk_config.py
 # Build Pootle
 # echo "Building and installing Pootle..."
 # sudo python setup.py build install
-
-echo "You may also need to download Google Protocol Buffers to work with MT Server Land and XML-RPC."
-echo "http://code.google.com/p/protobuf/"
-echo "Done."
-
