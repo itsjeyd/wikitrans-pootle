@@ -25,7 +25,3 @@ sudo pip install -I -r requirements.txt
 
 # Configure nltk
 python nltk_config.py
-
-# Build Pootle
-# echo "Building and installing Pootle..."
-# sudo python setup.py build install
