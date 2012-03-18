@@ -4,8 +4,6 @@
 --find-links=http://pypi.pinaxproject.com
 --find-links=http://pypi2.pinaxproject.com
 
-# Temporary fix to python-yadis, since it doesn't appear in PyPI
-http://static.crossway.org/_tmp/python-yadis-1.1.0.tar.gz #
 simplejson>=2.0.9
 
 django-uni-form>=0.6.0
