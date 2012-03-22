@@ -407,8 +407,8 @@ class SourceSentence(models.Model):
     text = models.CharField(_('Sentence Text'), max_length=2048)
     segment_id = models.IntegerField(_('Segment ID'))
     end_of_paragraph = models.BooleanField(_('Paragraph closer'))
-    is_heading = models.BooleanField(_('Heading'))
-    heading_level = models.IntegerField(_('Heading Level'))
+    is_heading = models.BooleanField(_('Heading'), null=True)
+    heading_level = models.IntegerField(_('Heading Level'), null=True)
 
     class Meta:
         ordering = ('segment_id','article')
