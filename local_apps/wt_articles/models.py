@@ -76,7 +76,7 @@ class SourceArticle(models.Model):
                     s.end_of_paragraph = True
                     s.save()
 
-                elif re.match('h', t.name):
+                elif re.match('h\d', t.name):
                     headline = t.findAll(attrs={'class': 'mw-headline'})
                     if headline:
                         h = headline[0].string
