@@ -448,10 +448,3 @@ def add_target_languages(request, aid,
         content_dict['target_language_form'] = target_language_form
     return render_to_response(template_name, content_dict,
                               context_instance=RequestContext(request))
-
-
-def update_articles(request):
-    import os
-    os.system("cd /home/tim/workspace/WikiTrans/wt-tim")
-    os.system("python manage.py update_wiki_articles")
-    return article_list(request)

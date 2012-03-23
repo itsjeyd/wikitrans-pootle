@@ -43,6 +43,5 @@ urlpatterns = patterns('wt_articles.views',
         name="add_target_languages"),
 
     ### Translation request related stuff
-    url(r'^request/', 'request_article', name="request_article"),
-    url(r'^update/', 'update_articles')
+    url(r'^request/', 'request_article', name="request_article")
 )
