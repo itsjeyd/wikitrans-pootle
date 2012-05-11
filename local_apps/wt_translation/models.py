@@ -390,12 +390,6 @@ def request_translation(translator, sentences, source_language, target_language)
         source_file_id = "%s-%s-%s" % (request_id, source_language.code, target_language.code)
 
         try:
-#            print "Requesting the translation"
-#            print serverland_host.token, request_id, translator.shortname
-#            print utils.get_iso639_2(source_language.code), utils.get_iso639_2(target_language.code)
-#            print source_file_id
-#            print text
-
             # Request the translation.
             proxy = xmlrpclib.ServerProxy(serverland_host.url)
             result = proxy.create_translation(serverland_host.token,            # Authentication token
