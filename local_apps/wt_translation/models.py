@@ -342,16 +342,24 @@ class ServerlandConfigError(TranslatorConfigError):
 
 def request_translation(translator, sentences, source_language, target_language):
     """
-    Request a MachineTranslator to perform a translation. The request process is implemented
-    based on the type of MachineTranslator. For example, a SERVERLAND type uses a MT Server Land
-    to request a translation.
+    Request a MachineTranslator to perform a translation. The request
+    process is implemented based on the type of MachineTranslator. For
+    example, a SERVERLAND type uses a MT Server Land to request a
+    translation.
+
     Preconditions:
         translator:    A MachineTranslator object.
         sentences:     A list of strings.
+
     Exceptions:
-        UnsupportedLanguagePair:The target translator doesn't support the language pair.
-        UndefinedTranslator:    When looking up the ServerlandHost for a MachineTranslator, if none exists (this should not happen).
-        ServerlandConfigError:  The ServerlandHost has an error.
+        UnsupportedLanguagePair:
+            - The target translator doesn't support the language pair.
+        UndefinedTranslator:
+            - When looking up the ServerlandHost for a
+              MachineTranslator, if none exists (this should not
+              happen).
+        ServerlandConfigError:
+            - The ServerlandHost has an error.
     """
 
     # Make sure that the translator supports the language pair
