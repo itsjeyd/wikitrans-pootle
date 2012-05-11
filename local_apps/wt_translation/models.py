@@ -105,18 +105,13 @@ class ServerlandHost(models.Model):
         return u"%s" % (self.url)
 
     def save(self):
-        # Perform an initial sync if a new host is created.
         if self.id is None:
             super(ServerlandHost, self).save()
             try:
                 self.sync()
-            except Exception:
-                # TODO: Should the host be deleted if it's invalid, or should it be left in an invalid state?
-                # TODO: For now, sync() will put the host in an invalid state.
-                # self.delete()
-                raise
+            except Exception as e:
+                print e
         else:
-            # Update the timestamp
             self.timestamp = datetime.now()
             super(ServerlandHost, self).save()
 
@@ -124,69 +119,59 @@ class ServerlandHost(models.Model):
         '''
         Add or synchronize a remote Serverland XML-RPC host and its translators (workers).
         '''
-        try:
-            # Query the URL to get the rest of the host information.
-            proxy = xmlrpclib.ServerProxy(self.url)
-            workers = proxy.list_workers(self.token)
+        # Fetch information about workers
+        import httplib2
+        from StringIO import StringIO
+        from xml.etree.ElementTree import ElementTree
 
-            # Force JSON/Dict result to a list.
-            if not isinstance(workers, list):
-                workers = [workers]
+        HTTP = httplib2.Http()
+        response = HTTP.request(
+            self.url + 'workers/?token=%s' % self.token, method='GET'
+            )
+        xml = response[1]
 
-            # Fetch each worker and store it.
-            for i in range(0, len(workers)):
-                # Check if the worker already exists in the database
-                mts = self.translators.filter(shortname = workers[i]['shortname'])
-                if len(mts) == 1:
-                    # Worker already exists
-                    mt = mts[0]
-                else:
+        # Turn string containing XML response into a file-like object
+        xmlfile = StringIO(xml)
+
+        # Create traversable ElementTree from file object
+        et = ElementTree(file=xmlfile)
+
+        # Workers are "resources", so:
+        workers = et.findall('resource')
+
+        for worker in workers:
+            # Extract relevant info from workers that are alive
+            if eval(worker.find('is_alive').text):
+                shortname = worker.find('shortname').text
+                description = worker.find('description').text
+                # is_busy = worker.find('is_busy').text
+                language_pairs = worker.find('language_pairs').getchildren()
+                # Create new MachineTranslator object and save to WT database
+                if not MachineTranslator.objects.filter(shortname=shortname):
                     mt = MachineTranslator()
-                    mt.shortname = workers[i]['shortname']
-                    mt.type = SERVERLAND
-
-                mt.description = workers[i]['description']
-                mt.is_alive = workers[i]['is_alive']
-                mt.save()
-
-                # If alive, then add the language pairs
-                if mt.is_alive:
-                    for language_pair in workers[i]['language_pairs']:
+                    mt.shortname = shortname
+                    mt.description = description
+                    mt.save()
+                    # Add language pairs
+                    iso = pycountry.languages
+                    for lp in language_pairs:
+                        lang1, lang2 = tuple(lang.text for lang in lp.getchildren())
+                        print lang1, lang2
                         try:
-                            # Get the ISO639-1 format
-                            language_code1 = pycountry.languages.get(bibliographic=language_pair[0]).alpha2
-                            language_code2 = pycountry.languages.get(bibliographic=language_pair[1]).alpha2
-
-                            # Find the corresponding Pootle languages
-                            l1 = Language.objects.get_by_natural_key(language_code1)
-                            l2 = Language.objects.get_by_natural_key(language_code2)
-
-                            # If the 2 languages exist in Pootle, add the translation pair to the MachineTranslator
-                            language_pair = get_or_create_language_pair(l1, l2)
-
-                            # Add the language pair for the current translator, if it doesn't already exist.
-                            if len(mt.supported_languages.filter(source_language = l1, target_language = l2)) == 0:
+                            code1, code2 = (iso.get(bibliographic=lang1).alpha2, iso.get(bibliographic=lang2).alpha2)
+                            lang1 = Language.objects.get_by_natural_key(code1)
+                            lang2 = Language.objects.get_by_natural_key(code2)
+                            if not mt.supported_languages.filter(source_language=lang1, target_language=lang2):
+                                language_pair = get_or_create_language_pair(lang1, lang2)
                                 mt.supported_languages.add(language_pair)
-
-                            # TODO: What about languages that used to be supported by the translator? Should they be deleted?
-
-                        except (KeyError, AttributeError):
-                            # Just continue if the language doesn't exist.
+                        except AttributeError:
                             continue
                         except Language.DoesNotExist:
-                            # Just Continue if the language doesn't exist.
-                            # TODO: Should we automatically add languages?
                             continue
+                    self.translators.add(mt)
+                    self.status = OK
+                    self.save()
 
-                self.translators.add(mt)
-                self.status = OK
-                self.save()
-        except EnvironmentError as ex:
-            raise ServerlandConfigError(self, ex)
-        except xmlrpclib.Fault as ex:
-            raise ServerlandConfigError(self, ex)
-        except xmlrpclib.ProtocolError as ex:
-            raise ServerlandConfigError(self, ex)
 
     def fetch_translations(self):
         proxy = xmlrpclib.ServerProxy(self.url)
