@@ -371,9 +371,6 @@ def request_translation(translator, sentences, source_language, target_language)
 
     # Make sure that sentences is a list.
     sentences = utils.cast_to_list(sentences)
-#    if not isinstance(sentences, list):
-#        print "Retrieved only one sentence."
-#        sentences = [sentences]
 
     # One sentence per line, to make it easier for the translator to do its job.
     text = "\n".join(sentence for sentence in sentences)
