@@ -1,7 +1,7 @@
 SERVERLAND = "Serverland"
 
 TRANSLATOR_TYPES = (
-    (SERVERLAND, SERVERLAND),
+    (SERVERLAND, SERVERLAND),   # Why 2?
 )
 
 OK = 0
