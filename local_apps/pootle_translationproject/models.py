@@ -26,32 +26,32 @@ import logging
 import tempfile
 import shutil
 
-from django.conf                   import settings
-from django.db                     import models, IntegrityError
-from django.db.models.signals      import post_save
+from django.conf import settings
+from django.db import models, IntegrityError
+from django.db.models.signals import post_save
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _
 
 from translate.filters import checks
-from translate.search  import match, indexing
+from translate.search import match, indexing
 from translate.storage import versioncontrol
 from translate.storage.base import ParseError
 from translate.misc.lru import LRUCachingDict
 
-from pootle.scripts                import hooks
+from pootle.scripts import hooks
 from pootle_misc.util import getfromcache, dictsum, deletefromcache
 from pootle_misc.baseurl import l
 from pootle_misc.aggregate import group_by_count, max_column
 from pootle_store.util import calculate_stats
-from pootle_store.models           import Store, Unit, QualityCheck, PARSED, CHECKED
-from pootle_store.util             import relative_real_path, absolute_real_path, OBSOLETE
+from pootle_store.models import Store, Unit, QualityCheck, PARSED, CHECKED
+from pootle_store.util import relative_real_path, absolute_real_path, OBSOLETE
 from pootle_store.util import empty_quickstats, empty_completestats
 
-from pootle_app.lib.util           import RelatedManager
-from pootle_project.models     import Project
-from pootle_language.models    import Language
-from pootle_app.models.directory   import Directory
-from pootle_app                    import project_tree
+from pootle_app.lib.util import RelatedManager
+from pootle_project.models import Project
+from pootle_language.models import Language
+from pootle_app.models.directory import Directory
+from pootle_app import project_tree
 from pootle_app.models.permissions import check_permission
 from pootle_app.models.signals import post_vc_update, post_vc_commit
 from pootle_app.models.signals import post_template_update
