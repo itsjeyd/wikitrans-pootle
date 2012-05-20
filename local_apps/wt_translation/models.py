@@ -266,19 +266,25 @@ def send_translation_requests(request_status=STATUS_PENDING):
     '''
     Sends a batch of machine translation requests.
     '''
-    pending_requests = TranslationRequest.objects.filter(status = request_status)
+    pending_requests = TranslationRequest.objects.filter(status=request_status)
     for request in pending_requests:
-        # Get the .po store for the file to be translated.
-        store = Store.objects.get(translation_project = request.translation_project)
 
-        # Get all of the sentences; store.unit_set.all() returns the sentences in order.
-        sentences = [unicode(unit) for unit in store.unit_set.all()]
+        # Get the .po store for the file to be translated
+        store = Store.objects.get(
+            translation_project=request.translation_project
+            )
+
+        # Get all of the sentences; store.unit_set.all() returns the
+        # sentences in order.
+        sentences = [unicode(unit) for unit in store.units]
 
         # Request the translation
-        external_request_id = request_translation(request.translator,
-                                sentences,
-                                request.translation_project.project.source_language,
-                                request.translation_project.language)
+        external_request_id = request_translation(
+            request.translator,
+            sentences,
+            request.translation_project.project.source_language,
+            request.translation_project.language
+            )
 
         # Update the status of the record
         request.external_id = external_request_id
@@ -361,46 +367,81 @@ def request_translation(translator, sentences, source_language, target_language)
         ServerlandConfigError:
             - The ServerlandHost has an error.
     """
+    if not translator.is_language_pair_supported(
+        source_language, target_language
+        ):
+        raise UnsupportedLanguagePair(
+            translator, source_language, target_language
+            )
 
-    # Make sure that the translator supports the language pair
-    if not translator.is_language_pair_supported(source_language, target_language):
-        raise UnsupportedLanguagePair(translator, source_language, target_language)
-
-    # Generate a request id
     request_id = utils.generate_request_id()
-
-    # Make sure that sentences is a list.
     sentences = utils.cast_to_list(sentences)
+    text = "\n".join(sentences)
+    source_file_id = "%s-%s-%s" % (
+        request_id, source_language.code, target_language.code
+        )
 
-    # One sentence per line, to make it easier for the translator to do its job.
-    text = "\n".join(sentence for sentence in sentences)
-
-    # Determine the machine translator type.
     if translator.type == SERVERLAND:
-        # Get the ServerlandHost
         try:
-            # TODO: Change this host reference. Currently, only one ServerLand host is allowed.
             serverland_host = translator.serverlandhost_set.all()[0]
         except IndexError:
             raise UndefinedTranslator(translator)
 
-        source_file_id = "%s-%s-%s" % (request_id, source_language.code, target_language.code)
+        result = send_trans_request(
+            serverland_host.token,
+            request_id,
+            translator.shortname,
+            utils.get_iso639_2(source_language.code),
+            utils.get_iso639_2(target_language.code),
+            source_file_id,
+            text
+            )
+        print result
+        return request_id
 
-        try:
-            # Request the translation.
-            proxy = xmlrpclib.ServerProxy(serverland_host.url)
-            result = proxy.create_translation(serverland_host.token,            # Authentication token
-                                     request_id,                                # Custom request ID
-                                     translator.shortname,                      # MT ServerLand worker
-                                     utils.get_iso639_2(source_language.code),  # Source language (in bibliographic)
-                                     utils.get_iso639_2(target_language.code),  # Target language (in bibliographic)
-                                     source_file_id,                            # Composite id
-                                     text)                                      # Sentence(s) to translate
 
-            # TODO: For now, just print the results.
-            print result
+def send_trans_request(token, request_id, worker, src, tgt, article, text):
+    import mimetools
+    from datetime import datetime
+    import httplib2
+    HTTP = httplib2.Http()
+    BASE_URL = str(ServerlandHost.objects.get(shortname='remote').url)
+    shortname = "wt_test_%s" % (datetime.now().isoformat())
+    contents = {'token': str(token),
+                'shortname': str(shortname),
+                'worker': str(worker),
+                'source_language': str(src),
+                'target_language': str(tgt)}
 
-            # TODO: Return the request_id
-            return request_id
-        except xmlrpclib.Fault as ex:
-            raise ServerlandConfigError(serverland_host, ex)
+    crlf = '\r\n'
+    boundary = '-----' + mimetools.choose_boundary() + '-----'
+    body = []
+    for (key, value) in contents.items():
+        body.append ('--' + boundary)
+        body.append('Content-Disposition: form-data; name="%s"' % key)
+        body.append('')
+        body.append(value)
+    body.append ('--' + boundary)
+    body.append ('Content-Disposition: form-data; ' +
+                  'name="source_text"; ' +
+                  'filename="%s"' % article)
+    body.append('Content-Type: text/plain; charset="UTF-8"')
+    body.append('')
+    body.extend(text.split('\n'))
+    body.append ('--' + boundary)
+    body.append('')
+    body = (crlf.join(body)).encode("utf-8")
+    content_type = 'multipart/form-data; boundary=%s' % boundary
+    header = {'Content-Type': content_type, 'Content-Length': str(len(body))}
+
+    response = HTTP.request(BASE_URL + 'requests/',
+                            method='POST', body=body, headers=header)
+
+    print 'create new request:'
+    print 'response status:', response[0].status
+    if response[0].status == 201:
+        print 'response (json):', json.loads(response[1])
+    else:
+        print response[0].reason
+
+    return shortname
