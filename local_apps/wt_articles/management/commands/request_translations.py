@@ -1,3 +1,4 @@
+from django.core.management.base import NoArgsCommand
 from wt_translation.models import send_translation_requests
 
 class Command(NoArgsCommand):
