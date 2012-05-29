@@ -173,68 +173,61 @@ class ServerlandHost(models.Model):
                     self.save()
 
 
+
+    # Reimplementation of ServerlandHost.fetch_translations method
     def fetch_translations(self):
-        proxy = xmlrpclib.ServerProxy(self.url)
-
-        # Fetch the translation requests (and make sure the result is a list)
-        requests = utils.cast_to_list(proxy.list_requests(self.token))
-
-        # Retrieve the translation requests that are "ready"
-        completedRequests = [request for request in requests if request['ready']]
-
-        # Process the completed requests
-        for completedRequest in completedRequests:
-            # Get the result
-            result = proxy.list_results(self.token, completedRequest['request_id'])
-
-            # Get the external request id and sentences
-            external_request_id = completedRequest['shortname']
-            result_sentences = utils.clean_string(result['result'].strip()).split('\n')
-
-            # FIXME: Add exception handling when the translation request is not found.
-            try:
-                # Look up the original translation request
-                request = TranslationRequest.objects.get_by_external_id(external_request_id)
-
-                # TODO: Should we delete the translations, or filter them some way in Serverland to prevent re-retrieving translations? This could get expensive...
-                if request.status == STATUS_FINISHED:
-                    # Only update if the translation isn't marked as finished.
-                    continue
-
-                # Fetch the Pootle store for the corresponding translation project and fill in the translations.
-                store = Store.objects.get(translation_project = request.translation_project)
-
-                # Get all of the units
-                units = store.unit_set.all()
-
-                # Make sure that len(units) matches len(result)
-#                print units[0].source
-#                print result_sentences[0]
-#                print "----"
-#                print units[len(units) - 1].source
-#                print result_sentences[len(result_sentences)-1]
-#                print result_sentences[len(result_sentences)-2]
-
-                # If the sentence length doesn't match, then we don't have a one-to-one correspondence
-                # between sentences. Mark the translation request with an error
-                if (len(units) != len(result_sentences)):
-                    request.status = STATUS_ERROR
-                    print "An error occurred with request %s" % request
-                else:
-                    # Start adding the translations to Pootle (lazy).
-                    for i in range(0, len(units)):
-#                        units[i].target = multistring(result_sentences[i])
-                        units[i].target = result_sentences[i]
-                        units[i].state = pootle_store.util.FUZZY
-                        units[i].save()
-
-                    # Set the status of the current TranslationRequest as completed
-                    request.status = STATUS_FINISHED
-
-                request.save()
-
-            except ObjectDoesNotExist as ex:
-                pass
+        import httplib2
+        from StringIO import StringIO
+        from xml.etree.ElementTree import ElementTree
+        HTTP = httplib2.Http()
+        # First step: Get list of results for registered token
+        url = self.url + 'requests/?token={0}'.format(self.token)
+        response = HTTP.request(url, method='GET')
+        if response[0].status == 200:
+            xml = response[1]
+            xmlfile = StringIO(xml)
+            et = ElementTree(file=xmlfile)
+            requests = et.findall('resource')
+            # Filter response for completed requests
+            completed_requests = (
+                r for r in requests if eval(r.findtext('ready'))
+                )
+            external_ids = set(
+                [tr.external_id for tr in TranslationRequest.objects.all()]
+                )
+            # Process completed requests one by one
+            for request in completed_requests:
+                shortname = request.findtext('shortname')
+                if shortname in external_ids:
+                    tr = TranslationRequest.objects.get_by_external_id(
+                        shortname
+                        )
+                    if tr.status == STATUS_FINISHED:
+                        continue
+                    url = self.url + 'results/{0}/?token={1}'.format(
+                        shortname, self.token)
+                    response = HTTP.request(url, method='GET')
+                    xml = response[1]
+                    xmlfile = StringIO(xml)
+                    et = ElementTree(file=xmlfile)
+                    result = et.findtext('result')
+                    result_sentences = utils.clean_string(result.strip()).split('\n')
+                    result_sentences = [s.strip() for s in result_sentences]
+                    store = Store.objects.get(
+                        translation_project=tr.translation_project)
+                    units = store.unit_set.all()
+                    if not len(units) == len(result_sentences):
+                        tr.status = STATUS_ERROR
+                        print 'ERROR!'
+                    else:
+                        for i in range(len(units)):
+                            units[i].target = result_sentences[i]
+                            units[i].state = pootle_store.util.FUZZY
+                            units[i].save()
+                        tr.status = STATUS_FINISHED
+                    tr.save()
+        else:
+            raise Exception(response[0].reason)
 
 class TranslationRequestManager(models.Manager):
     def get_by_external_id(self, external_id):
