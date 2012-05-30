@@ -399,9 +399,8 @@ def send_trans_request(token, request_id, worker, src, tgt, article, text):
     import httplib2
     HTTP = httplib2.Http()
     BASE_URL = str(ServerlandHost.objects.get(shortname='remote').url)
-    shortname = "wt_test_%s" % (datetime.now().isoformat())
     contents = {'token': str(token),
-                'shortname': str(shortname),
+                'shortname': str(request_id),
                 'worker': str(worker),
                 'source_language': str(src),
                 'target_language': str(tgt)}
@@ -437,4 +436,4 @@ def send_trans_request(token, request_id, worker, src, tgt, article, text):
     else:
         print response[0].reason
 
-    return shortname
+    return request_id
