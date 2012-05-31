@@ -202,7 +202,7 @@ class ServerlandHost(models.Model):
                     tr = TranslationRequest.objects.get_by_external_id(
                         shortname
                         )
-                    if tr.status == STATUS_FINISHED:
+                    if int(tr.status) == STATUS_FINISHED:
                         continue
                     url = self.url + 'results/{0}/?token={1}'.format(
                         shortname, self.token)
