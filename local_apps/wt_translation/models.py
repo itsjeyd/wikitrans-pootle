@@ -390,7 +390,7 @@ def request_translation(translator, sentences, source_language, target_language)
             text
             )
         print result
-        return request_id
+        return result
 
 
 def send_trans_request(token, request_id, worker, src, tgt, article, text):
@@ -398,9 +398,10 @@ def send_trans_request(token, request_id, worker, src, tgt, article, text):
     from datetime import datetime
     import httplib2
     HTTP = httplib2.Http()
+    shortname = 'wt_%s' % request_id
     BASE_URL = str(ServerlandHost.objects.get(shortname='remote').url)
     contents = {'token': str(token),
-                'shortname': str(request_id),
+                'shortname': str(shortname),
                 'worker': str(worker),
                 'source_language': str(src),
                 'target_language': str(tgt)}
@@ -436,4 +437,4 @@ def send_trans_request(token, request_id, worker, src, tgt, article, text):
     else:
         print response[0].reason
 
-    return request_id
+    return shortname
