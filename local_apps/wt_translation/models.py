@@ -97,6 +97,24 @@ class MachineTranslator(models.Model):
             supported_languages__target_language = target_language
                             )
 
+    def add_language_pair(self, source, target):
+        iso = pycountry.languages
+        try:
+            source_code, target_code = (
+                iso.get(bibliographic=source).alpha2,
+                iso.get(bibliographic=target).alpha2
+                )
+            source = Language.objects.get_by_natural_key(source_code)
+            target = Language.objects.get_by_natural_key(target_code)
+            if not self.supported_languages.filter(
+                source_language=source, target_language=target
+                ):
+                language_pair = get_or_create_language_pair(source, target)
+                self.supported_languages.add(language_pair)
+        except (AttributeError, Language.DoesNotExist):
+            pass
+
+
 class ServerlandHost(models.Model):
     shortname = models.CharField(_('Short Name'), max_length=100)
     description = models.TextField(_('Description'))
@@ -121,61 +139,44 @@ class ServerlandHost(models.Model):
             self.timestamp = datetime.now()
             super(ServerlandHost, self).save()
 
+    def request(self, url, method='GET'): # make private (?)
+        HTTP = httplib2.Http()
+        return HTTP.request(url, method=method)
+
+    def element_tree(self, response): # make private (?)
+        xml = response[1]
+        xmlfile = StringIO(xml)
+        return ElementTree(file=xmlfile)
+
+    def fetch_workers(self):
+        url = self.url + 'workers/?token=%s' % self.token
+        response = self.request(url)
+        et = self.element_tree(response)
+        return et.findall('resource')
+
     def sync(self):
         '''
-        Add or synchronize a remote Serverland XML-RPC host and its translators (workers).
+        Synchronize a remote Serverland host and its translators (workers).
         '''
-        # Fetch information about workers
-
-        HTTP = httplib2.Http()
-        response = HTTP.request(
-            self.url + 'workers/?token=%s' % self.token, method='GET'
-            )
-        xml = response[1]
-
-        # Turn string containing XML response into a file-like object
-        xmlfile = StringIO(xml)
-
-        # Create traversable ElementTree from file object
-        et = ElementTree(file=xmlfile)
-
-        # Workers are "resources", so:
-        workers = et.findall('resource')
-
+        workers = self.fetch_workers()
         for worker in workers:
-            # Extract relevant info from workers that are alive
             if eval(worker.find('is_alive').text):
                 shortname = worker.find('shortname').text
                 description = worker.find('description').text
-                # is_busy = worker.find('is_busy').text
                 language_pairs = worker.find('language_pairs').getchildren()
-                # Create new MachineTranslator object and save to WT database
                 if not MachineTranslator.objects.filter(shortname=shortname):
-                    mt = MachineTranslator()
-                    mt.shortname = shortname
-                    mt.description = description
-                    mt.save()
+                    mt = MachineTranslator.objects.create(
+                        shortname=shortname, description=description
+                        )
                     # Add language pairs
-                    iso = pycountry.languages
                     for lp in language_pairs:
-                        lang1, lang2 = tuple(lang.text for lang in lp.getchildren())
-                        print lang1, lang2
-                        try:
-                            code1, code2 = (iso.get(bibliographic=lang1).alpha2, iso.get(bibliographic=lang2).alpha2)
-                            lang1 = Language.objects.get_by_natural_key(code1)
-                            lang2 = Language.objects.get_by_natural_key(code2)
-                            if not mt.supported_languages.filter(source_language=lang1, target_language=lang2):
-                                language_pair = get_or_create_language_pair(lang1, lang2)
-                                mt.supported_languages.add(language_pair)
-                        except AttributeError:
-                            continue
-                        except Language.DoesNotExist:
-                            continue
+                        source, target = tuple(
+                            lang.text for lang in lp.getchildren()
+                            )
+                        mt.add_language_pair(source, target)
                     self.translators.add(mt)
                     self.status = OK
                     self.save()
-
-
 
     # Reimplementation of ServerlandHost.fetch_translations method
     def fetch_translations(self):
