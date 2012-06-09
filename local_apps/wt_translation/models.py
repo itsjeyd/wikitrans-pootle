@@ -31,36 +31,40 @@ import pycountry
 
 class LanguagePairManager(models.Manager):
     def get_by_natural_key(self, source_language, target_language):
-        return LanguagePair.objects.get(source_language=source_language, target_language=target_language)
+        return LanguagePair.objects.get(
+            source_language=source_language, target_language=target_language
+            )
 
 
-# TODO: Do I need this?
 class LanguagePair(models.Model):
-    source_language = models.ForeignKey(Language, related_name="source_language_ref")
-    target_language = models.ForeignKey(Language, related_name="target_language_ref")
+    source_language = models.ForeignKey(
+        Language, related_name="source_language_ref"
+        )
+    target_language = models.ForeignKey(
+        Language, related_name="target_language_ref"
+        )
 
     objects = LanguagePairManager()
 
     def __unicode__(self):
-        return u"%s :: %s" % (self.source_language.code, self.target_language.code)
+        return u"%s :: %s" % (
+            self.source_language.code, self.target_language.code
+            )
 
     class Meta:
         unique_together = (("source_language", "target_language"),)
 
 
-# Get or create a language pair
 def get_or_create_language_pair(source_language, target_language):
     try:
-        # Try to get the language pair
-        language_pair = LanguagePair.objects.get_by_natural_key(source_language, target_language)
-#        language_pair = LanguagePair.objects.filter(source_language = source_language, target_language = target_language)[0]
+        language_pair = LanguagePair.objects.get_by_natural_key(
+            source_language, target_language
+            )
     except (LanguagePair.DoesNotExist, IndexError):
-        # The language pair doesn't exist. Create it.
         language_pair = LanguagePair()
         language_pair.source_language = source_language
         language_pair.target_language = target_language
         language_pair.save()
-
     return language_pair
 
 
@@ -68,15 +72,19 @@ class MachineTranslator(models.Model):
     shortname = models.CharField(_('Name'), max_length=50)
     supported_languages = models.ManyToManyField(LanguagePair)
     description = models.TextField(_('Description'))
-    type = models.CharField(_('Type'), max_length=32, choices=TRANSLATOR_TYPES, default='Serverland')
+    type = models.CharField(
+        _('Type'), max_length=32, choices=TRANSLATOR_TYPES, default='Serverland'
+        )
     timestamp = models.DateTimeField(_('Refresh Date'), default=datetime.now())
 
     def __unicode__(self):
         return u"%s :: %s" % (self.shortname, self.timestamp)
 
     def is_language_pair_supported(self, source_language, target_language):
-        return self.supported_languages.filter(source_language = source_language,
-                                               target_language = target_language).exists()
+        return self.supported_languages.filter(
+            source_language = source_language,
+            target_language = target_language
+            ).exists()
 
     def create_translation_request(self, translation_project):
         '''
@@ -86,7 +94,6 @@ class MachineTranslator(models.Model):
         request.translator = self
         request.translation_project = translation_project
         request.save()
-
         return request
 
     @staticmethod
@@ -98,7 +105,7 @@ class MachineTranslator(models.Model):
         return MachineTranslator.objects.filter(
             supported_languages__source_language = source_language,
             supported_languages__target_language = target_language
-                            )
+            )
 
     def add_language_pair(self, source, target):
         iso = pycountry.languages
@@ -241,12 +248,16 @@ class TranslationRequestManager(models.Manager):
 
 class TranslationRequest(models.Model):
     translation_project = models.ForeignKey(TranslationProject)
-    translator = models.ForeignKey(MachineTranslator, related_name='requested_translator')
-    status = models.CharField(_('Request Status'),
-                              max_length=32,
-                              choices=TRANSLATION_STATUSES,
-                              default = STATUS_PENDING)
-    external_id = models.CharField(_('External ID'), max_length=32, editable=False, null=True)
+    translator = models.ForeignKey(
+        MachineTranslator, related_name='requested_translator'
+        )
+    status = models.CharField(
+        _('Request Status'), max_length=32,
+        choices=TRANSLATION_STATUSES, default = STATUS_PENDING
+        )
+    external_id = models.CharField(
+        _('External ID'), max_length=32, editable=False, null=True
+        )
     timestamp = models.DateTimeField(_('Last Updated'), default=datetime.now())
 
     objects = TranslationRequestManager()
@@ -258,7 +269,6 @@ class TranslationRequest(models.Model):
         return u"%s - %s" % (self.translator.shortname, self.translation_project)
 
     def save(self):
-        # Last step, call the normal save method
         super(TranslationRequest, self).save()
 
 def send_translation_requests(request_status=STATUS_PENDING):
