@@ -1,3 +1,8 @@
+import httplib2
+from StringIO import StringIO
+from xml.etree.ElementTree import ElementTree
+
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri
@@ -120,9 +125,6 @@ class ServerlandHost(models.Model):
         Add or synchronize a remote Serverland XML-RPC host and its translators (workers).
         '''
         # Fetch information about workers
-        import httplib2
-        from StringIO import StringIO
-        from xml.etree.ElementTree import ElementTree
 
         HTTP = httplib2.Http()
         response = HTTP.request(
@@ -176,9 +178,6 @@ class ServerlandHost(models.Model):
 
     # Reimplementation of ServerlandHost.fetch_translations method
     def fetch_translations(self):
-        import httplib2
-        from StringIO import StringIO
-        from xml.etree.ElementTree import ElementTree
         HTTP = httplib2.Http()
         # First step: Get list of results for registered token
         url = self.url + 'requests/?token={0}'.format(self.token)
@@ -396,7 +395,6 @@ def request_translation(translator, sentences, source_language, target_language)
 def send_trans_request(token, request_id, worker, src, tgt, article, text):
     import mimetools
     from datetime import datetime
-    import httplib2
     HTTP = httplib2.Http()
     shortname = 'wt_%s' % request_id
     BASE_URL = str(ServerlandHost.objects.get(shortname='remote').url)
