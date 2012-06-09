@@ -1,4 +1,5 @@
 import httplib2
+import mimetools
 import re
 
 from datetime import datetime
@@ -403,8 +404,6 @@ def request_translation(translator, sentences, source_language, target_language)
 
 
 def send_trans_request(token, request_id, worker, src, tgt, article, text):
-    import mimetools
-    from datetime import datetime
     HTTP = httplib2.Http()
     shortname = 'wt_%s' % request_id
     BASE_URL = str(ServerlandHost.objects.get(shortname='remote').url)
