@@ -153,9 +153,12 @@ class ServerlandHost(models.Model):
             self.timestamp = datetime.now()
             super(ServerlandHost, self).save()
 
-    def request(self, url, method='GET'): # make private (?)
+    def request(self, url, method='GET', body=None, header=None): # make private (?)
         HTTP = httplib2.Http()
-        return HTTP.request(url, method=method)
+        if body and header:
+            return HTTP.request(url, method=method, body=body, headers=header)
+        else:
+            return HTTP.request(url, method=method)
 
     def element_tree(self, response): # make private (?)
         xml = response[1]
@@ -191,6 +194,76 @@ class ServerlandHost(models.Model):
                     self.translators.add(mt)
                     self.status = OK
                     self.save()
+
+    def request_translation(self, trans_request):
+        translator = trans_request.translator
+        source_lang = trans_request.translation_project.project.source_language
+        target_lang = trans_request.translation_project.language
+        if not translator.is_language_pair_supported(source_lang, target_lang):
+            raise UnsupportedLanguagePair(
+                translator, source_lang, target_lang
+                )
+
+        if translator.type == SERVERLAND:
+            # Gather data
+            request_id = utils.generate_request_id()
+            shortname = 'wt_%s' % request_id
+            src = utils.get_iso639_2(source_lang.code)
+            tgt = utils.get_iso639_2(target_lang.code)
+            contents = {
+                'token': str(self.token),
+                'shortname': str(shortname),
+                'worker': str(translator.shortname),
+                'source_language': str(src),
+                'target_language': str(tgt)
+                }
+            source_file_id = "%s-%s-%s" % (
+                request_id, source_lang.code, target_lang.code
+                )
+            store = Store.objects.get(
+                translation_project=trans_request.translation_project
+                )
+            sentences = [unicode(unit) for unit in store.units]
+
+            # Concatenate data
+            crlf = '\r\n'
+            boundary = '-----' + mimetools.choose_boundary() + '-----'
+            body = []
+            for key, value in contents.items():
+                body.append('--' + boundary)
+                body.append('Content-Disposition: form-data; name="%s"' % key)
+                body.append('')
+                body.append(value)
+            body.append('--' + boundary)
+            body.append('Content-Disposition: form-data; ' +
+                        'name="source_text"; ' +
+                        'filename="%s"' % source_file_id)
+            body.append('Content-Type: text/plain; charset="UTF-8"')
+            body.append('')
+            body.extend(sentences)
+            body.append('--' + boundary)
+            body.append('')
+            body = (crlf.join(body)).encode("utf-8")
+            content_type = 'multipart/form-data; boundary=%s' % boundary
+
+            header = {'Content-Type': content_type, 'Content-Length': str(len(body))}
+
+            # Send request
+            response = self.request(
+                str(self.url) + 'requests/', method='POST',
+                body=body, header=header
+                )
+
+            print 'Creating new request...'
+            print '=> Response status:', response[0].status
+            print '=> Reason:', response[0].reason
+            print '=> Shortname:', shortname
+
+            # Update trans_request appropriately
+            trans_request.external_id = shortname
+            trans_request.status = STATUS_IN_PROGRESS
+            trans_request.save()
+
 
     # Reimplementation of ServerlandHost.fetch_translations method
     def fetch_translations(self):
@@ -275,35 +348,6 @@ class TranslationRequest(models.Model):
     def save(self):
         super(TranslationRequest, self).save()
 
-def send_translation_requests(request_status=STATUS_PENDING):
-    '''
-    Sends a batch of machine translation requests.
-    '''
-    pending_requests = TranslationRequest.objects.filter(status=request_status)
-    for request in pending_requests:
-
-        # Get the .po store for the file to be translated
-        store = Store.objects.get(
-            translation_project=request.translation_project
-            )
-
-        # Get all of the sentences; store.unit_set.all() returns the
-        # sentences in order.
-        sentences = [unicode(unit) for unit in store.units]
-
-        # Request the translation
-        external_request_id = request_translation(
-            request.translator,
-            sentences,
-            request.translation_project.project.source_language,
-            request.translation_project.language
-            )
-
-        # Update the status of the record
-        request.external_id = external_request_id
-        request.status = STATUS_IN_PROGRESS
-        request.save()
-
 
 class UndefinedTranslator(Exception):
     def __init__(self, value):
@@ -363,99 +407,12 @@ class ServerlandConfigError(TranslatorConfigError):
         else:
             super(TranslatorConfigError, self).__init__(host)
 
-def request_translation(translator, sentences, source_language, target_language):
-    """
-    Request a MachineTranslator to perform a translation. The request
-    process is implemented based on the type of MachineTranslator. For
-    example, a SERVERLAND type uses a MT Server Land to request a
-    translation.
 
-    Preconditions:
-        translator:    A MachineTranslator object.
-        sentences:     A list of strings.
-
-    Exceptions:
-        UnsupportedLanguagePair:
-            - The target translator doesn't support the language pair.
-        UndefinedTranslator:
-            - When looking up the ServerlandHost for a
-              MachineTranslator, if none exists (this should not
-              happen).
-        ServerlandConfigError:
-            - The ServerlandHost has an error.
-    """
-    if not translator.is_language_pair_supported(
-        source_language, target_language
-        ):
-        raise UnsupportedLanguagePair(
-            translator, source_language, target_language
-            )
-
-    request_id = utils.generate_request_id()
-    sentences = utils.cast_to_list(sentences)
-    text = "\n".join(sentences)
-    source_file_id = "%s-%s-%s" % (
-        request_id, source_language.code, target_language.code
-        )
-
-    if translator.type == SERVERLAND:
-        try:
-            serverland_host = translator.serverlandhost_set.all()[0]
-        except IndexError:
-            raise UndefinedTranslator(translator)
-
-        result = send_trans_request(
-            serverland_host.token,
-            request_id,
-            translator.shortname,
-            utils.get_iso639_2(source_language.code),
-            utils.get_iso639_2(target_language.code),
-            source_file_id,
-            text
-            )
-        print result
-        return result
-
-
-def send_trans_request(token, request_id, worker, src, tgt, article, text):
-    HTTP = httplib2.Http()
-    shortname = 'wt_%s' % request_id
-    BASE_URL = str(ServerlandHost.objects.get(shortname='remote').url)
-    contents = {'token': str(token),
-                'shortname': str(shortname),
-                'worker': str(worker),
-                'source_language': str(src),
-                'target_language': str(tgt)}
-
-    crlf = '\r\n'
-    boundary = '-----' + mimetools.choose_boundary() + '-----'
-    body = []
-    for (key, value) in contents.items():
-        body.append ('--' + boundary)
-        body.append('Content-Disposition: form-data; name="%s"' % key)
-        body.append('')
-        body.append(value)
-    body.append ('--' + boundary)
-    body.append ('Content-Disposition: form-data; ' +
-                  'name="source_text"; ' +
-                  'filename="%s"' % article)
-    body.append('Content-Type: text/plain; charset="UTF-8"')
-    body.append('')
-    body.extend(text.split('\n'))
-    body.append ('--' + boundary)
-    body.append('')
-    body = (crlf.join(body)).encode("utf-8")
-    content_type = 'multipart/form-data; boundary=%s' % boundary
-    header = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-
-    response = HTTP.request(BASE_URL + 'requests/',
-                            method='POST', body=body, headers=header)
-
-    print 'create new request:'
-    print 'response status:', response[0].status
-    if response[0].status == 201:
-        print 'response (json):', json.loads(response[1])
-    else:
-        print response[0].reason
-
-    return shortname
+def send_translation_requests():
+    '''
+    Sends a batch of machine translation requests.
+    '''
+    pending_requests = TranslationRequest.objects.filter(status=STATUS_PENDING)
+    serverland_host = ServerlandHost.objects.get(id=1)
+    for request in pending_requests:
+        serverland_host.request_translation(request)
