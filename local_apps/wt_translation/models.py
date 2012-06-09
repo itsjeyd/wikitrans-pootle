@@ -205,7 +205,7 @@ class ServerlandHost(models.Model):
                 )
 
         if translator.type == SERVERLAND:
-            # Gather data
+            # Populate contents
             request_id = utils.generate_request_id()
             shortname = 'wt_%s' % request_id
             src = utils.get_iso639_2(source_lang.code)
@@ -217,6 +217,17 @@ class ServerlandHost(models.Model):
                 'source_language': str(src),
                 'target_language': str(tgt)
                 }
+
+            # Create body + header
+            boundary = '-----' + mimetools.choose_boundary() + '-----'
+
+            body = []
+            for key, value in contents.items():
+                body.append('--' + boundary)
+                body.append('Content-Disposition: form-data; name="%s"' % key)
+                body.append('')
+                body.append(value)
+
             source_file_id = "%s-%s-%s" % (
                 request_id, source_lang.code, target_lang.code
                 )
@@ -225,15 +236,6 @@ class ServerlandHost(models.Model):
                 )
             sentences = [unicode(unit) for unit in store.units]
 
-            # Concatenate data
-            crlf = '\r\n'
-            boundary = '-----' + mimetools.choose_boundary() + '-----'
-            body = []
-            for key, value in contents.items():
-                body.append('--' + boundary)
-                body.append('Content-Disposition: form-data; name="%s"' % key)
-                body.append('')
-                body.append(value)
             body.append('--' + boundary)
             body.append('Content-Disposition: form-data; ' +
                         'name="source_text"; ' +
@@ -243,9 +245,11 @@ class ServerlandHost(models.Model):
             body.extend(sentences)
             body.append('--' + boundary)
             body.append('')
-            body = (crlf.join(body)).encode("utf-8")
-            content_type = 'multipart/form-data; boundary=%s' % boundary
 
+            crlf = '\r\n'
+            body = (crlf.join(body)).encode("utf-8")
+
+            content_type = 'multipart/form-data; boundary=%s' % boundary
             header = {'Content-Type': content_type, 'Content-Length': str(len(body))}
 
             # Send request
