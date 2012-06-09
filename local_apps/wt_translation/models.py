@@ -89,11 +89,12 @@ class MachineTranslator(models.Model):
     @staticmethod
     def get_eligible_translators(source_language, target_language):
         """
-        Get a list of translators that can be used to translate this language pair.
+        Get a list of translators that can be used to translate this
+        language pair.
         """
         return MachineTranslator.objects.filter(
-                                supported_languages__source_language = source_language,
-                                supported_languages__target_language = target_language
+            supported_languages__source_language = source_language,
+            supported_languages__target_language = target_language
                             )
 
 class ServerlandHost(models.Model):
