@@ -26,7 +26,6 @@ from wt_translation import SERVERLAND_HOST_STATUSES, OK, INVALID_URL, INVALID_TO
 import xmlrpclib
 import json
 import pycountry
-import errno
 
 
 class LanguagePairManager(models.Manager):
