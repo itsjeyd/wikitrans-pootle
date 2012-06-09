@@ -128,11 +128,15 @@ class MachineTranslator(models.Model):
 class ServerlandHost(models.Model):
     shortname = models.CharField(_('Short Name'), max_length=100)
     description = models.TextField(_('Description'))
-    url = models.URLField(_('URL Location'), verify_exists=True, max_length=255, unique=True)
+    url = models.URLField(
+        _('URL Location'), verify_exists=True, max_length=255, unique=True
+        )
     token = models.CharField(_('Auth Token'), max_length=8)
     timestamp = models.DateTimeField(_('Refresh Date'), default=datetime.now())
-    status = models.CharField(_('Status'), max_length=1, choices=SERVERLAND_HOST_STATUSES, editable=False)
-
+    status = models.CharField(
+        _('Status'), max_length=1,
+        choices=SERVERLAND_HOST_STATUSES, editable=False
+        )
     translators = models.ManyToManyField(MachineTranslator)
 
     def __unicode__(self):
