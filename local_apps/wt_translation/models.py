@@ -29,9 +29,11 @@ import json
 import pycountry
 import errno
 
+
 class LanguagePairManager(models.Manager):
     def get_by_natural_key(self, source_language, target_language):
         return LanguagePair.objects.get(source_language=source_language, target_language=target_language)
+
 
 # TODO: Do I need this?
 class LanguagePair(models.Model):
@@ -45,6 +47,7 @@ class LanguagePair(models.Model):
 
     class Meta:
         unique_together = (("source_language", "target_language"),)
+
 
 # Get or create a language pair
 def get_or_create_language_pair(source_language, target_language):
@@ -60,6 +63,7 @@ def get_or_create_language_pair(source_language, target_language):
         language_pair.save()
 
     return language_pair
+
 
 class MachineTranslator(models.Model):
     shortname = models.CharField(_('Name'), max_length=50)
@@ -230,9 +234,11 @@ class ServerlandHost(models.Model):
         else:
             raise Exception(response[0].reason)
 
+
 class TranslationRequestManager(models.Manager):
     def get_by_external_id(self, external_id):
         return TranslationRequest.objects.get(external_id = external_id)
+
 
 class TranslationRequest(models.Model):
     translation_project = models.ForeignKey(TranslationProject)
@@ -285,6 +291,7 @@ def send_translation_requests(request_status=STATUS_PENDING):
         request.status = STATUS_IN_PROGRESS
         request.save()
 
+
 class UndefinedTranslator(Exception):
     def __init__(self, value):
         if isinstance(value, MachineTranslator):
@@ -294,6 +301,7 @@ class UndefinedTranslator(Exception):
     def __str__(self):
         return repr(self.value)
 
+
 class UnsupportedLanguagePair(Exception):
     def __init__(self, translator, source_language, target_language):
         self.value = "Machine Translator %s does not support the language pair (%s, %s)." % (translator, source_language.code, target_language.code)
@@ -301,12 +309,14 @@ class UnsupportedLanguagePair(Exception):
     def __str__(self):
         return repr(self.value)
 
+
 class TranslatorConfigError(Exception):
     def __init__(self, msg):
         self.msg = msg
 
     def __str__(self):
         return repr(self.msg)
+
 
 class ServerlandConfigError(TranslatorConfigError):
     def __init__(self, host, error):
