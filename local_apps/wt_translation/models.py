@@ -153,7 +153,7 @@ class ServerlandHost(models.Model):
             self.timestamp = datetime.now()
             super(ServerlandHost, self).save()
 
-    def request(self, url, method='GET', body=None, header=None): # make private (?)
+    def request(self, url, method='GET', body=None, header=None):
         HTTP = httplib2.Http()
         if body and header:
             return HTTP.request(url, method=method, body=body, headers=header)
