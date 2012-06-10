@@ -195,6 +195,32 @@ class ServerlandHost(models.Model):
                     self.status = OK
                     self.save()
 
+    def _request_body(self, contents, source_file_id, sentences, boundary):
+        body = []
+        for key, value in contents.items():
+            body.append('--' + boundary)
+            body.append('Content-Disposition: form-data; name="%s"' % key)
+            body.append('')
+            body.append(value)
+
+        body.append('--' + boundary)
+        body.append('Content-Disposition: form-data; ' +
+                    'name="source_text"; ' +
+                    'filename="%s"' % source_file_id)
+        body.append('Content-Type: text/plain; charset="UTF-8"')
+        body.append('')
+        body.extend(sentences)
+        body.append('--' + boundary)
+        body.append('')
+
+        crlf = '\r\n'
+        return (crlf.join(body)).encode("utf-8")
+
+    def _request_header(self, boundary, body):
+        content_type = 'multipart/form-data; boundary=%s' % boundary
+        return {'Content-Type': content_type, 'Content-Length': str(len(body))}
+
+
     def request_translation(self, trans_request):
         translator = trans_request.translator
         source_lang = trans_request.translation_project.project.source_language
@@ -205,7 +231,6 @@ class ServerlandHost(models.Model):
                 )
 
         if translator.type == SERVERLAND:
-            # Populate contents
             request_id = utils.generate_request_id()
             shortname = 'wt_%s' % request_id
             src = utils.get_iso639_2(source_lang.code)
@@ -218,16 +243,6 @@ class ServerlandHost(models.Model):
                 'target_language': str(tgt)
                 }
 
-            # Create body + header
-            boundary = '-----' + mimetools.choose_boundary() + '-----'
-
-            body = []
-            for key, value in contents.items():
-                body.append('--' + boundary)
-                body.append('Content-Disposition: form-data; name="%s"' % key)
-                body.append('')
-                body.append(value)
-
             source_file_id = "%s-%s-%s" % (
                 request_id, source_lang.code, target_lang.code
                 )
@@ -236,29 +251,17 @@ class ServerlandHost(models.Model):
                 )
             sentences = [unicode(unit) for unit in store.units]
 
-            body.append('--' + boundary)
-            body.append('Content-Disposition: form-data; ' +
-                        'name="source_text"; ' +
-                        'filename="%s"' % source_file_id)
-            body.append('Content-Type: text/plain; charset="UTF-8"')
-            body.append('')
-            body.extend(sentences)
-            body.append('--' + boundary)
-            body.append('')
-
-            crlf = '\r\n'
-            body = (crlf.join(body)).encode("utf-8")
-
-            content_type = 'multipart/form-data; boundary=%s' % boundary
-            header = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-
-            # Send request
+            boundary = '-----' + mimetools.choose_boundary() + '-----'
+            body = self._request_body(
+                contents, source_file_id, sentences, boundary
+                )
+            header = self._request_header(boundary, body)
             response = self.request(
                 str(self.url) + 'requests/', method='POST',
                 body=body, header=header
                 )
 
-            print 'Creating new request...'
+            print 'Submitted new request...'
             print '=> Response status:', response[0].status
             print '=> Reason:', response[0].reason
             print '=> Shortname:', shortname
