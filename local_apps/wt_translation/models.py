@@ -266,7 +266,6 @@ class ServerlandHost(models.Model):
             print '=> Reason:', response[0].reason
             print '=> Shortname:', shortname
 
-            # Update trans_request appropriately
             trans_request.external_id = shortname
             trans_request.status = STATUS_IN_PROGRESS
             trans_request.save()
