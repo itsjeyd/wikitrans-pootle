@@ -1,7 +1,6 @@
 import pycountry
 import uuid
 from BeautifulSoup import BeautifulStoneSoup
-
 from pootle_language.models import Language
 
 def get_iso639_2(language):
@@ -9,8 +8,6 @@ def get_iso639_2(language):
     Gets the iso-639-2 language format.
     """
     # TODO: Need to handle the case where a language isn't valid.
-    # print "Language:", language
-
     language_length = len(language)
 
     if language_length == 2:
@@ -25,7 +22,9 @@ def generate_request_id():
     return uuid.uuid1().hex
 
 def clean_string(input):
-    return BeautifulStoneSoup(input, convertEntities=BeautifulStoneSoup.ALL_ENTITIES).contents[0]
+    return BeautifulStoneSoup(
+        input, convertEntities=BeautifulStoneSoup.ALL_ENTITIES
+        ).contents[0]
 
 def generate_request_body(boundary, contents, source_file_id, sentences):
     body = []
