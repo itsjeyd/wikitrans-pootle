@@ -1,7 +1,12 @@
+from StringIO import StringIO
+from xml.etree.ElementTree import ElementTree
+
 import pycountry
 import uuid
+
 from BeautifulSoup import BeautifulStoneSoup
 from pootle_language.models import Language
+
 
 def get_iso639_2(language):
     """
@@ -48,3 +53,9 @@ def generate_request_body(boundary, contents, source_file_id, sentences):
 def generate_request_header(boundary, body):
     content_type = 'multipart/form-data; boundary=%s' % boundary
     return {'Content-Type': content_type, 'Content-Length': str(len(body))}
+
+def element_tree(response):
+    xml = response[1]
+    xmlfile = StringIO(xml)
+    return ElementTree(file=xmlfile)
+

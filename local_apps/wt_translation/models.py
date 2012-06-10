@@ -3,8 +3,6 @@ import mimetools
 import re
 
 from datetime import datetime
-from StringIO import StringIO
-from xml.etree.ElementTree import ElementTree
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -184,15 +182,10 @@ class ServerlandHost(models.Model):
         else:
             return HTTP.request(url, method=method)
 
-    def element_tree(self, response): # make private (?)
-        xml = response[1]
-        xmlfile = StringIO(xml)
-        return ElementTree(file=xmlfile)
-
     def fetch_workers(self):
         url = self.url + 'workers/?token=%s' % self.token
         response = self.request(url)
-        et = self.element_tree(response)
+        et = utils.element_tree(response)
         return et.findall('resource')
 
     def request_translation(self, trans_request):
@@ -249,7 +242,7 @@ class ServerlandHost(models.Model):
             self.url + 'requests/?token={0}'.format(self.token)
             )
         if response[0].status == 200:
-            et = self.element_tree(response)
+            et = utils.element_tree(response)
             requests = et.findall('resource')
             completed_requests = (
                 r for r in requests if eval(r.findtext('ready'))
@@ -269,7 +262,7 @@ class ServerlandHost(models.Model):
                             shortname, self.token
                             )
                         )
-                    et = self.element_tree(response)
+                    et = utils.element_tree(response)
                     result = et.findtext('result')
                     result_sentences = [
                         sentence.strip() for sentence in
