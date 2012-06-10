@@ -195,32 +195,6 @@ class ServerlandHost(models.Model):
                     self.status = OK
                     self.save()
 
-    def _request_body(self, contents, source_file_id, sentences, boundary):
-        body = []
-        for key, value in contents.items():
-            body.append('--' + boundary)
-            body.append('Content-Disposition: form-data; name="%s"' % key)
-            body.append('')
-            body.append(value)
-
-        body.append('--' + boundary)
-        body.append('Content-Disposition: form-data; ' +
-                    'name="source_text"; ' +
-                    'filename="%s"' % source_file_id)
-        body.append('Content-Type: text/plain; charset="UTF-8"')
-        body.append('')
-        body.extend(sentences)
-        body.append('--' + boundary)
-        body.append('')
-
-        crlf = '\r\n'
-        return (crlf.join(body)).encode("utf-8")
-
-    def _request_header(self, boundary, body):
-        content_type = 'multipart/form-data; boundary=%s' % boundary
-        return {'Content-Type': content_type, 'Content-Length': str(len(body))}
-
-
     def request_translation(self, trans_request):
         translator = trans_request.translator
         source_lang = trans_request.translation_project.project.source_language
@@ -242,7 +216,6 @@ class ServerlandHost(models.Model):
                 'source_language': str(src),
                 'target_language': str(tgt)
                 }
-
             source_file_id = "%s-%s-%s" % (
                 request_id, source_lang.code, target_lang.code
                 )
@@ -252,10 +225,11 @@ class ServerlandHost(models.Model):
             sentences = [unicode(unit) for unit in store.units]
 
             boundary = '-----' + mimetools.choose_boundary() + '-----'
-            body = self._request_body(
-                contents, source_file_id, sentences, boundary
+            body = utils.generate_request_body(
+                boundary, contents, source_file_id, sentences
                 )
-            header = self._request_header(boundary, body)
+            header = utils.generate_request_header(boundary, body)
+
             response = self.request(
                 str(self.url) + 'requests/', method='POST',
                 body=body, header=header
