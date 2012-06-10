@@ -153,24 +153,6 @@ class ServerlandHost(models.Model):
             self.timestamp = datetime.now()
             super(ServerlandHost, self).save()
 
-    def request(self, url, method='GET', body=None, header=None):
-        HTTP = httplib2.Http()
-        if body and header:
-            return HTTP.request(url, method=method, body=body, headers=header)
-        else:
-            return HTTP.request(url, method=method)
-
-    def element_tree(self, response): # make private (?)
-        xml = response[1]
-        xmlfile = StringIO(xml)
-        return ElementTree(file=xmlfile)
-
-    def fetch_workers(self):
-        url = self.url + 'workers/?token=%s' % self.token
-        response = self.request(url)
-        et = self.element_tree(response)
-        return et.findall('resource')
-
     def sync(self):
         '''
         Synchronize a remote Serverland host and its translators (workers).
@@ -194,6 +176,24 @@ class ServerlandHost(models.Model):
                     self.translators.add(mt)
                     self.status = OK
                     self.save()
+
+    def request(self, url, method='GET', body=None, header=None):
+        HTTP = httplib2.Http()
+        if body and header:
+            return HTTP.request(url, method=method, body=body, headers=header)
+        else:
+            return HTTP.request(url, method=method)
+
+    def element_tree(self, response): # make private (?)
+        xml = response[1]
+        xmlfile = StringIO(xml)
+        return ElementTree(file=xmlfile)
+
+    def fetch_workers(self):
+        url = self.url + 'workers/?token=%s' % self.token
+        response = self.request(url)
+        et = self.element_tree(response)
+        return et.findall('resource')
 
     def request_translation(self, trans_request):
         translator = trans_request.translator
