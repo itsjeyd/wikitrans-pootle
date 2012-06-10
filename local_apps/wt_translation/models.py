@@ -244,7 +244,6 @@ class ServerlandHost(models.Model):
             trans_request.status = STATUS_IN_PROGRESS
             trans_request.save()
 
-
     def fetch_translations(self):
         response = self.request(
             self.url + 'requests/?token={0}'.format(self.token)
