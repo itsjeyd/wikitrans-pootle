@@ -245,44 +245,40 @@ class ServerlandHost(models.Model):
             trans_request.save()
 
 
-    # Reimplementation of ServerlandHost.fetch_translations method
     def fetch_translations(self):
-        HTTP = httplib2.Http()
-        # First step: Get list of results for registered token
-        url = self.url + 'requests/?token={0}'.format(self.token)
-        response = HTTP.request(url, method='GET')
+        response = self.request(
+            self.url + 'requests/?token={0}'.format(self.token)
+            )
         if response[0].status == 200:
-            xml = response[1]
-            xmlfile = StringIO(xml)
-            et = ElementTree(file=xmlfile)
+            et = self.element_tree(response)
             requests = et.findall('resource')
-            # Filter response for completed requests
             completed_requests = (
                 r for r in requests if eval(r.findtext('ready'))
                 )
-            external_ids = set(
-                [tr.external_id for tr in TranslationRequest.objects.all()]
-                )
-            # Process completed requests one by one
+            in_progress_requests = set([
+                tr.external_id for tr in
+                TranslationRequest.objects.filter(status=STATUS_IN_PROGRESS)
+                ])
             for request in completed_requests:
                 shortname = request.findtext('shortname')
-                if shortname in external_ids:
+                if shortname in in_progress_requests:
                     tr = TranslationRequest.objects.get_by_external_id(
                         shortname
                         )
-                    if int(tr.status) == STATUS_FINISHED:
-                        continue
-                    url = self.url + 'results/{0}/?token={1}'.format(
-                        shortname, self.token)
-                    response = HTTP.request(url, method='GET')
-                    xml = response[1]
-                    xmlfile = StringIO(xml)
-                    et = ElementTree(file=xmlfile)
+                    response = self.request(
+                        self.url + 'results/{0}/?token={1}'.format(
+                            shortname, self.token
+                            )
+                        )
+                    et = self.element_tree(response)
                     result = et.findtext('result')
-                    result_sentences = utils.clean_string(result.strip()).split('\n')
-                    result_sentences = [s.strip() for s in result_sentences]
+                    result_sentences = [
+                        sentence.strip() for sentence in
+                        utils.clean_string(result.strip()).split('\n')
+                        ]
                     store = Store.objects.get(
-                        translation_project=tr.translation_project)
+                        translation_project=tr.translation_project
+                        )
                     units = store.unit_set.all()
                     if not len(units) == len(result_sentences):
                         tr.status = STATUS_ERROR
