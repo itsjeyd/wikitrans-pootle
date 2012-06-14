@@ -82,6 +82,8 @@ class SourceArticle(models.Model):
                         h = headline[0].string
                     else:
                         h = t.string
+                    if h.lower() == 'weblinks':
+                        break
                     s = SourceSentence(article=self,
                                        text=h,
                                        segment_id=segment_id,
