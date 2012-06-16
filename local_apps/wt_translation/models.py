@@ -285,6 +285,14 @@ class ServerlandHost(models.Model):
         else:
             raise Exception(response[0].reason)
 
+    def delete_request(self, shortname):
+        print shortname
+        response = self.request(
+            self.url + 'requests/%s/?token=%s' % (shortname, self.token),
+            method='DELETE'
+            )
+        print response[0].status, response[0].reason
+
 
 class TranslationRequestManager(models.Manager):
     def get_by_external_id(self, external_id):
