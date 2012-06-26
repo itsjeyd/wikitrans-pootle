@@ -100,10 +100,17 @@ class MachineTranslator(models.Model):
         Get a list of translators that can be used to translate this
         language pair.
         """
-        return MachineTranslator.objects.filter(
-            supported_languages__source_language = source_language,
-            supported_languages__target_language = target_language
-            )
+        # For each worker, check whether or not it is alive
+        host = ServerlandHost.objects.get(shortname='remote')
+        workers = host.fetch_workers()
+        alive_workers = [
+            worker.find('shortname').text for worker in workers if
+            eval(worker.find('is_alive').text)]
+        eligible_workers = [mt for mt in MachineTranslator.objects.filter(
+            supported_languages__source_language=source_language,
+            supported_languages__target_language=target_language
+            ) if mt.shortname in alive_workers]
+        return eligible_workers
 
     def add_language_pair(self, source, target):
         iso = pycountry.languages
