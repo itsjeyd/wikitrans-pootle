@@ -272,6 +272,7 @@ class ServerlandHost(models.Model):
                     et = utils.element_tree(response)
                     result = et.findtext('result')
                     result = re.sub('### (\[\[YAHOO_SPLITTER\]\]\n)?(### )?', '', result)
+                    result = re.sub('(<[A-Z]\[)?(\]>)?', '', result)
                     result_sentences = [
                         sentence.strip() for sentence in
                         utils.clean_string(result.strip()).split('\n')
