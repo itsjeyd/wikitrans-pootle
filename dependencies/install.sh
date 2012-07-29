@@ -9,7 +9,7 @@ sudo apt-get install translate-toolkit
 sudo apt-get install python-protobuf
 
 # Install django
-sudo pip install django
+sudo pip install django==1.3.1
 
 # Install dependencies from requirements.txt
 sudo apt-get install libyaml-0-2
