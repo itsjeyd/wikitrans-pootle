@@ -49,7 +49,7 @@
 	    			{{ item.mt_request_form.translation_project.as_hidden }}
 	    			{{ item.mt_request_form.translator }}
 	    			<input type="submit" value="{% trans 'Go!' %}"></input>
-	    		<!-- 
+	    		<!--
 		    		<select id="translator_list_{{ item.project_id }}">
 		    			<option id="_blank" selected="selected"></option>
 		    			{% for translator in item.translators %}
@@ -88,7 +88,7 @@ $(".request_translation_option").click(function() {
 	var option = $(this);
 	var values = option.attr("id").split("_");
 	var msg = "Project: " + values[1] + "\n" + "Translator: " + values[3];
-	
+
 	alert(msg);
 });
 </script>
