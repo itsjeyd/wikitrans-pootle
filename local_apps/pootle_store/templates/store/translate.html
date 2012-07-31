@@ -35,7 +35,7 @@
 {% block breadcrumbs_content %}
 {% cache settings.CACHE_TIMEOUT store_bread store.id LANGUAGE_CODE %}
 {{ block.super }} {% if not directory.trail.count %} » {% endif %}
- <a href="{{ store.pootle_path|l}}/translate">{{ store.name }}</a>
+ <a href="/wikitrans{{ store.pootle_path|l}}/translate">{{ store.name }}</a>
 {% endcache %}
 {% endblock %}
 
