@@ -80,12 +80,7 @@ All other dependencies of WT should be installed using `pip`:
 
 6. Set up MT Serverland:
 
-       <pre>
-       $ python manage.py shell
-       ...
-       &gt;&gt;&gt; execfile('tests/serverland_init.py')
-       </pre>
-
+       <pre>python manage.py serverland_init</pre>
 
 ## Usage
 N.B.: The shell commands listed throughout this section consistently
