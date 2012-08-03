@@ -9,8 +9,8 @@ machine translations before submitting the new article to Wikipedia.
 Eventually, these post-edits will be used to update the MT systems.
 
 ## Dependencies
-As described below, an installation script can be used to
-automatically install all dependencies listed in this section.
+As described [below](#installation), an installation script can be
+used to automatically install all dependencies listed in this section.
 
 ### apt-get
 Some of WT's dependencies can be installed using `apt-get`. They
@@ -47,7 +47,7 @@ All other dependencies of WT should be installed using `pip`:
 - `apyrtium`
 - `pycountry`
 
-## Installation
+## Installation<a id="installation" />
 1. Get code:
 
        <pre>$ git clone https://github.com/itsjeyd/wikitrans-pootle.git</pre>
