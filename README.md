@@ -1,5 +1,13 @@
 # Documentation
 
+## Introduction
+WikiTrans is an open-source machine translation project that is
+intended for use with the Wikipedia community. Using Pootle as a
+platform, users are able to request translations of Wikipedia articles
+into various languages. The user community can review and post-edit
+machine translations before submitting the new article to Wikipedia.
+Eventually, these post-edits will be used to update the MT systems.
+
 ## Dependencies
 As described below, an installation script can be used to
 automatically install all dependencies listed in this section.
