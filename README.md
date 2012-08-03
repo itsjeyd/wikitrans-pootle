@@ -60,27 +60,43 @@ All other dependencies of WT should be installed using `pip`:
 
        <pre>$ ./dependencies/install.sh</pre>
 
-4. Start the server:
+4. Set up the database:
+
+       <pre>$ python manage.py syncdb</pre>
+
+   Answer `yes` when asked whether or not you would like to create a
+   superuser. You will be prompted for a user name, an email address,
+   and a password.
+5. Populate the database:
+
+       <pre>$ python manage.py initdb</pre>
+
+6. Precalculate statistics about existing translation projects:
+
+       <pre>$ python manage.py refresh_stats</pre>
+
+   Please note that
+   - this will take a while, and
+   - doing it manually is *optional*.<br>
+     If you decide to skip this step, these precalculations will be
+     done when you try to access your WT installation through your
+     browser for the first time.
+
+7. Set up the translation host (MT Serverland):
+
+       <pre>$ python manage.py serverland_init</pre>
+
+8. Start the server:
 
        <pre>$ ./PootleServer</pre>
 
-5. In your browser, access the following URL:
+9. In your browser, access the following URL:
 
        <pre>http://localhost:8080/wikitrans</pre>
 
-   When doing this for the first time, this will initialize the
-   database and populate it with languages supported by Pootle;
-   additionally, a superuser will be created (user name: `admin`,
-   password: `admin`).
-
-   After initialization, you will be redirected to the main page of
-   WikiTrans:
+   This  will take you to the main page of WikiTrans:
 
    ![WT main page](https://raw.github.com/itsjeyd/wikitrans-pootle/master/screenshots/main-page.png)
-
-6. Set up MT Serverland:
-
-       <pre>python manage.py serverland_init</pre>
 
 ## Usage
 N.B.: The shell commands listed throughout this section consistently
