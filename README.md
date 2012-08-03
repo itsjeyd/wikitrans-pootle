@@ -66,7 +66,7 @@ All other dependencies of WT should be installed using `pip`:
 
 5. In your browser, access the following URL:
 
-   http://localhost:8080/wikitrans
+       <pre>http://localhost:8080/wikitrans</pre>
 
    When doing this for the first time, this will initialize the
    database and populate it with languages supported by Pootle;
