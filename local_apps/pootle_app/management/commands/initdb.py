@@ -42,7 +42,8 @@ def create_default_db():
 
             create_default_projects()
             create_default_languages()
-            create_default_admin()
+            # Don't do this because syncdb already takes care of it
+            # create_default_admin()
         except:
             if transaction.is_dirty():
                 transaction.rollback()
