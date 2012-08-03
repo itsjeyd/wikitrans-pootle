@@ -111,11 +111,8 @@ for WT:
 
 ![WT login](https://raw.github.com/itsjeyd/wikitrans-pootle/master/screenshots/login.png)
 
-You can use the superuser credentials created during the
-initialization step to log in:
-
-- Username: `admin`
-- Password: `admin`
+Enter the superuser credentials you provided when you first ran the
+`syncdb` command.
 
 After successful login, you will be taken to your "Dashboard":
 
