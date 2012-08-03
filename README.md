@@ -31,7 +31,7 @@ installed:
 - `python-dev`
 - `python-setuptools`
 
-## pip
+### pip
 All other dependencies of WT should be installed using `pip`:
 
 - `django`, version 1.3.1
