@@ -42,19 +42,19 @@ All other dependencies of WT should be installed using `pip`:
 ## Installation
 1. Get code:
 
-       $ git clone https://github.com/itsjeyd/wikitrans-pootle.git
+       <pre>$ git clone https://github.com/itsjeyd/wikitrans-pootle.git</pre>
 
 2. Enter project directory:
 
-       $ cd wikitrans-pootle
+       <pre>$ cd wikitrans-pootle</pre>
 
 3. Run installation script:
 
-       $ ./dependencies/install.sh
+       <pre>$ ./dependencies/install.sh</pre>
 
 4. Start the server:
 
-       $ ./PootleServer
+       <pre>$ ./PootleServer</pre>
 
 5. In your browser, access the following URL:
 
@@ -72,9 +72,11 @@ All other dependencies of WT should be installed using `pip`:
 
 6. Set up MT Serverland:
 
-       $ python manage.py shell<br>
-       ...<br>
+       <pre>
+       $ python manage.py shell
+       ...
        &gt;&gt;&gt; execfile('tests/serverland_init.py')
+       </pre>
 
 
 ## Usage
