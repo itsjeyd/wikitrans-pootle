@@ -18,8 +18,7 @@ include:
 
 - `translate-toolkit`, version 1.9
 - `python-protobuf`
-- `libyaml-0-2`
-- `libxml2-dev`
+- `python-yaml`
 - `libxslt-dev`
 - `libevent-dev`
 
@@ -28,24 +27,23 @@ for the remaining dependencies, the following packages need to be
 installed:
 
 - `build-essential`
-- `python-dev`
 - `python-setuptools`
+- `python-dev`
 
 ### pip
 All other dependencies of WT should be installed using `pip`:
 
 - `django`, version 1.3.1
-- `pyyaml`
 - `lxml`
 - `simplejson`
+- `apyrtium`
+- `BeautifulSoup`
 - `django-uni-form`
-- `wikipydia`
 - `goopytrans`
 - `nltk`, version 2.0b7
 - `polib`, version 0.5.3
-- `BeautifulSoup`
-- `apyrtium`
 - `pycountry`
+- `wikipydia`
 
 ## Installation<a id="installation" />
 1. Get code:
