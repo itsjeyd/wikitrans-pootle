@@ -1,25 +1,21 @@
 #! /bin/bash
 
-# Install easy_install and pip
-sudo apt-get install python-setuptools python-dev build-essential
+# apt-get
+sudo apt-get install translate-toolkit
+sudo apt-get install python-protobuf
+sudo apt-get install python-yaml
+sudo apt-get install libxslt-dev
+sudo apt-get install libevent-dev
+
+# Set up easy_install and pip
+sudo apt-get install build-essential
+sudo apt-get install python-setuptools
+sudo apt-get install python-dev
+
 sudo easy_install pip
 sudo pip install --upgrade pip
 
-sudo apt-get install translate-toolkit
-sudo apt-get install python-protobuf
-
-# Install django
-sudo pip install django==1.3.1
-
-# Install dependencies from requirements.txt
-sudo apt-get install libyaml-0-2
-sudo pip install -I pyyaml
-
-sudo apt-get install libxml2-dev
-sudo apt-get install libxslt-dev
-sudo pip install lxml
-
-sudo apt-get install libevent-dev
+# pip
 sudo pip install -I -r requirements.txt
 
 # Configure nltk
