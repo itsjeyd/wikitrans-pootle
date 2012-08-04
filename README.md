@@ -12,27 +12,14 @@ Eventually, these post-edits will be used to update the MT systems.
 As described [below](#installation), an installation script can be
 used to automatically install all dependencies listed in this section.
 
-### apt-get
-Some of WT's dependencies can be installed using `apt-get`. They
-include:
-
 - `translate-toolkit`, version 1.9
 - `python-protobuf`
 - `python-yaml`
 - `libxslt-dev`
 - `libevent-dev`
-
-Additionally, in order to be able to `easy_install` pip and use that
-for the remaining dependencies, the following packages need to be
-installed:
-
 - `build-essential`
 - `python-setuptools`
 - `python-dev`
-
-### pip
-All other dependencies of WT should be installed using `pip`:
-
 - `django`, version 1.3.1
 - `lxml`
 - `simplejson`
@@ -44,6 +31,10 @@ All other dependencies of WT should be installed using `pip`:
 - `polib`, version 0.5.3
 - `pycountry`
 - `wikipydia`
+
+About half of these dependencies can be installed using `apt-get`; the
+remaining dependencies should be installed using `pip`. For details,
+consult the [installation script](https://raw.github.com/itsjeyd/wikitrans-pootle/master/dependencies/install.sh).
 
 ## Installation<a id="installation" />
 1. Get code:
