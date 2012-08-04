@@ -6,16 +6,13 @@
 
 django==1.3.1
 lxml>=2.3.2
-
 simplejson>=2.0.9
 
+apyrtium>=0.1
+BeautifulSoup>=3.0
 django-uni-form>=0.6.0
-
-wikipydia>=0.1.4
 goopytrans>=0.1.1
 nltk==2.0b7
 polib==0.5.3
-BeautifulSoup>=3.0
-apyrtium>=0.1
-
 pycountry>=0.12.1
+wikipydia>=0.1.4
