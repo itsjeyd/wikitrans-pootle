@@ -232,7 +232,7 @@ def translate_from_scratch(request, source, target, title, aid,
     else:
         initial_ss_set = [{'source_sentence': s} for s in ss_list]
         formset = TranslatedSentenceSet(initial=initial_ss_set)
-    for form,s in zip(formset.forms,ss_list):
+    for form, s in zip(formset.forms, ss_list):
         form.fields['text'].label = s.text
 
     return render_to_response(template_name, {
@@ -266,7 +266,7 @@ def translate_post_edit(request, source, target, title, aid,
     else:
         initial_ts_set = [{'text': s.text} for s in ts_list]
         formset = TranslatedSentenceSet(initial=initial_ts_set)
-    for form,s in zip(formset.forms,ss_list):
+    for form, s in zip(formset.forms, ss_list):
         form.fields['text'].label = s.text
         form.fields['text'].__dict__
 

@@ -13,23 +13,23 @@ class TranslationRequestAdmin(admin.ModelAdmin):
     search_fields = ('article', 'target_language', 'translator',)
 
 class SourceArticleAdmin(admin.ModelAdmin):
-    list_display = ('title','language',)
-    search_fields = ('title','language','source_url','source_text',)
+    list_display = ('title', 'language',)
+    search_fields = ('title', 'language', 'source_url', 'source_text',)
 
 class SourceSentenceAdmin(admin.ModelAdmin):
-    list_display = ('article','text','segment_id','end_of_paragraph',)
-    search_fields = ('article','text',)
+    list_display = ('article', 'text', 'segment_id', 'end_of_paragraph',)
+    search_fields = ('article', 'text',)
 
 class TranslatedArticleAdmin(admin.ModelAdmin):
     list_display = ('article', 'language', 'timestamp', 'approved',)
     search_fields = ('article', 'title', 'language', 'timestamp', 'approved',)
 
 class TranslatedSentenceAdmin(admin.ModelAdmin):
-    list_display = ('segment_id','translation_date','text', 'approved',)
-    search_fields = ('segment_id','translation_date','text', 'approved',)
+    list_display = ('segment_id', 'translation_date', 'text', 'approved',)
+    search_fields = ('segment_id', 'translation_date', 'text', 'approved',)
 
 class FeaturedTranslationAdmin(admin.ModelAdmin):
-    list_display = ('article','featured_date',)
+    list_display = ('article', 'featured_date',)
 
 admin.site.register(ArticleOfInterest, ArticleOfInterestAdmin)
 admin.site.register(TranslationRequest, TranslationRequestAdmin)

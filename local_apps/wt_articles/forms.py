@@ -14,8 +14,8 @@ class TranslatedSentenceMappingForm(forms.ModelForm):
 
     class Meta:
         model = TranslatedSentence
-        exclude = ('segment_id','translated_by','language',
-                   'translation_date','best','end_of_paragraph')
+        exclude = ('segment_id', 'translated_by', 'language',
+                   'translation_date', 'best', 'end_of_paragraph')
 
     def __init__(self, user=None, *args, **kwargs):
         self.user = user
