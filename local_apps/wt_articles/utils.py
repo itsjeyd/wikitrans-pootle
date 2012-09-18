@@ -120,7 +120,8 @@ def user_compatible_articles(user):
 
 def target_pairs_by_user(user, source):
     target_languages = set([lc.language for lc in
-                            user.languagecompetancy_set.exclude(translation_options=SOURCE_LANGUAGE)])
+                            user.languagecompetancy_set.exclude(
+                                translation_options=SOURCE_LANGUAGE)])
     # Exclude identical source/target pairs
     target_languages.discard(source)
 

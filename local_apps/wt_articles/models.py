@@ -333,7 +333,9 @@ class SourceArticle(models.Model):
         templates) under the corresponding Pootle project.
         """
         try:
-            translation_projects = self.get_pootle_project().translationproject_set.exclude(language__code="templates")
+            translation_projects = self.get_pootle_project().\
+                                   translationproject_set.\
+                                   exclude(language__code="templates")
             return Language.objects.filter(id__in=
                                            [tp.language.id for tp in
                                             translation_projects])

@@ -16,11 +16,13 @@ def determine_splitter(language):
             tokenizer = 'tokenizers/punkt/%s.pickle' % (desc_pair[1].lower())
             break
     try:
-        # TODO: Can we save multiple tokenizers in memory to speed the tokenization process?
+        # TODO: Can we save multiple tokenizers in memory to speed up
+        # the tokenization process?
         tokenizer = nltk.data.load(tokenizer)
         return tokenizer.tokenize
     except:
-        raise AttributeError('%s not supported by sentence splitters' % (language))
+        raise AttributeError(
+            '%s not supported by sentence splitters' % (language))
 
 def urdu_split_sentences(text):
     """
@@ -51,7 +53,8 @@ def urdu_split_sentences(text):
     text = text.replace('|','')
     #/(\n{2,}|!|\x{061f}|\x{06D4}|\x{2022}|\x{000d}|\s{2,}|\x{2026}|\x{002e})/
     # '\n{2,}|!|QUESTION|DASH    |BULLET  |CR      |\s{2,}|ELLIPSIS|FULL_STOP'
-    regex = u'(\n{2,}|!|%s|%s|%s|%s|\s{2,}|%s|\%s)' % (QUESTION, DASH, BULLET, CR, ELLIPSIS, FULL_STOP)
+    regex = u'(\n{2,}|!|%s|%s|%s|%s|\s{2,}|%s|\%s)' % (
+        QUESTION, DASH, BULLET, CR, ELLIPSIS, FULL_STOP)
     p = re.compile(regex)
     sentences = p.split(text)
 

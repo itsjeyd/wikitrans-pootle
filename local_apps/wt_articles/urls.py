@@ -24,7 +24,8 @@ urlpatterns = patterns('wt_articles.views',
         'show_source', name="articles_show_source"),
     url(r'^fix/(?P<aid>\d+)', 'fix_article', name="fix_article"),
 
-    url(r'^translated/(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
+    url(r'^translated/'\
+        '(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
         'show_translated', name="articles_show_translated"),
     url(r'^translated/(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/',
         'show_translated', name="articles_show_translated"),
@@ -35,9 +36,11 @@ urlpatterns = patterns('wt_articles.views',
     url(r'^posteditable/', 'posteditable_list', name="posteditable_list"),
     url(r'^fix/', 'fix_article_list', name="fix_article_list"),
 
-    url(r'^translate/new/(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
+    url(r'^translate/new/'\
+        '(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
         'translate_from_scratch', name="translate_from_scratch"),
-    url(r'^translate/postedit/(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
+    url(r'^translate/postedit/'\
+        '(?P<source>\w+)-(?P<target>\w+)/(?P<title>[^/]+)/(?P<aid>\d+)',
         'translate_post_edit', name="translate_post_edit"),
     url(r'^translate/languages/add/(?P<aid>\d+)', 'add_target_languages',
         name="add_target_languages"),

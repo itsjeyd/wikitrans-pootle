@@ -53,7 +53,8 @@ def landing(request, template_name="wt_articles/landing.html"):
     featured_translation = latest_featured_article()
     featured_text = u'No translations are featured'
     if featured_translation != None:
-        featured_text = sentences_as_html(featured_translation.article.sentences.all())
+        featured_text = sentences_as_html(
+            featured_translation.article.sentences.all())
 
     recent_translations = TranslatedArticle.objects.order_by('-timestamp')[:5]
 
@@ -70,10 +71,11 @@ def show_source(request, title, source, aid=None,
     if aid != None:
         sa_set = SourceArticle.objects.filter(id=aid)
     else:
-        sa_set = SourceArticle.objects.filter(language=source,
-                                              title=title).order_by('-timestamp')
+        sa_set = SourceArticle.objects.filter(
+            language=source, title=title).order_by('-timestamp')
     if len(sa_set) > 0:
-        article_text = sentences_as_html_span(sa_set[0].sourcesentence_set.all())
+        article_text = sentences_as_html_span(
+            sa_set[0].sourcesentence_set.all())
     else:
         article_text = None
 
@@ -89,9 +91,10 @@ def show_translated(request, title, source, target, aid=None,
     if aid != None:
         ta_set = TranslatedArticle.objects.filter(id=aid)
     else:
-        ta_set = TranslatedArticle.objects.filter(article__language=source,
-                                                  language=target,
-                                                  title=title).order_by('-timestamp')
+        ta_set = TranslatedArticle.objects.filter(
+            article__language=source,
+            language=target,
+            title=title).order_by('-timestamp')
     if len(ta_set) > 0:
         article_text = sentences_as_html(ta_set[0].sentences.all())
     else:
@@ -332,13 +335,13 @@ def request_article(request,
         if article_request_form.is_valid():
             title = article_request_form.cleaned_data['title']
             title_language = article_request_form.cleaned_data['title_language']
-            if not ArticleOfInterest.objects.filter(title__exact=title,
-                                                    title_language__exact=title_language):
+            if not ArticleOfInterest.objects.filter(
+                title__exact=title, title_language__exact=title_language):
                 article_of_interest = article_request_form.save(commit=False)
                 article_of_interest.date = datetime.now()
                 article_of_interest.save()
-                article_dict = query_text_rendered(title,
-                                                   language=title_language.code)
+                article_dict = query_text_rendered(
+                    title, language=title_language.code)
                 request_form = form_class()
                 return {"article_requested": True,
                         "request_form": request_form}
