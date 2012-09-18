@@ -34,20 +34,20 @@ def urdu_split_sentences(text):
     CR = u'\u000D'
     SPACE = u'\u0020'
     FULL_STOP = u'\u002e'
-    
+
     text = text.replace('\r','')
     text = text.replace('\n','\n\n')
     reg_bullet = u'\s*%s\s*' % BULLET
     text = re.sub(reg_bullet, '\n\n\n\n\n', text)
-    
+
     text = text.replace('\t* +\t*$', ' ')
-    
+
     reg_cr = u'[\n%s][ ]+[\n%s]' % (CR, CR)
     text = re.sub(reg_cr, '\n\n', text)
-    
+
     reg_space = u'^[\t%s]+$' % SPACE
     text = re.sub(reg_space, '\n\n', text)
-    
+
     text = text.replace('|','')
     #/(\n{2,}|!|\x{061f}|\x{06D4}|\x{2022}|\x{000d}|\s{2,}|\x{2026}|\x{002e})/
     # '\n{2,}|!|QUESTION|DASH    |BULLET  |CR      |\s{2,}|ELLIPSIS|FULL_STOP'
