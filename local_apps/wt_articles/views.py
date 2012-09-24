@@ -178,7 +178,6 @@ def translate_from_scratch(request, source, target, title, aid,
     """
     sa_set = SourceArticle.objects.filter(id=aid)
     if len(sa_set) < 1:
-        no_match = True
         return render_to_response(template_name,
                                   {"no_match": True},
                                   context_instance=RequestContext(request))
@@ -237,7 +236,6 @@ def translate_post_edit(request, source, target, title, aid,
     """
     ta_set = TranslatedArticle.objects.filter(id=aid)
     if len(ta_set) < 1:
-        no_match = True
         return render_to_response(template_name,
                                   {"no_match": True},
                                   context_instance=RequestContext(request))
@@ -270,7 +268,6 @@ def fix_article(request, aid, form_class=DummyFixArticleForm,
     """
     sa_set = SourceArticle.objects.filter(id=aid)
     if len(sa_set) < 1:
-        no_match = True
         return render_to_response(template_name,
                                   {"no_match": True},
                                   context_instance=RequestContext(request))
@@ -344,7 +341,6 @@ def source_to_po(request, aid,
 
     sa_set = SourceArticle.objects.filter(id=aid)
     if len(sa_set) < 1:
-        no_match = True
         return render_to_response(template_name,
                                   {"no_match": True},
                                   context_instance=RequestContext(request))
@@ -366,11 +362,10 @@ def delete_pootle_project(request, aid):
     Deletes a pootle Project by id (aid).
     """
     # Fetch the article
-    no_match = False
 
     sa_set = SourceArticle.objects.filter(id=aid)
     if len(sa_set) < 1:
-        no_match = True
+        pass
     else:
         article = sa_set[0]
         article.delete_pootle_project(delete_local=True)
@@ -388,11 +383,10 @@ def create_pootle_project(request, aid):
     Converts an article to a Pootle project by id (aid).
     """
     # Fetch the article
-    no_match = False
 
     sa_set = SourceArticle.objects.filter(id=aid)
     if len(sa_set) < 1:
-        no_match = True
+        pass
     else:
         article = sa_set[0]
         project = article.create_pootle_project()
