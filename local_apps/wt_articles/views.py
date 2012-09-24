@@ -1,40 +1,24 @@
 from datetime import datetime
-from urllib import quote_plus, unquote_plus
+from urllib import unquote_plus
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.forms.formsets import formset_factory
-from django.http import Http404
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.utils.translation import ugettext_lazy as _
-from django.views.generic import date_based
 from wikipydia import query_text_rendered
 
-from pootle_language.models import Language
-from pootle_project.models import Project
-from pootle_store.filetypes import factory_classes
-from pootle_store.filetypes import filetype_choices
-from pootle_store.filetypes import is_monolingual
-from pootle_translationproject.models import TranslationProject
 from wt_articles.forms import AddTargetLanguagesForm
 from wt_articles.forms import ArticleRequestForm
 from wt_articles.forms import DummyFixArticleForm
 from wt_articles.forms import TranslatedSentenceMappingForm
 from wt_articles.models import ArticleOfInterest
-from wt_articles.models import FeaturedTranslation
 from wt_articles.models import latest_featured_article
 from wt_articles.models import SourceArticle
-from wt_articles.models import SourceSentence
 from wt_articles.models import TranslatedArticle
 from wt_articles.models import TranslatedSentence
-from wt_articles.utils import all_articles
 from wt_articles.utils import all_source_articles
-from wt_articles.utils import all_translated_articles
 from wt_articles.utils import sentences_as_html
 from wt_articles.utils import sentences_as_html_span
 from wt_articles.utils import target_pairs_by_user
@@ -123,7 +107,6 @@ def article_list(request, template_name="wt_articles/article_list.html"):
     # articles, since we are merging with Pootle. articles =
     # user_compatible_articles(request.user)
     articles = all_source_articles()
-    from django.utils.encoding import smart_unicode
 
     content_dict = { "articles": articles, }
     content_dict.update(request_article(request))
@@ -136,7 +119,6 @@ def article_list(request, template_name="wt_articles/article_list.html"):
 def fix_article_list(request,
                      template_name="wt_articles/fix_article_list.html"):
     articles = user_compatible_articles(request.user)
-    from django.utils.encoding import smart_unicode
 
     return render_to_response(template_name, {
         "articles": articles,
