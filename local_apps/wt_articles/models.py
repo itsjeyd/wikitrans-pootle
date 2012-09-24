@@ -54,38 +54,38 @@ class SourceArticle(models.Model):
             super(SourceArticle, self).save()
 
             segment_id = 0
-            for t in soup.findAll(re.compile('^[ph]')):
-                if re.match('p', t.name):
-                    p_text = ''.join([x.string for x in t.findAll(text=True)
+            for tag in soup.findAll(re.compile('^[ph]')):
+                if re.match('p', tag.name):
+                    p_text = ''.join([x.string for x in tag.findAll(text=True)
                                       if not re.match('[\[\]\\d]+$',
                                                       x.string)])
                     sentences = sentence_splitter(p_text.strip())
                     for sentence in sentences:
                         sentence = sentence.replace("&#160;", " ")
-                        s = SourceSentence(article=self,
-                                           text=sentence,
-                                           segment_id=segment_id,
-                                           is_heading=False,
-                                           heading_level=0)
+                        src_sent = SourceSentence(article=self,
+                                                  text=sentence,
+                                                  segment_id=segment_id,
+                                                  is_heading=False,
+                                                  heading_level=0)
                         segment_id += 1
-                        s.save()
-                    s.end_of_paragraph = True
-                    s.save()
+                        src_sent.save()
+                    src_sent.end_of_paragraph = True
+                    src_sent.save()
 
-                elif re.match('h\d', t.name):
-                    headline = t.findAll(attrs={'class': 'mw-headline'})
+                elif re.match('h\d', tag.name):
+                    headline = tag.findAll(attrs={'class': 'mw-headline'})
                     if headline:
-                        h = headline[0].string
+                        content = headline[0].string
                     else:
-                        h = t.string
-                    if h.lower() == 'weblinks':
+                        content = tag.string
+                    if content.lower() == 'weblinks':
                         break
-                    s = SourceSentence(article=self,
-                                       text=h,
-                                       segment_id=segment_id,
-                                       is_heading=True,
-                                       heading_level=int(t.name[-1]))
-                    s.save()
+                    src_sent = SourceSentence(article=self,
+                                              text=content,
+                                              segment_id=segment_id,
+                                              is_heading=True,
+                                              heading_level=int(tag.name[-1]))
+                    src_sent.save()
                     segment_id += 1
 
             self.sentences_processed = True
@@ -155,22 +155,22 @@ class SourceArticle(models.Model):
         }
 
         # Export the title
-        poTitle = polib.POEntry(
+        po_title = polib.POEntry(
             tcomment = "Title",
             msgid = self.title
         )
-        po.append(poTitle)
+        po.append(po_title)
 
         # Export the sentences
         for sentence in self.sourcesentence_set.order_by('segment_id'):
-            poEntry = polib.POEntry(
+            po_entry = polib.POEntry(
                 occurrences = [('segment_id', sentence.segment_id)],
                 tcomment = "sentence",  # TODO: Check to see if it's a
                                         # sentence or a header
                 msgid = sentence.text
             )
 
-            po.append(poEntry)
+            po.append(po_entry)
 
         return po
 
@@ -194,11 +194,11 @@ class SourceArticle(models.Model):
             if i > 0 and len(sentences[i].strip()) == 0:
                 source_sentences[segment_id-1].end_of_paragraph = True
             else:
-                s = SourceSentence(article=self,
-                                   text=sentences[i].strip(),
-                                   segment_id=segment_id)
+                src_sent = SourceSentence(article=self,
+                                          text=sentences[i].strip(),
+                                          segment_id=segment_id)
 
-                source_sentences.append(s)
+                source_sentences.append(src_sent)
                 segment_id += 1
 
         return source_sentences
@@ -279,23 +279,23 @@ class SourceArticle(models.Model):
         # 2. Export the article to .po and store in the templates
         # "translation project". This will be used to generate
         # translation requests for other languages.
-        templatesProject = project.get_template_translationproject()
+        templates_project = project.get_template_translationproject()
         po = self.sentences_to_po()
-        poFilePath = "%s/article.pot" % (templatesProject.abs_real_path)
+        po_file_path = "%s/article.pot" % (templates_project.abs_real_path)
 
-        oldstats = templatesProject.getquickstats()
+        oldstats = templates_project.getquickstats()
 
         # Write the file
-        with open(poFilePath, 'w') as f:
-            f.write(smart_str(po.__str__()))
+        with open(po_file_path, 'w') as po_file:
+            po_file.write(smart_str(po.__str__()))
 
         # Force the project to scan for changes.
-        templatesProject.scan_files()
-        templatesProject.update(conservative=False)
+        templates_project.scan_files()
+        templates_project.update(conservative=False)
 
         # Log the changes
-        newstats = templatesProject.getquickstats()
-        post_template_update.send(sender=templatesProject,
+        newstats = templates_project.getquickstats()
+        post_template_update.send(sender=templates_project,
                                   oldstats=oldstats,
                                   newstats=newstats)
 
@@ -434,11 +434,11 @@ class TranslationRequest(models.Model):
     def __unicode__(self):
         return u"%s: %s" % (self.target_language, self.article)
 
-    def get_subset(self, requestStatus):
+    def get_subset(self, request_status):
         """
         Retrieves all of the TranslationRequests that have a specific status
         """
-        return TranslationRequest.objects.filter(status=requestStatus)
+        return TranslationRequest.objects.filter(status=request_status)
 
     def send_request(self):
         """
@@ -495,8 +495,8 @@ class TranslatedArticle(models.Model):
             translated_article_list[0] != self.article):
             raise ValueError('Not all translated sentences derive from the ' \
                                  'source article')
-        for ts in translated_sentences:
-            self.sentences.add(ts)
+        for trans_sent in translated_sentences:
+            self.sentences.add(trans_sent)
 
     def __unicode__(self):
         return u'%s :: %s' % (self.title, self.article)
@@ -533,8 +533,8 @@ class FeaturedTranslation(models.Model):
         return u'%s :: %s' % (self.featured_date, self.article.title)
 
 def latest_featured_article():
-    ft = FeaturedTranslation.objects.all()[0:]
-    if len(ft) > 0:
-        return ft[0]
+    featured_translations = FeaturedTranslation.objects.all()[0:]
+    if len(featured_translations) > 0:
+        return featured_translations[0]
     else:
         return None
