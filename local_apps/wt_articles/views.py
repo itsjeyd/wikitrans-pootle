@@ -132,10 +132,10 @@ def translatable_list(request,
     user = request.user
     source_articles = user_compatible_source_articles(request.user)
     articles = []
-    for sa in source_articles:
-        lang_pairs = target_pairs_by_user(user, sa.language)
+    for src_art in source_articles:
+        lang_pairs = target_pairs_by_user(user, src_art.language)
         for pair in lang_pairs:
-            article = copy.deepcopy(sa)
+            article = copy.deepcopy(src_art)
             article.target = pair[0]
             article.link = (u'/articles/translate/new/%s' %
                             (article.get_relative_url(pair[1])))
@@ -154,10 +154,10 @@ def posteditable_list(request,
     user = request.user
     target_articles = user_compatible_target_articles(request.user)
     articles = []
-    for ta in target_articles:
-        lang_pairs = target_pairs_by_user(user, ta.language)
+    for target_art in target_articles:
+        lang_pairs = target_pairs_by_user(user, target_art.language)
         for pair in lang_pairs:
-            article = copy.deepcopy(ta)
+            article = copy.deepcopy(target_art)
             article.target = pair[0]
             article.link = (u'/articles/translate/postedit/%s' %
                             (article.get_relative_url()))
@@ -191,34 +191,35 @@ def translate_from_scratch(request, source, target, title, aid,
         formset = TranslatedSentenceSet(request.POST, request.FILES)
         if formset.is_valid():
             ts_list = []
-            ta = TranslatedArticle()
+            trans_art = TranslatedArticle()
             for form in formset.forms:
-                ss = form.cleaned_data['source_sentence']
+                src_sent = form.cleaned_data['source_sentence']
                 text = form.cleaned_data['text']
-                ts = TranslatedSentence(segment_id=ss.segment_id,
-                                        source_sentence=ss,
-                                        text=text,
-                                        translated_by=request.user.username,
-                                        translation_date=datetime.now(),
-                                        language=target,
-                                        best=True,
-                                        end_of_paragraph=ss.end_of_paragraph)
-                ts_list.append(ts)
-            ta.article = ss.article
-            ta.title = ss.article.title
-            ta.timestamp = datetime.now()
-            ta.language = target
-            ta.save()
-            for ts in ts_list:
-                ts.save()
-            ta.sentences = ts_list
-            ta.save()
-            return HttpResponseRedirect(ta.get_absolute_url())
+                trans_sent = TranslatedSentence(
+                    segment_id=src_sent.segment_id,
+                    source_sentence=src_sent,
+                    text=text,
+                    translated_by=request.user.username,
+                    translation_date=datetime.now(),
+                    language=target,
+                    best=True,
+                    end_of_paragraph=src_sent.end_of_paragraph)
+                ts_list.append(trans_sent)
+            trans_art.article = src_sent.article
+            trans_art.title = src_sent.article.title
+            trans_art.timestamp = datetime.now()
+            trans_art.language = target
+            trans_art.save()
+            for trans_sent in ts_list:
+                trans_sent.save()
+            trans_art.sentences = ts_list
+            trans_art.save()
+            return HttpResponseRedirect(trans_art.get_absolute_url())
     else:
         initial_ss_set = [{'source_sentence': s} for s in ss_list]
         formset = TranslatedSentenceSet(initial=initial_ss_set)
-    for form, s in zip(formset.forms, ss_list):
-        form.fields['text'].label = s.text
+    for form, sent in zip(formset.forms, ss_list):
+        form.fields['text'].label = sent.text
 
     return render_to_response(template_name, {
         "formset": formset,
@@ -251,8 +252,8 @@ def translate_post_edit(request, source, target, title, aid,
     else:
         initial_ts_set = [{'text': s.text} for s in ts_list]
         formset = TranslatedSentenceSet(initial=initial_ts_set)
-    for form, s in zip(formset.forms, ss_list):
-        form.fields['text'].label = s.text
+    for form, sent in zip(formset.forms, ss_list):
+        form.fields['text'].label = sent.text
         form.fields['text'].__dict__
 
     return render_to_response(template_name, {
