@@ -28,38 +28,38 @@ def urdu_split_sentences(text):
     This function is a python implementation of Danish Munir's
     perl urdu-segmenter.
     """
-    DASH = u'\u06D4' # arabic full stop
-    QUESTION = u'\u061F'
-    ELLIPSIS = u'\u2026'
-    BULLET = u'\u2022'
-    CR = u'\u000D'
-    SPACE = u'\u0020'
-    FULL_STOP = u'\u002e'
+    dash = u'\u06D4' # arabic full stop
+    question = u'\u061F'
+    ellipsis = u'\u2026'
+    bullet = u'\u2022'
+    carriage_return = u'\u000D'
+    space = u'\u0020'
+    full_stop = u'\u002e'
 
     text = text.replace('\r','')
     text = text.replace('\n','\n\n')
-    reg_bullet = u'\s*%s\s*' % BULLET
+    reg_bullet = u'\s*%s\s*' % bullet
     text = re.sub(reg_bullet, '\n\n\n\n\n', text)
 
     text = text.replace('\t* +\t*$', ' ')
 
-    reg_cr = u'[\n%s][ ]+[\n%s]' % (CR, CR)
+    reg_cr = u'[\n%s][ ]+[\n%s]' % (carriage_return, carriage_return)
     text = re.sub(reg_cr, '\n\n', text)
 
-    reg_space = u'^[\t%s]+$' % SPACE
+    reg_space = u'^[\t%s]+$' % space
     text = re.sub(reg_space, '\n\n', text)
 
     text = text.replace('|','')
-    #/(\n{2,}|!|\x{061f}|\x{06D4}|\x{2022}|\x{000d}|\s{2,}|\x{2026}|\x{002e})/
-    # '\n{2,}|!|QUESTION|DASH    |BULLET  |CR      |\s{2,}|ELLIPSIS|FULL_STOP'
+    #/(\n{2,}|!|\x{061f}|\x{06D4}|\x{2022}|\x{000d}       |\s{2,}|\x{2026}|\x{002e})/
+    # '\n{2,}|!|question|dash    |bullet  |carriage_return|\s{2,}|ellipsis|full_stop'
     regex = u'(\n{2,}|!|%s|%s|%s|%s|\s{2,}|%s|\%s)' % (
-        QUESTION, DASH, BULLET, CR, ELLIPSIS, FULL_STOP)
-    p = re.compile(regex)
-    sentences = p.split(text)
+        question, dash, bullet, carriage_return, ellipsis, full_stop)
+    punctuation = re.compile(regex)
+    sentences = punctuation.split(text)
 
     new_string = ''
     segment_id = 1
-    follow_up_punctuation = re.compile('[\n%s%s]' % (CR, BULLET))
+    follow_up_punctuation = re.compile('[\n%s%s]' % (carriage_return, bullet))
     i = 0
     new_sentences = []
     while i < len(sentences):
@@ -70,7 +70,7 @@ def urdu_split_sentences(text):
             continue
         new_string = new_string + sent
         # check punctuation in following sentence
-        # if not newline, CR or BULLET, print it
+        # if not newline, carriage_return or bullet, print it
         next_sent = sentences[i+1]
         if not follow_up_punctuation.match(next_sent):
             new_string = new_string + next_sent
