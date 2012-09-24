@@ -1,7 +1,6 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, url
 
 from wt_articles import views
-from wt_articles.forms import *
 
 
 urlpatterns = patterns('wt_articles.views',
