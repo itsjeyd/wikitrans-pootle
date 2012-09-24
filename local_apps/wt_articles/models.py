@@ -1,24 +1,20 @@
-import logging
 import re
 
 import polib
 
-from aifc import Error
 from datetime import datetime
-from urllib import quote_plus, unquote_plus
+from urllib import quote_plus
 
 from BeautifulSoup import BeautifulSoup
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 
 from pootle_language.models import Language
 from pootle_project.models import Project
-from pootle_translationproject.models import TranslationProject
 
-from wt_articles import TRANSLATION_STATUSES, TRANSLATORS
+from wt_articles import TRANSLATION_STATUSES
 from wt_articles.splitting import determine_splitter
 from wt_translation.models import MachineTranslator
 
