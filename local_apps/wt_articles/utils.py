@@ -31,12 +31,12 @@ def apertium_translator():
 def _group_sentences(sentences):
     p_groups = []
     prev_s = None
-    for s in sentences:
+    for sent in sentences:
         if prev_s == None or prev_s.end_of_paragraph:
             cur_list = []
             p_groups.append(cur_list)
-        cur_list.append(s)
-        prev_s = s
+        cur_list.append(sent)
+        prev_s = sent
     return p_groups
 
 def _format_sentences(sentences, fun):
@@ -59,16 +59,15 @@ def sentences_as_html(sentences):
     return html
 
 def sentences_as_html_span(sentences):
-    format_span = lambda sid, text: u"<span id='ss_%d'>%s</span>" % (sid,
-                                                                     text)
+    format_span = lambda sid, text: u"<span id='ss_%d'>%s</span>" % (sid, text)
     format_h = lambda text, level: u'<h%d>%s</h%d>' % (level+1,
                                                        text,
                                                        level+1)
-    for s in sentences:
-        if s.is_heading:
-            s.text = format_h(s.text, s.heading_level)
+    for sent in sentences:
+        if sent.is_heading:
+            sent.text = format_h(sent.text, sent.heading_level)
         else:
-            s.text = format_span(s.segment_id, s.text)
+            sent.text = format_span(sent.segment_id, sent.text)
 
     html = sentences_as_html(sentences)
     return html
