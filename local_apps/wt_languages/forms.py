@@ -1,7 +1,4 @@
-
-from datetime import datetime
 from django import forms
-from django.utils.translation import ugettext_lazy as _
 
 from wt_languages.models import LanguageCompetancy
 
