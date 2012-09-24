@@ -3,7 +3,6 @@
 
 from wt_languages.models import LANGUAGE_CHOICES
 
-import sys
 import re
 import nltk.data
 
