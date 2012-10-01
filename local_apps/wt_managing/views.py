@@ -58,24 +58,24 @@ def review_translatedarticle(request, source, target, title, aid,
         if formset.is_valid():
             articlereview_id = formset.forms[0].cleaned_data['articlereview']
             articlereview, created = ArticleReview.objects.get_or_create(id=articlereview_id)
-            for form, ts in zip(formset.forms, ts_list):
+            for form, trans_sent in zip(formset.forms, ts_list):
                 accepted = form.cleaned_data['accepted']
                 segment_id = form.cleaned_data['segment_id']
                 print 'JD acc : %s' % accepted
                 print 'JD seg : %s' % segment_id
                 print 'JD aid : %s' % articlereview
-                sr = SentenceReview(translated_sentence=ts,
-                                    articlereview=articlereview,
-                                    accepted=accepted,
-                                    review_date=datetime.now(),
-                                    segment_id=segment_id,
-                                    status=FINISHED)
-                sr.save()
+                sent_review = SentenceReview(translated_sentence=trans_sent,
+                                             articlereview=articlereview,
+                                             accepted=accepted,
+                                             review_date=datetime.now(),
+                                             segment_id=segment_id,
+                                             status=FINISHED)
+                sent_review.save()
         return HttpResponseRedirect(reverse(reviewable_article_list))
     else:
-        ar = ArticleReview()
-        ar.translated_by = request.user.username
-        sr_list = ar.bootstrap(article)
+        art_review = ArticleReview()
+        art_review.translated_by = request.user.username
+        sr_list = art_review.bootstrap(article)
         initial_ts_set = [{'translated_sentence': s,
                            'articlereview': s.articlereview.id,
                            'segment_id': s.segment_id} for s in sr_list]
@@ -83,8 +83,8 @@ def review_translatedarticle(request, source, target, title, aid,
         formset = TranslatedSentenceSet(initial=initial_ts_set)
 
     # Change label to show sentence
-    for form, ts in zip(formset.forms, ts_list):
-        form.fields['accepted'].label = ts.text
+    for form, trans_sent in zip(formset.forms, ts_list):
+        form.fields['accepted'].label = trans_sent.text
 
     return render_to_response(template_name, {
         "formset": formset,
