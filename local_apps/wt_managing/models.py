@@ -3,7 +3,6 @@ from datetime import datetime
 from django.db import models
 from django.db.transaction import commit_on_success
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 from wt_articles.models import TranslatedArticle, TranslatedSentence
