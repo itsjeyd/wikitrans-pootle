@@ -1,5 +1,5 @@
 from django.core.management.base import NoArgsCommand
-from wt_translation.models import MachineTranslator, ServerlandHost
+from wt_translation.models import ServerlandHost
 
 class Command(NoArgsCommand):
 
