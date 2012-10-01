@@ -381,7 +381,9 @@ class ServerlandConfigError(TranslatorConfigError):
 #            if self.errorCode == UNAVAILABLE:
 #                self.msg = "Serverland host '%s' is unavailable." % host.shortname
 
-            # TODO: Should updating the ServerlandHost instance go here? And if the host is unavailable, should we update the status as such? For now, assume yes.
+            # TODO: Should updating the ServerlandHost instance go
+            # here? And if the host is unavailable, should we update
+            # the status as such? For now, assume yes.
             host.status = self.errorCode
             host.save()
         else:
