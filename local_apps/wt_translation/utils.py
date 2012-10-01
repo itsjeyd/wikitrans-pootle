@@ -5,7 +5,6 @@ import pycountry
 import uuid
 
 from BeautifulSoup import BeautifulStoneSoup
-from pootle_language.models import Language
 
 
 def get_iso639_2(language):
