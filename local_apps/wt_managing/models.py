@@ -16,7 +16,7 @@ else:
 PENDING = 0
 IN_PROGRESS = 1
 FINISHED = 2
-REVIEW_STATUSES = ( 
+REVIEW_STATUSES = (
     (PENDING, 'Pending'),
     (IN_PROGRESS, 'In Progress'),
     (FINISHED, 'Finished'),
@@ -40,7 +40,7 @@ class ArticleReview(models.Model):
         for s in sentences:
             sr = SentenceReview(translated_sentence=s,
                                 articlereview=self,
-                                segment_id=s.segment_id)                                
+                                segment_id=s.segment_id)
             sr.save()
             sr_list.append(sr)
         return sr_list
