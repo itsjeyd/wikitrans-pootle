@@ -20,11 +20,11 @@ class Command(NoArgsCommand):
         for host in hosts:
             try:
                 host.fetch_translations()
-            except UnsupportedLanguagePair as ex:
-                self.handle_error(host, ex)
-            except UndefinedTranslator as ex:
-                self.handle_error(host, ex)
-            except ServerlandConfigError as ex:
-                self.handle_error(host, ex)
-            except Exception as ex:
-                self.handle_error(host, ex)
+            except UnsupportedLanguagePair as error:
+                self.handle_error(host, error)
+            except UndefinedTranslator as error:
+                self.handle_error(host, error)
+            except ServerlandConfigError as error:
+                self.handle_error(host, error)
+            except Exception as error:
+                self.handle_error(host, error)
