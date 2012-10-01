@@ -1,7 +1,6 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, url
 
-from wt_managing import views, models
-from wt_languages.forms import *
+from wt_managing import views
 
 urlpatterns = patterns('wt_managing.views',
     url(r'^$', 'reviewable_article_list', name="reviewable_article_list"),
