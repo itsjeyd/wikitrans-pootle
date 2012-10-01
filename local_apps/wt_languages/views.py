@@ -27,13 +27,13 @@ def language_competancy_list(request, template_name="wt_languages/language_compe
 def language_competancy_destroy(request, id):
     language_competancy = LanguageCompetancy.objects.get(pk=id)
     user = request.user
-    if language_competancy.user != request.user:
-        request.user.message_set.create(message="You can't delete competancies that aren't yours")
+    if language_competancy.user != user:
+        user.message_set.create(message="You can't delete competancies that aren't yours")
         return HttpResponseRedirect(reverse("language_competancy_list"))
 
     if request.method == "POST" and request.POST["action"] == "delete":
         language_competancy.delete()
-        request.user.message_set.create(message=_("Successfully deleted competancy '%s'") % language_competancy)
+        user.message_set.create(message=_("Successfully deleted competancy '%s'") % language_competancy)
         return HttpResponseRedirect(reverse("language_competancy_list"))
     else:
         return HttpResponseRedirect(reverse("language_competancy_list"))
