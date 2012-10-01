@@ -78,5 +78,5 @@ class LanguageCompetancy(models.Model):
 
 
 
-    
-    
+
+
