@@ -30,18 +30,18 @@ class ArticleReview(models.Model):
                                  default=PENDING)
 
     @commit_on_success
-    def bootstrap(self, ta):
-        self.translated_article = ta
+    def bootstrap(self, trans_art):
+        self.translated_article = trans_art
         self.start_date = datetime.now()
         self.save() # generates id for foreignkey in sentence review
         sentences = self.translated_article.sentences.all()
         sr_list = []
-        for s in sentences:
-            sr = SentenceReview(translated_sentence=s,
-                                articlereview=self,
-                                segment_id=s.segment_id)
-            sr.save()
-            sr_list.append(sr)
+        for sent in sentences:
+            sent_review = SentenceReview(translated_sentence=sent,
+                                         articlereview=self,
+                                         segment_id=sent.segment_id)
+            sent_review.save()
+            sr_list.append(sent_review)
         return sr_list
 
     def __unicode__(self):
