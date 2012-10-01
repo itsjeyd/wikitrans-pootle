@@ -1,7 +1,6 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, url
 
-from wt_languages import views, models
-from wt_languages.forms import *
+from wt_languages import views
 
 
 urlpatterns = patterns('',
