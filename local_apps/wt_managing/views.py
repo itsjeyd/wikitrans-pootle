@@ -45,7 +45,6 @@ def review_translatedarticle(request, source, target, title, aid,
     """
     ta_set = TranslatedArticle.objects.filter(id=aid)
     if len(ta_set) < 1:
-        no_match = True
         return render_to_response(template_name,
                                   {"no_match": True},
                                   context_instance=RequestContext(request))
