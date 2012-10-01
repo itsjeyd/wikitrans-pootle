@@ -1,5 +1,3 @@
-from django.utils.safestring import SafeUnicode
-
 from wt_articles.models import TranslatedArticle
 
 def user_compatible_translations(user, article_model=TranslatedArticle):
