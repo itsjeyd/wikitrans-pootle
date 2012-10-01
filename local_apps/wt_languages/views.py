@@ -24,8 +24,8 @@ def language_competancy_list(request, template_name="wt_languages/language_compe
     }, context_instance=RequestContext(request))
 
 @login_required
-def language_competancy_destroy(request, id):
-    language_competancy = LanguageCompetancy.objects.get(pk=id)
+def language_competancy_destroy(request, lc_id):
+    language_competancy = LanguageCompetancy.objects.get(pk=lc_id)
     user = request.user
     if language_competancy.user != user:
         user.message_set.create(message="You can't delete competancies that aren't yours")
@@ -63,8 +63,8 @@ def language_competancy_new(request, form_class=LanguageCompetancyForm, template
     }, context_instance=RequestContext(request))
 
 @login_required
-def language_competancy_edit(request, id, form_class=LanguageCompetancyForm, template_name="wt_languages/language_competancy_edit.html"):
-    competancy = get_object_or_404(LanguageCompetancy, id=id)
+def language_competancy_edit(request, lc_id, form_class=LanguageCompetancyForm, template_name="wt_languages/language_competancy_edit.html"):
+    competancy = get_object_or_404(LanguageCompetancy, id=lc_id)
 
     if request.method == "POST":
         if competancy.user != request.user:
