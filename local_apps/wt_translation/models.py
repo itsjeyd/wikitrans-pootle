@@ -164,31 +164,31 @@ class ServerlandHost(models.Model):
                 description = worker.find('description').text
                 language_pairs = worker.find('language_pairs').getchildren()
                 if not MachineTranslator.objects.filter(shortname=shortname):
-                    mt = MachineTranslator.objects.create(
+                    translator = MachineTranslator.objects.create(
                         shortname=shortname, description=description
                         )
                     # Add language pairs
-                    for lp in language_pairs:
+                    for lang_pair in language_pairs:
                         source, target = tuple(
-                            lang.text for lang in lp.getchildren()
+                            lang.text for lang in lang_pair.getchildren()
                             )
-                        mt.add_language_pair(source, target)
-                    self.translators.add(mt)
+                        translator.add_language_pair(source, target)
+                    self.translators.add(translator)
                     self.status = OK
                     self.save()
 
     def request(self, url, method='GET', body=None, header=None):
-        HTTP = httplib2.Http()
+        http = httplib2.Http()
         if body and header:
-            return HTTP.request(url, method=method, body=body, headers=header)
+            return http.request(url, method=method, body=body, headers=header)
         else:
-            return HTTP.request(url, method=method)
+            return http.request(url, method=method)
 
     def fetch_workers(self):
         url = self.url + 'workers/?token=%s' % self.token
         response = self.request(url)
-        et = utils.element_tree(response)
-        return et.findall('resource')
+        etree = utils.element_tree(response)
+        return etree.findall('resource')
 
     def request_translation(self, trans_request):
         translator = trans_request.translator
@@ -244,8 +244,8 @@ class ServerlandHost(models.Model):
             self.url + 'requests/?token={0}'.format(self.token)
             )
         if response[0].status == 200:
-            et = utils.element_tree(response)
-            requests = et.findall('resource')
+            etree = utils.element_tree(response)
+            requests = etree.findall('resource')
             completed_requests = (
                 r for r in requests if eval(r.findtext('ready'))
                 )
@@ -256,7 +256,7 @@ class ServerlandHost(models.Model):
             for request in completed_requests:
                 shortname = request.findtext('shortname')
                 if shortname in in_progress_requests:
-                    tr = TranslationRequest.objects.get_by_external_id(
+                    trans_request = TranslationRequest.objects.get_by_external_id(
                         shortname
                         )
                     response = self.request(
@@ -264,8 +264,8 @@ class ServerlandHost(models.Model):
                             shortname, self.token
                             )
                         )
-                    et = utils.element_tree(response)
-                    result = et.findtext('result')
+                    etree = utils.element_tree(response)
+                    result = etree.findtext('result')
                     result = re.sub('### (\[\[YAHOO_SPLITTER\]\]\n)?(### )?', '', result)
                     result = re.sub('(<[A-Z]\[)?(\]>)?', '', result)
                     result_sentences = [
@@ -273,19 +273,19 @@ class ServerlandHost(models.Model):
                         utils.clean_string(result.strip()).split('\n')
                         ]
                     store = Store.objects.get(
-                        translation_project=tr.translation_project
+                        translation_project=trans_request.translation_project
                         )
                     units = store.unit_set.all()
                     if not len(units) == len(result_sentences):
-                        tr.status = STATUS_ERROR
+                        trans_request.status = STATUS_ERROR
                         print 'ERROR!'
                     else:
                         for i in range(len(units)):
                             units[i].target = result_sentences[i]
                             units[i].state = pootle_store.util.FUZZY
                             units[i].save()
-                        tr.status = STATUS_FINISHED
-                    tr.save()
+                        trans_request.status = STATUS_FINISHED
+                    trans_request.save()
         else:
             raise Exception(response[0].reason)
 
@@ -358,33 +358,33 @@ class TranslatorConfigError(Exception):
 class ServerlandConfigError(TranslatorConfigError):
     def __init__(self, host, error):
 
-        self.errorCode = UNAVAILABLE
+        self.error_code = UNAVAILABLE
 
         if isinstance(host, ServerlandHost):
             # Inspect the XML-RPC error type. It can either be a Fault or a ProtocolError
             if isinstance(error, xmlrpclib.ProtocolError):
-                self.errorCode = INVALID_URL
+                self.error_code = INVALID_URL
                 self.msg = "Invalid Serverland host URL: '%s'." % host.url
             elif isinstance(error, xmlrpclib.Fault):
                 # Inspect the faultCode and faultString to determine the error
                 if re.search("[Errno 111] Connection refused", error.faultString) != None:
-                    self.errorCode = INVALID_TOKEN
+                    self.error_code = INVALID_TOKEN
                     self.msg = "Invalid authentication token for Serverland host '%s'." % host.shortname
                 elif re.search("[Errno 111] Connection refused", error.faultString) != None:
-                    self.errorCode = UNAVAILABLE
+                    self.error_code = UNAVAILABLE
                 elif re.search("takes exactly \d+ arguments", error.faultString) != None:
-                    self.errorCode = MISCONFIGURED_HOST
+                    self.error_code = MISCONFIGURED_HOST
                     self.msg = "Serverland host '%s' is misconfigured." % host.shortname
                 else:
                     self.msg = error.faultString
 
-#            if self.errorCode == UNAVAILABLE:
+#            if self.error_code == UNAVAILABLE:
 #                self.msg = "Serverland host '%s' is unavailable." % host.shortname
 
             # TODO: Should updating the ServerlandHost instance go
             # here? And if the host is unavailable, should we update
             # the status as such? For now, assume yes.
-            host.status = self.errorCode
+            host.status = self.error_code
             host.save()
         else:
             super(TranslatorConfigError, self).__init__(host)
