@@ -1,21 +1,17 @@
 from datetime import datetime
 
-from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponseRedirect, Http404
-from django.template import RequestContext
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.views.generic import date_based
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.forms.formsets import formset_factory
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
-
-from wt_managing.utils import user_compatible_translations
+from wt_articles.models import TranslatedArticle
 from wt_managing.forms import SentenceReviewForm
 from wt_managing.models import FINISHED, ArticleReview, SentenceReview
-from wt_articles.models import TranslatedSentence, TranslatedArticle
+from wt_managing.utils import user_compatible_translations
 
 
 if "notification" in settings.INSTALLED_APPS:
