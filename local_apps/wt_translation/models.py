@@ -4,26 +4,21 @@ import re
 
 from datetime import datetime
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext_lazy as _
 
 import pootle_store.util
 import utils
 
 from pootle_language.models import Language
-from pootle_store.models import Store, Unit, Suggestion
+from pootle_store.models import Store
 from pootle_translationproject.models import TranslationProject
 from wt_translation import TRANSLATOR_TYPES, SERVERLAND
-from wt_translation import TRANSLATION_STATUSES, STATUS_PENDING, STATUS_IN_PROGRESS, STATUS_FINISHED, STATUS_ERROR, STATUS_CANCELLED
+from wt_translation import TRANSLATION_STATUSES, STATUS_PENDING, STATUS_IN_PROGRESS, STATUS_FINISHED, STATUS_ERROR
 from wt_translation import SERVERLAND_HOST_STATUSES, OK, INVALID_URL, INVALID_TOKEN, UNAVAILABLE, MISCONFIGURED_HOST
 
 # Serverland integration
 import xmlrpclib
-import json
 import pycountry
 
 
