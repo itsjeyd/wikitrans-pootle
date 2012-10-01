@@ -30,8 +30,8 @@ def language_competancy_destroy(request, id):
     language_competancy = LanguageCompetancy.objects.get(pk=id)
     user = request.user
     if language_competancy.user != request.user:
-            request.user.message_set.create(message="You can't delete competancies that aren't yours")
-            return HttpResponseRedirect(reverse("language_competancy_list"))
+        request.user.message_set.create(message="You can't delete competancies that aren't yours")
+        return HttpResponseRedirect(reverse("language_competancy_list"))
 
     if request.method == "POST" and request.POST["action"] == "delete":
         language_competancy.delete()
