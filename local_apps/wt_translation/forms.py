@@ -1,9 +1,7 @@
 from django import forms
-from django.forms.formsets import formset_factory
 from django.db.models import Q
 
-from wt_translation.models import MachineTranslator, LanguagePair, ServerlandHost, TranslationRequest
-from pootle_language.models import Language
+from wt_translation.models import MachineTranslator, LanguagePair, TranslationRequest
 
 #class MachineTranslatorSelectorForm(forms.Form):
 #    """
