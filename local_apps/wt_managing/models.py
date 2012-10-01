@@ -31,7 +31,7 @@ class ArticleReview(models.Model):
 
     @commit_on_success
     def bootstrap(self, ta):
-        self.translated_article=ta
+        self.translated_article = ta
         self.start_date = datetime.now()
         self.save() # generates id for foreignkey in sentence review
         sentences = self.translated_article.sentences.all()
