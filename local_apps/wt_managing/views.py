@@ -33,7 +33,7 @@ def reviewable_article_list(request, template_name="wt_managing/reviewable_artic
 
 @login_required
 def reviewable_sentence_list(request, template_name="wt_managing/reviewable_sentence_list.html"):
-    
+
     articles = user_compatible_translations(request.user)
 
     return render_to_response(template_name, {
@@ -90,7 +90,7 @@ def review_translatedarticle(request, source, target, title, aid,
     # Change label to show sentence
     for form,ts in zip(formset.forms, ts_list):
         form.fields['accepted'].label = ts.text
-        
+
     return render_to_response(template_name, {
         "formset": formset,
         "title": article.title,
