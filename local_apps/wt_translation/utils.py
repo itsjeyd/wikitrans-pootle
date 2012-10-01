@@ -25,9 +25,9 @@ def get_iso639_2(language):
 def generate_request_id():
     return uuid.uuid1().hex
 
-def clean_string(input):
+def clean_string(string):
     return BeautifulStoneSoup(
-        input, convertEntities=BeautifulStoneSoup.ALL_ENTITIES
+        string, convertEntities=BeautifulStoneSoup.ALL_ENTITIES
         ).contents[0]
 
 def generate_request_body(boundary, contents, source_file_id, sentences):
