@@ -49,13 +49,13 @@ class AdminTests(PootleTestCase):
         response = self.client.get("/admin/projects.html")
         self.assertContains(response, "<a href='/projects/tutorial/admin.html'>tutorial</a>")
         self.assertContains(response, "<a href='/projects/terminology/admin.html'>terminology</a>")
-        en = Language.objects.get(code='en')
+        english = Language.objects.get(code='en')
         add_dict = {
             "code": "testproject",
             "localfiletype": "xlf",
             "fullname": "Test Project",
             "checkstyle": "standard",
-            "source_language": en.id,
+            "source_language": english.id,
             "treestyle": "gnu",
             }
 
