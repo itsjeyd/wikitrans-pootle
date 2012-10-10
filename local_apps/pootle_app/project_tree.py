@@ -189,7 +189,7 @@ def translation_project_should_exist(language, project):
                 for filename in filenames:
                     if project.file_belongs_to_project(filename, match_templates=True) and \
                            match_template_filename(project, filename):
-                            return True
+                        return True
         else:
             # find files with the language name in the project dir
             for dirpath, dirnames, filenames in os.walk(project.get_real_path()):
