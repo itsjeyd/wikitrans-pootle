@@ -42,11 +42,11 @@ def url_split(path):
     except ValueError:
         return '', path
 
-def split_trailing_slash(p):
-    if p[-1] == u'/':
-        return p[:-1], p[-1]
+def split_trailing_slash(path):
+    if path[-1] == u'/':
+        return path[:-1], path[-1]
     else:
-        return p, u''
+        return path, u''
 
 def get_relative(ref_path, abs_path):
     def get_last_agreement(ref_chain, abs_chain):
