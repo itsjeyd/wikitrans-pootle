@@ -272,7 +272,6 @@ msgstr "resto"
         # NOTE: this is what we do currently: any altered strings become suggestions.
         # It may be a good idea to change this
         mergedcontent = '#: test.c\nmsgid "test"\nmsgstr "rest"\n\n#: frog.c\nmsgid "tadpole"\nmsgstr "fish"\n'
-        suggestedcontent = '#: test.c\nmsgid ""\n"_: suggested by admin [595179475]\\n"\n"test"\nmsgstr "rested"\n'
         store = Store.objects.get(pootle_path="/ar/tutorial/test_upload_xliff.po")
         self.assertTrue(os.path.isfile(store.file.path))
         self.assertTrue(store.file.read().find(mergedcontent) >= 0)
