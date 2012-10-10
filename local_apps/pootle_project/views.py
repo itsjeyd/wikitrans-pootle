@@ -48,7 +48,7 @@ from pootle_app.views.admin.permissions import admin_permissions
 from pootle_app.models import Directory
 
 #from wt_translation.forms import MachineTranslatorSelectorForm
-from wt_translation.models import MachineTranslator, LanguagePair
+from wt_translation.models import MachineTranslator
 from wt_translation.forms import TranslationRequestForm
 
 def limit(query):
