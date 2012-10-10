@@ -186,27 +186,27 @@ class Project(models.Model):
                 return self.translationproject_set.get(language=self.source_language_id)
             except ObjectDoesNotExist:
                 pass
-     
+
      #################
      # WikiTrans edits
-     #################       
+     #################
 #    def language_exists(self, language):
 #        return len(TranslationProject.objects.filter(language = templates_language, id=self.id)) > 0
-            
+
     def add_language(self, language):
         """
         Adds a language as a translation project.
         """
         import logging
-        
+
         from pootle_translationproject.models import TranslationProject
         logging.debug("Project ID: %s, language id: %s", self.id , language.id)
         tp = TranslationProject(project_id = self.id,
                                 language_id = language.id)
-        
         tp.save()
-        
+
+
         # Update the translation project files from the template, if it exists.
         tp.update_from_templates()
-        
         return tp
+
