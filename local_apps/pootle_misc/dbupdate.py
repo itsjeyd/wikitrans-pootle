@@ -138,13 +138,13 @@ def update_tables_21000():
 
     field = Project._meta.get_field('source_language')
     try:
-        en = Language.objects.get(code='en')
+        english = Language.objects.get(code='en')
     except Language.DoesNotExist:
         # we can't allow translation project detection to kick in yet so let's create en manually
-        en = Language(code='en', fullname='English', nplurals=2, pluralequation="(n != 1)")
-        en.directory = Directory.objects.root.get_or_make_subdir(en.code)
-        en.save_base(raw=True)
-    field.default = en.id
+        english = Language(code='en', fullname='English', nplurals=2, pluralequation="(n != 1)")
+        english.directory = Directory.objects.root.get_or_make_subdir(english.code)
+        english.save_base(raw=True)
+    field.default = english.id
     db.add_column(table_name, field.name, field)
     db.create_index(table_name, (field.name + '_id',))
     return text
@@ -162,8 +162,8 @@ def update_stats_21060():
     <p>%s</p>
     """ %_('Removing potentially incorrect cached stats, will be recalculated...')
     logging.info('flushing cached stats')
-    for tp in TranslationProject.objects.filter(stores__unit__state=OBSOLETE).distinct().iterator():
-        deletefromcache(tp, ["getquickstats", "getcompletestats", "get_mtime", "has_suggestions"])
+    for trans_proj in TranslationProject.objects.filter(stores__unit__state=OBSOLETE).distinct().iterator():
+        deletefromcache(trans_proj, ["getquickstats", "getcompletestats", "get_mtime", "has_suggestions"])
     return text
 
 def update_ts_tt_12008():
