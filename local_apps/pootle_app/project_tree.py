@@ -295,9 +295,9 @@ def get_translated_name_gnu(translation_project, store):
                  translation_project.stores.exclude(name__iexact=suffix).exclude(file="").count()
     if not use_prefix:
         # let's make sure
-        for tp in translation_project.project.translationproject_set.exclude(language__code='templates').iterator():
-            temp_suffix = tp.language.code + os.extsep + translation_project.project.localfiletype
-            if tp.stores.exclude(name__iexact=temp_suffix).exclude(file="").count():
+        for trans_proj in translation_project.project.translationproject_set.exclude(language__code='templates').iterator():
+            temp_suffix = trans_proj.language.code + os.extsep + translation_project.project.localfiletype
+            if trans_proj.stores.exclude(name__iexact=temp_suffix).exclude(file="").count():
                 use_prefix = True
                 break
 
