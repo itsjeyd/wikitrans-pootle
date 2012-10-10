@@ -49,7 +49,7 @@ def new_project(sender, instance, created=False, raw=False, **kwargs):
 
 def delete_project(sender, instance, created=False, raw=False, **kwargs):
     if raw:
-		return
+        return
     message = 'Project <i>%s</i> deleted.' % (instance.fullname)
     new_object(created, message, parent=Directory.objects.root)
 
