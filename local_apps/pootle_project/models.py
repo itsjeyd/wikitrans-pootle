@@ -201,12 +201,12 @@ class Project(models.Model):
 
         from pootle_translationproject.models import TranslationProject
         logging.debug("Project ID: %s, language id: %s", self.id , language.id)
-        tp = TranslationProject(project_id = self.id,
+        trans_proj = TranslationProject(project_id = self.id,
                                 language_id = language.id)
-        tp.save()
 
+        trans_proj.save()
 
         # Update the translation project files from the template, if it exists.
-        tp.update_from_templates()
-        return tp
+        trans_proj.update_from_templates()
 
+        return trans_proj
