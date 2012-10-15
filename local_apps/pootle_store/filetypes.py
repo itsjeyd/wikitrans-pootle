@@ -49,7 +49,8 @@ def get_supported_formats():
         pass
     try:
         from translate.storage.catkeys import CatkeysFile
-        formats.append(('catkeys', _('Haiku catkeys'), CatkeysFile, 'bilingual'))
+        formats.append(
+            ('catkeys', _('Haiku catkeys'), CatkeysFile, 'bilingual'))
     except ImportError:
         pass
     try:
@@ -60,30 +61,42 @@ def get_supported_formats():
     # Monolingual formats
     try:
         from translate.storage.properties import javafile
-        formats.append(('properties', _('Java Properties'), javafile, 'monolingual'))
+        formats.append(
+            ('properties', _('Java Properties'), javafile, 'monolingual'))
     except ImportError:
         from translate.storage.properties import propfile
-        formats.append(('properties', _('Java Properties'), propfile, 'monolingual'))
+        formats.append(
+            ('properties', _('Java Properties'), propfile, 'monolingual'))
     try:
         from translate.storage.properties import javautf8file
-        formats.append(('properties', _('Java Properties (UTF-8)'), javautf8file, 'monolingual'))
+        formats.append(
+            ('properties', _('Java Properties (UTF-8)'),
+             javautf8file, 'monolingual'))
     except ImportError:
         pass
     try:
         from translate.storage.properties import stringsfile
-        #l10n: Don't translate "strings" unless you are sure these files have
-        # another name in your language
-        formats.append(('strings', _('OS X Strings'), stringsfile, 'monolingual'))
+        # l10n: Don't translate "strings" unless you are sure these
+        # files have another name in your language
+        formats.append(
+            ('strings', _('OS X Strings'), stringsfile, 'monolingual'))
     except ImportError:
         pass
     from translate.storage.php import phpfile
     formats.append(('php', _('PHP arrays'), phpfile, 'monolingual'))
     try:
-        from translate.storage.subtitles import SubRipFile, MicroDVDFile, AdvSubStationAlphaFile, SubStationAlphaFile
-        formats.append(('srt', _('Subtitles: srt'), SubRipFile, 'monolingual'))
-        formats.append(('sub', _('Subtitles: sub'), MicroDVDFile, 'monolingual'))
-        formats.append(('ssa', _('Subtitles: ssa'), SubStationAlphaFile, 'monolingual'))
-        formats.append(('ass', _('Subtitles: ass'), AdvSubStationAlphaFile, 'monolingual'))
+        from translate.storage.subtitles import SubRipFile, \
+             MicroDVDFile, AdvSubStationAlphaFile, SubStationAlphaFile
+        formats.append(
+            ('srt', _('Subtitles: srt'), SubRipFile, 'monolingual'))
+        formats.append(
+            ('sub', _('Subtitles: sub'), MicroDVDFile, 'monolingual'))
+        formats.append(
+            ('ssa', _('Subtitles: ssa'),
+             SubStationAlphaFile, 'monolingual'))
+        formats.append(
+            ('ass', _('Subtitles: ass'),
+             AdvSubStationAlphaFile, 'monolingual'))
     except ImportError:
         pass
 

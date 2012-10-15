@@ -51,7 +51,8 @@ def list_empty(strings):
     return True
 
 class MultiStringField(models.Field):
-    description = "a field imitating translate.misc.multistring used for plurals"
+    description = "a field imitating translate.misc.multistring " \
+                  "used for plurals"
     __metaclass__ = models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
@@ -76,7 +77,9 @@ class MultiStringField(models.Field):
             ms.plural = plural
             return ms
         elif isinstance(value, dict):
-            return multistring([val for key, val in sorted(value.items())], encoding="UTF-8")
+            return multistring(
+                [val for key, val in sorted(value.items())],
+                encoding="UTF-8")
         else:
             return multistring(value, encoding="UTF-8")
 
@@ -98,9 +101,11 @@ class MultiStringField(models.Field):
             return value
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type in ('exact', 'iexact') or not isinstance(value, basestring):
+        if lookup_type in ('exact', 'iexact') or not \
+               isinstance(value, basestring):
             value = self.get_db_prep_value(value)
-        return super(MultiStringField, self).get_db_prep_lookup(lookup_type, value)
+        return super(MultiStringField, self).get_db_prep_lookup(
+            lookup_type, value)
 
 ################# File ###############################
 
@@ -115,10 +120,13 @@ class StoreTuple(object):
         self.realpath = realpath
 
 class TranslationStoreFieldFile(FieldFile):
-    """FieldFile is the File-like object of a FileField, that is found in a
-    TranslationStoreField."""
+    """
+    FieldFile is the File-like object of a FileField, that is found in
+    a TranslationStoreField.
+    """
 
-    _store_cache = LRUCachingDict(settings.PARSE_POOL_SIZE, settings.PARSE_POOL_CULL_FREQUENCY)
+    _store_cache = LRUCachingDict(
+        settings.PARSE_POOL_SIZE, settings.PARSE_POOL_CULL_FREQUENCY)
 
     def getpomtime(self):
         file_stat = os.stat(self.realpath)
@@ -149,19 +157,27 @@ class TranslationStoreFieldFile(FieldFile):
         return self._store_tuple.store
 
     def _update_store_cache(self):
-        """Add translation store to dictionary cache, replace old cached
-        version if needed."""
+        """
+        Add translation store to dictionary cache, replace old cached
+        version if needed.
+        """
         mod_info = self.getpomtime()
-        if not hasattr(self, "_store_typle") or self._store_tuple.mod_info != mod_info:
+        if not hasattr(self, "_store_typle") or \
+               self._store_tuple.mod_info != mod_info:
             try:
                 self._store_tuple = self._store_cache[self.path]
                 if self._store_tuple.mod_info != mod_info:
-                    # if file is modified act as if it doesn't exist in cache
+                    # if file is modified act as if it doesn't exist
+                    # in cache
                     raise KeyError
             except KeyError:
                 logging.debug(u"cache miss for %s", self.path)
-                self._store_tuple = StoreTuple(factory.getobject(self.path, ignore=self.field.ignore, classes=factory_classes),
-                                               mod_info, self.realpath)
+                self._store_tuple = StoreTuple(
+                    factory.getobject(
+                        self.path,
+                        ignore=self.field.ignore,
+                        classes=factory_classes),
+                    mod_info, self.realpath)
                 self._store_cache[self.path] = self._store_tuple
                 translation_file_updated.send(sender=self, path=self.path)
 
@@ -204,7 +220,8 @@ class TranslationStoreFieldFile(FieldFile):
         self._touch_store_cache()
 
     def save(self, name, content, save=True):
-        #FIXME: implement save to tmp file then move instead of directly saving
+        # FIXME: implement save to tmp file then move instead of
+        # directly saving
         super(TranslationStoreFieldFile, self).save(name, content, save)
         self._delete_store_cache()
 

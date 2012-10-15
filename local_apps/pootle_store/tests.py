@@ -51,7 +51,8 @@ class UnitTests(PootleTestCase):
     def test_convert(self):
         for dbunit in self.store.units.iterator():
             if dbunit.hasplural() and not dbunit.istranslated():
-                # skip untranslated plural units, they will always look different
+                # skip untranslated plural units, they will always
+                # look different
                 continue
             storeunit = dbunit.getorig()
             newunit = dbunit.convert(self.store.file.store.UnitClass)
@@ -75,39 +76,47 @@ class UnitTests(PootleTestCase):
         self.assertEqual(len(storeunit.target.strings), 2)
 
     def test_update_plural_target(self):
-        dbunit = self._update_translation(2, {'target': [u'samaka', u'samak']})
+        dbunit = self._update_translation(
+            2, {'target': [u'samaka', u'samak']})
         storeunit = dbunit.getorig()
 
         self.assertEqual(dbunit.target.strings, [u'samaka', u'samak'])
         self.assertEqual(dbunit.target.strings, storeunit.target.strings)
         pofile = factory.getobject(self.store.file.path)
-        self.assertEqual(dbunit.target.strings, pofile.units[dbunit.index].target.strings)
+        self.assertEqual(
+            dbunit.target.strings,
+            pofile.units[dbunit.index].target.strings)
 
         self.assertEqual(dbunit.target, u'samaka')
         self.assertEqual(dbunit.target, storeunit.target)
         self.assertEqual(dbunit.target, pofile.units[dbunit.index].target)
 
     def test_update_plural_target_dict(self):
-        dbunit = self._update_translation(2, {'target': {0: u'samaka', 1: u'samak'}})
+        dbunit = self._update_translation(
+            2, {'target': {0: u'samaka', 1: u'samak'}})
         storeunit = dbunit.getorig()
 
         self.assertEqual(dbunit.target.strings, [u'samaka', u'samak'])
         self.assertEqual(dbunit.target.strings, storeunit.target.strings)
         pofile = factory.getobject(self.store.file.path)
-        self.assertEqual(dbunit.target.strings, pofile.units[dbunit.index].target.strings)
+        self.assertEqual(
+            dbunit.target.strings,
+            pofile.units[dbunit.index].target.strings)
 
         self.assertEqual(dbunit.target, u'samaka')
         self.assertEqual(dbunit.target, storeunit.target)
         self.assertEqual(dbunit.target, pofile.units[dbunit.index].target)
 
     def test_update_fuzzy(self):
-        dbunit = self._update_translation(0, {'target': u'samaka', 'fuzzy': True})
+        dbunit = self._update_translation(
+            0, {'target': u'samaka', 'fuzzy': True})
         storeunit = dbunit.getorig()
 
         self.assertTrue(dbunit.isfuzzy())
         self.assertEqual(dbunit.isfuzzy(), storeunit.isfuzzy())
         pofile = factory.getobject(self.store.file.path)
-        self.assertEqual(dbunit.isfuzzy(), pofile.units[dbunit.index].isfuzzy())
+        self.assertEqual(
+            dbunit.isfuzzy(), pofile.units[dbunit.index].isfuzzy())
 
         time.sleep(1)
 
@@ -117,22 +126,29 @@ class UnitTests(PootleTestCase):
         self.assertFalse(dbunit.isfuzzy())
         self.assertEqual(dbunit.isfuzzy(), storeunit.isfuzzy())
         pofile = factory.getobject(self.store.file.path)
-        self.assertEqual(dbunit.isfuzzy(), pofile.units[dbunit.index].isfuzzy())
+        self.assertEqual(
+            dbunit.isfuzzy(), pofile.units[dbunit.index].isfuzzy())
 
     def test_update_comment(self):
-        dbunit = self._update_translation(0, {'translator_comment': u'7amada'})
+        dbunit = self._update_translation(
+            0, {'translator_comment': u'7amada'})
         storeunit = dbunit.getorig()
 
         self.assertEqual(dbunit.getnotes(origin="translator"), u'7amada')
-        self.assertEqual(dbunit.getnotes(origin="translator"), storeunit.getnotes(origin="translator"))
+        self.assertEqual(
+            dbunit.getnotes(origin="translator"),
+            storeunit.getnotes(origin="translator"))
         pofile = factory.getobject(self.store.file.path)
-        self.assertEqual(dbunit.getnotes(origin="translator"), pofile.units[dbunit.index].getnotes(origin="translator"))
+        self.assertEqual(
+            dbunit.getnotes(origin="translator"),
+            pofile.units[dbunit.index].getnotes(origin="translator"))
 
 
 class StoreTests(PootleTestCase):
     def setUp(self):
         super(StoreTests, self).setUp()
-        self.store = Store.objects.get(pootle_path="/af/tutorial/pootle.po")
+        self.store = Store.objects.get(
+            pootle_path="/af/tutorial/pootle.po")
 
     def test_quickstats(self):
         statscache = statsdb.StatsCache()
@@ -140,11 +156,20 @@ class StoreTests(PootleTestCase):
         filestats = statscache.filetotals(self.store.file.path)
 
         self.assertEqual(dbstats['total'], filestats['total'])
-        self.assertEqual(dbstats['totalsourcewords'], filestats['totalsourcewords'])
-        self.assertEqual(dbstats['untranslated'], filestats['untranslated'])
-        self.assertEqual(dbstats['untranslatedsourcewords'], filestats['untranslatedsourcewords'])
+        self.assertEqual(
+            dbstats['totalsourcewords'], filestats['totalsourcewords'])
+        self.assertEqual(
+            dbstats['untranslated'], filestats['untranslated'])
+        self.assertEqual(
+            dbstats['untranslatedsourcewords'],
+            filestats['untranslatedsourcewords'])
         self.assertEqual(dbstats['fuzzy'], filestats['fuzzy'])
-        self.assertEqual(dbstats['fuzzysourcewords'], filestats['fuzzysourcewords'])
+        self.assertEqual(
+            dbstats['fuzzysourcewords'], filestats['fuzzysourcewords'])
         self.assertEqual(dbstats['translated'], filestats['translated'])
-        self.assertEqual(dbstats['translatedsourcewords'], filestats['translatedsourcewords'])
-        self.assertEqual(dbstats['translatedtargetwords'], filestats['translatedtargetwords'])
+        self.assertEqual(
+            dbstats['translatedsourcewords'],
+            filestats['translatedsourcewords'])
+        self.assertEqual(
+            dbstats['translatedtargetwords'],
+            filestats['translatedtargetwords'])

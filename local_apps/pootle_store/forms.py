@@ -80,7 +80,9 @@ class MultiStringWidget(forms.MultiWidget):
 
         output = ''
         for i, widget in enumerate(rendered_widgets):
-            output += '<p class="translation-text-headers" lang="%s">%s</p>' % (get_language(), _('Plural Form %d', i))
+            output += '<p class="translation-text-headers" ' \
+                      'lang="%s">%s</p>' % (
+                get_language(), _('Plural Form %d', i))
             output += widget
         return mark_safe(output)
 
@@ -117,11 +119,14 @@ class HiddenMultiStringWidget(MultiStringWidget):
         return self
 
 class MultiStringFormField(forms.MultiValueField):
-    def __init__(self, nplurals=1, attrs=None, textarea=True, *args, **kwargs):
-        self.widget = MultiStringWidget(nplurals=nplurals, attrs=attrs, textarea=textarea)
+    def __init__(
+        self, nplurals=1, attrs=None, textarea=True, *args, **kwargs):
+        self.widget = MultiStringWidget(
+            nplurals=nplurals, attrs=attrs, textarea=textarea)
         self.hidden_widget = HiddenMultiStringWidget(nplurals=nplurals)
         fields = [forms.CharField() for i in range(nplurals)]
-        super(MultiStringFormField, self).__init__(fields=fields, *args, **kwargs)
+        super(MultiStringFormField, self).__init__(
+            fields=fields, *args, **kwargs)
 
     def compress(self, data_list):
         return [unhighlight_whitespace(string) for string in data_list]
@@ -160,11 +165,15 @@ def unit_form_factory(language, snplurals=None):
             exclude = ['store']
 
         id = forms.IntegerField(required=False)
-        source_f = MultiStringFormField(nplurals=snplurals or 1, required=False, textarea=False)
-        target_f = MultiStringFormField(nplurals=tnplurals, required=False, attrs=target_attrs)
-        state = forms.BooleanField(required=False,
-                label=_('Fuzzy'),
-                widget=forms.CheckboxInput(attrs=fuzzy_attrs, check_test=lambda x: x == FUZZY))
+        source_f = MultiStringFormField(
+            nplurals=snplurals or 1, required=False, textarea=False)
+        target_f = MultiStringFormField(
+            nplurals=tnplurals, required=False, attrs=target_attrs)
+        state = forms.BooleanField(
+            required=False,
+            label=_('Fuzzy'),
+            widget=forms.CheckboxInput(
+                attrs=fuzzy_attrs, check_test=lambda x: x == FUZZY))
         translator_comment = forms.CharField(required=False,
                 widget=forms.Textarea(attrs=comment_attrs),
                 label=_("Translator comment"))

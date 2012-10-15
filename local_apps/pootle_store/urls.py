@@ -23,10 +23,14 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('pootle_store.views',
     (r'^wikitrans/(?P<pootle_path>.*)/export/xlf/?$', 'export_as_xliff'),
-    (r'^(?P<pootle_path>.*)/export_store/(?P<filetype>.*)/?$', 'export_as_type'),
+    (r'^(?P<pootle_path>.*)/export_store/(?P<filetype>.*)/?$',
+     'export_as_type'),
     (r'^wikitrans/(?P<pootle_path>.*)/download/?$', 'download'),
     (r'^wikitrans/(?P<pootle_path>.*)/translate/?$', 'translate'),
-    (r'^suggestion/reject/(?P<uid>[0-9]+)/(?P<suggid>[0-9]+)/?$', 'reject_suggestion'),
-    (r'^suggestion/accept/(?P<uid>[0-9]+)/(?P<suggid>[0-9]+)/?$', 'accept_suggestion'),
-    (r'^qualitycheck/reject/(?P<uid>[0-9]+)/(?P<checkid>[0-9]+)/?$', 'reject_qualitycheck'),
+    (r'^suggestion/reject/(?P<uid>[0-9]+)/(?P<suggid>[0-9]+)/?$',
+     'reject_suggestion'),
+    (r'^suggestion/accept/(?P<uid>[0-9]+)/(?P<suggid>[0-9]+)/?$',
+     'accept_suggestion'),
+    (r'^qualitycheck/reject/(?P<uid>[0-9]+)/(?P<checkid>[0-9]+)/?$',
+     'reject_qualitycheck'),
 )
