@@ -534,8 +534,9 @@ class TranslationProject(models.Model):
             # using zip command line is fast
             # The temporary file below is opened and immediately
             # closed for security reasons
-            fd, tempzipfile = tempfile.mkstemp(prefix='pootle', suffix='.zip')
-            os.close(fd)
+            file_desc, tempzipfile = tempfile.mkstemp(
+                prefix='pootle', suffix='.zip')
+            os.close(file_desc)
             result = os.system(
                 "cd %s ; zip -r - %s > %s" % (
                     self.abs_real_path, " ".join(
@@ -557,9 +558,9 @@ class TranslationProject(models.Model):
         archivecontents = None
         try:
             if path is not None:
-                fd, tempzipfile = tempfile.mkstemp(
+                file_desc, tempzipfile = tempfile.mkstemp(
                     prefix='pootle', suffix='.zip')
-                os.close(fd)
+                os.close(file_desc)
                 archivecontents = open(tempzipfile, "wb")
             else:
                 archivecontents = cStringIO.StringIO()
