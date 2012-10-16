@@ -312,11 +312,11 @@ def get_children(
                                        links_required=links_required)
              for child_store in directory.child_stores.iterator()]
 
-def unix_to_host_path(p):
-    return os.sep.join(p.split('/'))
+def unix_to_host_path(path):
+    return os.sep.join(path.split('/'))
 
-def host_to_unix_path(p):
-    return '/'.join(p.split(os.sep))
+def host_to_unix_path(path):
+    return '/'.join(path.split(os.sep))
 
 def get_upload_path(translation_project, relative_root_dir, local_filename):
     """gets the path of a translation file being uploaded securely,
@@ -696,10 +696,10 @@ class UploadHandler(view_handler.Handler):
 
             # create a submission, doesn't fix stats but at least
             # shows up in last activity column
-            s = Submission(creation_time=datetime.datetime.utcnow(),
-                           translation_project=translation_project,
-                           submitter=get_profile(request.user))
-            s.save()
+            submission = Submission(creation_time=datetime.datetime.utcnow(),
+                                    translation_project=translation_project,
+                                    submitter=get_profile(request.user))
+            submission.save()
 
             post_file_upload.send(
                 sender=translation_project, user=request.user,
