@@ -24,7 +24,8 @@ from pootle.tests import PootleTestCase
 
 from pootle_project.models import Project
 from pootle_store.models import Store
-from pootle_app.project_tree import get_translated_name, get_translated_name_gnu
+from pootle_app.project_tree import get_translated_name, \
+     get_translated_name_gnu
 from pootle_language.models import Language
 from pootle_app.management import require_english
 from pootle_store.util import OBSOLETE
@@ -138,18 +139,25 @@ msgstr "2adim"
         lang_count = self.project.translationproject_set.count()
         self.assertEqual(lang_count, 5)
 
-        store_count = Store.objects.filter(translation_project__project=self.project).count()
+        store_count = Store.objects.filter(
+            translation_project__project=self.project).count()
         self.assertEqual(store_count, 10)
 
-        lang_list = list(self.project.translationproject_set.values_list('language__code', flat=True).order_by('language__code'))
-        self.assertEqual(lang_list, [u'af', u'ar', u'pt_BR', u'templates', u'zu'])
+        lang_list = list(self.project.translationproject_set.values_list(
+            'language__code', flat=True).order_by('language__code'))
+        self.assertEqual(
+            lang_list, [u'af', u'ar', u'pt_BR', u'templates', u'zu'])
 
     def test_template_detection(self):
-        """test that given a template the correct target file name is generated"""
+        """
+        test that given a template the correct target file name is generated
+        """
         template_tp = self.project.get_template_translationproject()
         for template_store in template_tp.stores.iterator():
-            for tp in self.project.translationproject_set.exclude(language__code='templates').iterator():
-                new_pootle_path, new_path = get_translated_name_gnu(tp, template_store)
+            for tp in self.project.translationproject_set.exclude(
+                language__code='templates').iterator():
+                new_pootle_path, new_path = get_translated_name_gnu(
+                    tp, template_store)
                 store = tp.stores.get(pootle_path=new_pootle_path)
                 self.assertEqual(new_pootle_path, store.pootle_path)
                 self.assertEqual(new_path, store.abs_real_path)
@@ -311,11 +319,15 @@ class NonGnuTests(GnuTests):
             self.assertEqual(tp.real_path, expected_path)
 
     def test_template_detection(self):
-        """test that given a template the correct target file name is generated"""
+        """
+        test that given a template the correct target file name is generated
+        """
         template_tp = self.project.get_template_translationproject()
         for template_store in template_tp.stores.iterator():
-            for tp in self.project.translationproject_set.exclude(language__code='templates').iterator():
-                new_pootle_path, new_path = get_translated_name(tp, template_store)
+            for tp in self.project.translationproject_set.exclude(
+                language__code='templates').iterator():
+                new_pootle_path, new_path = get_translated_name(
+                    tp, template_store)
                 store = tp.stores.get(pootle_path=new_pootle_path)
                 self.assertEqual(new_pootle_path, store.pootle_path)
                 self.assertEqual(new_path, store.abs_real_path)
@@ -408,8 +420,9 @@ X-Generator: Pootle Tests
     def setUp(self):
         super(XliffTests, self).setUp()
         en = require_english()
-        Project.objects.get_or_create(code="testproj", fullname=u"testproj",
-                                      localfiletype=self.ext, source_language=en)
+        Project.objects.get_or_create(
+            code="testproj", fullname=u"testproj",
+            localfiletype=self.ext, source_language=en)
         self.project = Project.objects.get(code='testproj')
         for tp in self.project.translationproject_set.iterator():
             tp.require_units()
@@ -431,7 +444,8 @@ X-Generator: Pootle Tests
         self.assertTrue(unit)
 
     def test_plural(self):
-        store = Store.objects.get(pootle_path='/en/testproj/test_en.'+self.ext)
+        store = Store.objects.get(
+            pootle_path='/en/testproj/test_en.'+self.ext)
         unit = store.findunit('%d new')
         self.assertTrue(unit.hasplural())
 
@@ -475,7 +489,9 @@ X-Generator: Pootle Tests
         pofile.write(self.target_text)
         pofile.close()
 
-        store.update(update_structure=True, update_translation=True, conservative=False)
+        store.update(
+            update_structure=True, update_translation=True,
+            conservative=False)
         unit = store.findunit('obsolete')
         self.assertEqual(unit.target, u'2adim')
         self.assertFalse(unit.isobsolete())
@@ -558,10 +574,12 @@ new=%d new
 
     def setUp(self):
         super(PropTests, self).setUp()
-        potfile = file(os.path.join(self.testpodir, "testproj", "test_en."+self.ext), 'w')
+        potfile = file(os.path.join(
+            self.testpodir, "testproj", "test_en."+self.ext), 'w')
         potfile.write(self.new_template_text)
         potfile.close()
-        template_tp = self.project.translationproject_set.get(language__code='en')
+        template_tp = self.project.translationproject_set.get(
+            language__code='en')
         template_tp.update(conservative=False)
 
     def test_plural(self):

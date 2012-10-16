@@ -21,17 +21,23 @@
 
 from django.conf.urls.defaults import *
 urlpatterns = patterns('pootle_translationproject.views',
-    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/((.*/)*)admin_permissions.html$',
+    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/' \
+     '((.*/)*)admin_permissions.html$',
      'tp_admin_permissions'),
-    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/((.*/)*)admin_files.html$',
+    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/' \
+     '((.*/)*)admin_files.html$',
      'tp_admin_files'),
-    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/(?P<dir_path>(.*/)*)(index.html)?$',
+    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/' \
+     '(?P<dir_path>(.*/)*)(index.html)?$',
      'tp_overview'),
-    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/(?P<dir_path>.*)edit.html$',
+    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/' \
+     '(?P<dir_path>.*)edit.html$',
      'tp_translate'),
-    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/(?P<dir_path>.*)review.html$',
+    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/' \
+     '(?P<dir_path>.*)review.html$',
      'tp_review'),
-    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/(?P<file_path>.*)export/zip$',
+    (r'^wikitrans/(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/' \
+     '(?P<file_path>.*)export/zip$',
      'export_zip'),
     (r'^(?P<language_code>[^/]*)/(?P<project_code>[^/]*)/translate.html$',
      'translate'),
