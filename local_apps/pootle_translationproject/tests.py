@@ -118,12 +118,12 @@ msgstr "2adim"
 
     def setUp(self):
         super(GnuTests, self).setUp()
-        en = require_english()
+        english = require_english()
         Project.objects.get_or_create(code="testproj", fullname=u"testproj",
-                                      source_language=en)
+                                      source_language=english)
         self.project = Project.objects.get(code='testproj')
-        for tp in self.project.translationproject_set.iterator():
-            tp.require_units()
+        for trans_proj in self.project.translationproject_set.iterator():
+            trans_proj.require_units()
 
     def test_treestyle(self):
         """test treestyle detection"""
@@ -131,8 +131,8 @@ msgstr "2adim"
 
     def test_realpath(self):
         """test that physical path is calculated correctly"""
-        for tp in self.project.translationproject_set.iterator():
-            self.assertEqual(tp.real_path, u'testproj')
+        for trans_proj in self.project.translationproject_set.iterator():
+            self.assertEqual(trans_proj.real_path, u'testproj')
 
     def test_file_detection(self):
         """test correct language detection when a project is added"""
@@ -154,18 +154,18 @@ msgstr "2adim"
         """
         template_tp = self.project.get_template_translationproject()
         for template_store in template_tp.stores.iterator():
-            for tp in self.project.translationproject_set.exclude(
+            for trans_proj in self.project.translationproject_set.exclude(
                 language__code='templates').iterator():
                 new_pootle_path, new_path = get_translated_name_gnu(
-                    tp, template_store)
-                store = tp.stores.get(pootle_path=new_pootle_path)
+                    trans_proj, template_store)
+                store = trans_proj.stores.get(pootle_path=new_pootle_path)
                 self.assertEqual(new_pootle_path, store.pootle_path)
                 self.assertEqual(new_path, store.abs_real_path)
 
     def test_new(self):
         """test initializing a new file from templates"""
-        fr = Language.objects.get(code='fr')
-        new_tp = self.project.translationproject_set.create(language=fr)
+        french = Language.objects.get(code='fr')
+        new_tp = self.project.translationproject_set.create(language=french)
         new_tp.update_from_templates()
         store_count = new_tp.stores.count()
         self.assertEqual(store_count, 2)
@@ -177,13 +177,14 @@ msgstr "2adim"
 
     def test_update(self):
         """test updating existing files to templates"""
-        tp = self.project.translationproject_set.get(language__code='ar')
-        tp.update_from_templates()
+        trans_proj = self.project.translationproject_set.get(
+            language__code='ar')
+        trans_proj.update_from_templates()
 
-        store_count = tp.stores.count()
+        store_count = trans_proj.stores.count()
         self.assertEqual(store_count, 2)
 
-        store = tp.stores.all()[0]
+        store = trans_proj.stores.all()[0]
         dbunit_count = store.units.count()
         self.assertEqual(dbunit_count, 3)
 
@@ -314,9 +315,9 @@ class NonGnuTests(GnuTests):
 
     def test_realpath(self):
         """test that physical path is calculated correctly"""
-        for tp in self.project.translationproject_set.iterator():
-            expected_path = u'testproj/%s' % tp.language.code
-            self.assertEqual(tp.real_path, expected_path)
+        for trans_proj in self.project.translationproject_set.iterator():
+            expected_path = u'testproj/%s' % trans_proj.language.code
+            self.assertEqual(trans_proj.real_path, expected_path)
 
     def test_template_detection(self):
         """
@@ -324,11 +325,11 @@ class NonGnuTests(GnuTests):
         """
         template_tp = self.project.get_template_translationproject()
         for template_store in template_tp.stores.iterator():
-            for tp in self.project.translationproject_set.exclude(
+            for trans_proj in self.project.translationproject_set.exclude(
                 language__code='templates').iterator():
                 new_pootle_path, new_path = get_translated_name(
-                    tp, template_store)
-                store = tp.stores.get(pootle_path=new_pootle_path)
+                    trans_proj, template_store)
+                store = trans_proj.stores.get(pootle_path=new_pootle_path)
                 self.assertEqual(new_pootle_path, store.pootle_path)
                 self.assertEqual(new_path, store.abs_real_path)
 
@@ -419,18 +420,18 @@ X-Generator: Pootle Tests
 
     def setUp(self):
         super(XliffTests, self).setUp()
-        en = require_english()
+        english = require_english()
         Project.objects.get_or_create(
             code="testproj", fullname=u"testproj",
-            localfiletype=self.ext, source_language=en)
+            localfiletype=self.ext, source_language=english)
         self.project = Project.objects.get(code='testproj')
-        for tp in self.project.translationproject_set.iterator():
-            tp.require_units()
+        for trans_proj in self.project.translationproject_set.iterator():
+            trans_proj.require_units()
 
     def test_new(self):
         """test initializing a new file from templates"""
-        fr = Language.objects.get(code='fr')
-        new_tp = self.project.translationproject_set.create(language=fr)
+        french = Language.objects.get(code='fr')
+        new_tp = self.project.translationproject_set.create(language=french)
         new_tp.update_from_templates()
         store_count = new_tp.stores.count()
         self.assertEqual(store_count, 1)
@@ -451,13 +452,14 @@ X-Generator: Pootle Tests
 
     def test_update(self):
         """test updating existing files to templates"""
-        tp = self.project.translationproject_set.get(language__code='ar')
-        tp.update_from_templates()
+        trans_proj = self.project.translationproject_set.get(
+            language__code='ar')
+        trans_proj.update_from_templates()
 
-        store_count = tp.stores.count()
+        store_count = trans_proj.stores.count()
         self.assertEqual(store_count, 1)
 
-        store = tp.stores.all()[0]
+        store = trans_proj.stores.all()[0]
         dbunit_count = store.units.count()
         self.assertEqual(dbunit_count, self.unit_count)
 
