@@ -33,7 +33,8 @@ from pootle_store.models import Store, Unit, PARSED, LOCKED
 from pootle_store.forms import unit_form_factory
 from pootle_misc.baseurl import redirect
 
-def create_termunit(term, unit, targets, locations, sourcenotes, transnotes, filecounts):
+def create_termunit(
+    term, unit, targets, locations, sourcenotes, transnotes, filecounts):
     termunit = Unit()
     termunit.source = term
     termunit.setid(term)
@@ -48,13 +49,16 @@ def create_termunit(term, unit, targets, locations, sourcenotes, transnotes, fil
     for sourcenote in sourcenotes:
         termunit.addnote(sourcenote, "developer")
     for filename, count in filecounts.iteritems():
-        termunit.addnote("(poterminology) %s (%d)\n" % (filename, count), 'translator')
+        termunit.addnote(
+            "(poterminology) %s (%d)\n" % (filename, count), 'translator')
     return termunit
 
 def get_terminology_filename(translation_project):
     try:
         # see if a terminology store already exists
-        return translation_project.stores.filter(name__startswith='pootle-terminology.').values_list('name', flat=True)[0]
+        return translation_project.stores.filter(
+            name__startswith='pootle-terminology.').values_list(
+            'name', flat=True)[0]
     except IndexError:
         pass
     if translation_project.project.is_monolingual():
@@ -67,7 +71,10 @@ def get_terminology_filename(translation_project):
 @get_translation_project
 @util.has_permission('administrate')
 def extract(request, translation_project):
-    """generate glossary of common keywords and phrases from translation project"""
+    """
+    generate glossary of common keywords and phrases from translation
+    project
+    """
     template_vars = {
         'translation_project': translation_project,
         'language': translation_project.language,
@@ -77,17 +84,20 @@ def extract(request, translation_project):
         }
     terminology_filename = get_terminology_filename(translation_project)
     if request.method == 'POST' and request.POST['extract']:
-        extractor = TerminologyExtractor(accelchars=translation_project.checker.config.accelmarkers,
-                                         sourcelanguage=str(translation_project.project.source_language.code))
+        extractor = TerminologyExtractor(
+            accelchars=translation_project.checker.config.accelmarkers,
+            sourcelanguage=str(
+                translation_project.project.source_language.code))
         for store in translation_project.stores.iterator():
             if store.name.startswith('pootle-terminology.'):
                 continue
             extractor.processunits(store.units, store.pootle_path)
         terms = extractor.extract_terms(create_termunit=create_termunit)
         termunits = extractor.filter_terms(terms, nonstopmin=2)
-        store, created = Store.objects.get_or_create(parent=translation_project.directory,
-                                                     translation_project=translation_project,
-                                                     name=terminology_filename)
+        store, created = Store.objects.get_or_create(
+            parent=translation_project.directory,
+            translation_project=translation_project,
+            name=terminology_filename)
         # lock file
         oldstate = store.state
         store.state = LOCKED
@@ -97,8 +107,10 @@ def extract(request, translation_project):
             store.units.delete()
 
         # calculate maximum terms
-        maxunits = int(translation_project.getquickstats()['totalsourcewords'] * 0.02)
-        maxunits = min(max(settings.MIN_AUTOTERMS, maxunits), settings.MAX_AUTOTERMS)
+        maxunits = int(
+            translation_project.getquickstats()['totalsourcewords'] * 0.02)
+        maxunits = min(max(
+            settings.MIN_AUTOTERMS, maxunits), settings.MAX_AUTOTERMS)
         for index, (score, unit) in enumerate(termunits[:maxunits]):
             unit.store = store
             unit.index = index
@@ -115,8 +127,11 @@ def extract(request, translation_project):
 
         template_vars['store'] = store
         template_vars['termcount'] = len(termunits)
-        return redirect(translation_project.pootle_path + 'terminology_manage.html')
-    return render_to_response("terminology/extract.html", template_vars, context_instance=RequestContext(request))
+        return redirect(
+            translation_project.pootle_path + 'terminology_manage.html')
+    return render_to_response(
+        "terminology/extract.html", template_vars,
+        context_instance=RequestContext(request))
 
 @get_translation_project
 @util.has_permission('administrate')
@@ -132,10 +147,12 @@ def manage(request, translation_project):
         }
     try:
         terminology_filename = get_terminology_filename(translation_project)
-        term_store = Store.objects.get(pootle_path=translation_project.pootle_path + terminology_filename)
+        term_store = Store.objects.get(
+            pootle_path=translation_project.pootle_path+terminology_filename)
         template_vars['store'] = term_store
 
-        #HACKISH: Django won't allow excluding form fields already defined in parent class, manually extra fields.
+        # HACKISH: Django won't allow excluding form fields already
+        # defined in parent class, manually extra fields.
         unit_form_class = unit_form_factory(translation_project.language, 1)
         del(unit_form_class.base_fields['target_f'])
         del(unit_form_class.base_fields['id'])
@@ -148,8 +165,11 @@ def manage(request, translation_project):
 
         class TermUnitForm(unit_form_class):
             # set store for new terms
-            store = forms.ModelChoiceField(queryset=Store.objects.filter(pk=term_store.pk), initial=term_store.pk, widget=forms.HiddenInput)
-            index = forms.IntegerField(required=False, widget=forms.HiddenInput)
+            store = forms.ModelChoiceField(
+                queryset=Store.objects.filter(pk=term_store.pk),
+                initial=term_store.pk, widget=forms.HiddenInput)
+            index = forms.IntegerField(
+                required=False, widget=forms.HiddenInput)
 
             def clean_index(self):
                 # assign new terms an index value
@@ -163,13 +183,16 @@ def manage(request, translation_project):
                 if value:
                     existing = term_store.findid(value[0])
                     if existing and existing.id != self.instance.id:
-                        raise forms.ValidationError(_('Please correct the error below.'))
+                        raise forms.ValidationError(
+                            _('Please correct the error below.'))
                     self.instance.setid(value[0])
                 return value
 
-        return util.edit(request, 'terminology/manage.html', Unit, template_vars, None, None,
-                         queryset=term_store.units, can_delete=True, form=TermUnitForm,
-                         exclude=['state', 'target_f', 'id', 'translator_comment'])
+        return util.edit(
+            request, 'terminology/manage.html', Unit, template_vars, None,
+            None, queryset=term_store.units, can_delete=True,
+            form=TermUnitForm, exclude=['state', 'target_f', 'id',
+                                        'translator_comment'])
     except Store.DoesNotExist:
         return render_to_response("terminology/manage.html", template_vars,
                                   context_instance=RequestContext(request))
