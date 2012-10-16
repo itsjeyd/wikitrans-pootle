@@ -295,10 +295,9 @@ def fix_article(request, aid, form_class=DummyFixArticleForm,
         # WikiTrans, but is no longer working when merged with Pootle.
         # fix_form = form_class(instance=article,
         # initial = {'sentences': article.sentences_to_lines()}
-        dummy_fix_form = DummyFixArticleForm(initial=
-                                             {'sentences':
-                                                  article.sentences_to_lines(),
-                                              'title': article.title})
+        dummy_fix_form = DummyFixArticleForm(
+            initial={'sentences': article.sentences_to_lines(),
+                     'title': article.title})
 
     return render_to_response(template_name, {
         "article": article,
@@ -314,7 +313,8 @@ def request_article(request,
         article_request_form = form_class(request.POST)
         if article_request_form.is_valid():
             title = article_request_form.cleaned_data['title']
-            title_language = article_request_form.cleaned_data['title_language']
+            title_language = article_request_form. \
+                             cleaned_data['title_language']
             if not ArticleOfInterest.objects.filter(
                 title__exact=title, title_language__exact=title_language):
                 article_of_interest = article_request_form.save(commit=False)
@@ -396,8 +396,8 @@ def create_pootle_project(request, aid):
 
 
 @login_required
-def add_target_languages(request, aid,
-                         template_name="wt_articles/add_target_languages.html"):
+def add_target_languages(
+    request, aid, template_name="wt_articles/add_target_languages.html"):
     """
     Adds one or more target language translations to a source article.
     """
@@ -415,7 +415,8 @@ def add_target_languages(request, aid,
         content_dict['article'] = article
 
         if request.method == "POST":
-            target_language_form = AddTargetLanguagesForm(article, request.POST)
+            target_language_form = AddTargetLanguagesForm(
+                article, request.POST)
 
             if target_language_form.is_valid():
                 languages = target_language_form.cleaned_data['languages']

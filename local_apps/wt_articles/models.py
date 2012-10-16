@@ -269,8 +269,8 @@ class SourceArticle(models.Model):
         templates_language = Language.objects.get_by_natural_key('templates')
 
         # Check to see if the templates language exists. If not, add it.
-        if len(project.translationproject_set.filter(language=
-                                                     templates_language)) == 0:
+        if len(project.translationproject_set.filter(
+            language=templates_language)) == 0:
             project.add_language(templates_language)
             project.save()
 
@@ -480,13 +480,14 @@ class TranslatedArticle(models.Model):
     approved = models.BooleanField(_('Approved'), default=False)
 
     def set_sentences(self, translated_sentences):
-        source_sentences = self.article.sourcesentence_set.order_by('segment' \
-                                                                        '_id')
+        source_sentences = self.article.sourcesentence_set.order_by(
+            'segment_id')
         source_segment_ids = [s.segment_id for s in source_sentences]
         translated_segment_ids = [s.segment_id for s in translated_sentences]
         if len(source_segment_ids) != len(translated_segment_ids):
-            raise ValueError('Number of translated sentences doesn\'t match ' \
-                                 'number of source sentences')
+            raise ValueError(
+                "Number of translated sentences doesn't match " \
+                "number of source sentences")
         if source_segment_ids != translated_segment_ids:
             ValueError('Segment id lists do not match')
         translated_article_list = [ts.source_sentence.article for ts in \

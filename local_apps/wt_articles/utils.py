@@ -59,7 +59,8 @@ def sentences_as_html(sentences):
     return html
 
 def sentences_as_html_span(sentences):
-    format_span = lambda sid, text: u"<span id='ss_%d'>%s</span>" % (sid, text)
+    format_span = lambda sid, text: u"<span id='ss_%d'>%s</span>" % (
+        sid, text)
     format_h = lambda text, level: u'<h%d>%s</h%d>' % (level+1,
                                                        text,
                                                        level+1)

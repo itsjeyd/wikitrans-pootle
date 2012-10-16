@@ -50,8 +50,10 @@ def urdu_split_sentences(text):
     text = re.sub(reg_space, '\n\n', text)
 
     text = text.replace('|','')
-    #/(\n{2,}|!|\x{061f}|\x{06D4}|\x{2022}|\x{000d}       |\s{2,}|\x{2026}|\x{002e})/
-    # '\n{2,}|!|question|dash    |bullet  |carriage_return|\s{2,}|ellipsis|full_stop'
+    #/(\n{2,}|!|\x{061f}|\x{06D4}|\x{2022}|\x{000d}       |
+    #\s{2,}|\x{2026}|\x{002e})/
+    # '\n{2,}|!|question|dash    |bullet  |carriage_return|
+    #\s{2,}|ellipsis|full_stop'
     regex = u'(\n{2,}|!|%s|%s|%s|%s|\s{2,}|%s|\%s)' % (
         question, dash, bullet, carriage_return, ellipsis, full_stop)
     punctuation = re.compile(regex)
