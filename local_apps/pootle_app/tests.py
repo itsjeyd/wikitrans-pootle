@@ -47,8 +47,12 @@ class AdminTests(PootleTestCase):
     def test_add_project(self):
         """Checks that we can add a project successfully."""
         response = self.client.get("/admin/projects.html")
-        self.assertContains(response, "<a href='/projects/tutorial/admin.html'>tutorial</a>")
-        self.assertContains(response, "<a href='/projects/terminology/admin.html'>terminology</a>")
+        self.assertContains(
+            response,
+            "<a href='/projects/tutorial/admin.html'>tutorial</a>")
+        self.assertContains(
+            response,
+            "<a href='/projects/terminology/admin.html'>terminology</a>")
         english = Language.objects.get(code='en')
         add_dict = {
             "code": "testproject",
@@ -59,8 +63,11 @@ class AdminTests(PootleTestCase):
             "treestyle": "gnu",
             }
 
-        response = self.client.post("/admin/projects.html", formset_dict([add_dict]))
-        self.assertContains(response, "<a href='/projects/testproject/admin.html'>testproject</a>")
+        response = self.client.post(
+            "/admin/projects.html", formset_dict([add_dict]))
+        self.assertContains(
+            response,
+            "<a href='/projects/testproject/admin.html'>testproject</a>")
 
         # check for the actual model
         testproject = Project.objects.get(code="testproject")
@@ -68,7 +75,8 @@ class AdminTests(PootleTestCase):
         self.assertTrue(testproject)
         self.assertEqual(testproject.fullname, add_dict['fullname'])
         self.assertEqual(testproject.checkstyle, add_dict['checkstyle'])
-        self.assertEqual(testproject.localfiletype, add_dict['localfiletype'])
+        self.assertEqual(
+            testproject.localfiletype, add_dict['localfiletype'])
         self.assertEqual(testproject.treestyle, add_dict['treestyle'])
 
     def test_add_project_language(self):
@@ -85,17 +93,20 @@ class AdminTests(PootleTestCase):
             "language": fish.id,
             "project": project.id,
             }
-        response = self.client.post("/projects/tutorial/admin.html", formset_dict([add_dict]))
+        response = self.client.post(
+            "/projects/tutorial/admin.html", formset_dict([add_dict]))
         self.assertContains(response, '/fish/tutorial/')
 
         response = self.client.get("/fish/")
         self.assertContains(response, '<a href="/fish/">fish</a>')
-        self.assertContains(response, '<a href="/fish/tutorial/">Tutorial</a>')
+        self.assertContains(
+            response, '<a href="/fish/tutorial/">Tutorial</a>')
         self.assertContains(response, "1 project, 0% translated")
 
     def test_upload_new_file(self):
         """Tests that we can upload a new file into a project."""
-        pocontent = wStringIO.StringIO('#: test.c\nmsgid "test"\nmsgstr "rest"\n')
+        pocontent = wStringIO.StringIO(
+            '#: test.c\nmsgid "test"\nmsgstr "rest"\n')
         pocontent.name = "test_new_upload.po"
 
         post_dict = {
@@ -106,13 +117,16 @@ class AdminTests(PootleTestCase):
         response = self.client.post("/ar/tutorial/", post_dict)
 
         self.assertContains(response, 'href="/ar/tutorial/test_new_upload.po')
-        store = Store.objects.get(pootle_path="/ar/tutorial/test_new_upload.po")
+        store = Store.objects.get(
+            pootle_path="/ar/tutorial/test_new_upload.po")
         self.assertTrue(os.path.isfile(store.file.path))
         self.assertEqual(store.file.read(), pocontent.getvalue())
 
     def test_upload_overwrite(self):
         """Tests that we can overwrite a file in a project."""
-        pocontent = wStringIO.StringIO('#: test.c\nmsgid "fish"\nmsgstr ""\n#: test.c\nmsgid "test"\nmsgstr "barf"\n\n')
+        pocontent = wStringIO.StringIO('#: test.c\nmsgid "fish"\n' \
+                                       'msgstr ""\n#: test.c\nmsgid ' \
+                                       '"test"\nmsgstr "barf"\n\n')
         pocontent.name = "pootle.po"
 
         post_dict = {
@@ -149,11 +163,13 @@ class AdminTests(PootleTestCase):
         self.assertContains(response, 'href="/ar/tutorial/test_archive_1.po')
         self.assertContains(response, 'href="/ar/tutorial/test_archive_2.po')
 
-        store = Store.objects.get(pootle_path="/ar/tutorial/test_archive_1.po")
+        store = Store.objects.get(
+            pootle_path="/ar/tutorial/test_archive_1.po")
         self.assertTrue(os.path.isfile(store.file.path))
         self.assertEqual(store.file.read(), po_content_1)
 
-        store = Store.objects.get(pootle_path="/ar/tutorial/test_archive_2.po")
+        store = Store.objects.get(
+            pootle_path="/ar/tutorial/test_archive_2.po")
         self.assertTrue(os.path.isfile(store.file.path))
         self.assertEqual(store.file.read(), po_content_2)
 
@@ -178,7 +194,9 @@ msgstr "resto"
         pootle_path = "/af/tutorial/pootle.po"
         response = self.client.get(pootle_path + "/translate")
         time.sleep(1)
-        pocontent = wStringIO.StringIO('#: test.c\nmsgid "test"\nmsgstr "blo3"\n\n#: fish.c\nmsgid "fish"\nmsgstr "stink"\n')
+        pocontent = wStringIO.StringIO('#: test.c\nmsgid "test"\n' \
+                    'msgstr "blo3"\n\n#: fish.c\nmsgid "fish"\nmsgstr ' \
+                    '"stink"\n')
         pocontent.name = "pootle.po"
 
         post_dict = {
@@ -188,19 +206,21 @@ msgstr "resto"
             }
         response = self.client.post("/af/tutorial/", post_dict)
 
-        # NOTE: this is what we do currently: any altered strings become suggestions.
-        # It may be a good idea to change this
+        # NOTE: this is what we do currently: any altered strings
+        # become suggestions. It may be a good idea to change this
         mergedcontent = '#: fish.c\nmsgid "fish"\nmsgstr "stink"\n'
         response = self.client.get(pootle_path + "/download")
         store = Store.objects.get(pootle_path=pootle_path)
         self.assertTrue(store.file.read().find(mergedcontent) >= 0)
-        suggestions = [str(sug) for sug in store.findunit('test').get_suggestions()]
+        suggestions = [
+        str(sug) for sug in store.findunit('test').get_suggestions()]
         self.assertTrue("blo3" in suggestions)
 
 
     def test_upload_new_xliff_file(self):
         """Tests that we can upload a new XLIFF file into a project."""
-        xliffcontent = wStringIO.StringIO('''<?xml version='1.0' encoding='utf-8'?>
+        xliffcontent = wStringIO.StringIO(
+            '''<?xml version='1.0' encoding='utf-8'?>
         <xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
         <file original="" source-language="en-US" datatype="po">
         <body>
@@ -224,13 +244,19 @@ msgstr "resto"
             }
 
         response = self.client.post("/ar/tutorial/", post_dict)
-        self.assertContains(response, ' href="/ar/tutorial/test_new_xliff_upload.po')
+        self.assertContains(
+            response, ' href="/ar/tutorial/test_new_xliff_upload.po')
 
         #FIXME: test conversion?
 
     def test_upload_xliff_over_file(self):
-        """Tests that we can upload a new version of a XLIFF file into a project."""
-        pocontent = wStringIO.StringIO('#: test.c\nmsgid "test"\nmsgstr "rest"\n\n#: frog.c\nmsgid "tadpole"\nmsgstr "fish"\n')
+        """
+        Tests that we can upload a new version of a XLIFF file into a
+        project.
+        """
+        pocontent = wStringIO.StringIO('#: test.c\nmsgid "test"\n' \
+                                       'msgstr "rest"\n\n#: frog.c\nmsgid ' \
+                                       '"tadpole"\nmsgstr "fish"\n')
         pocontent.name = "test_upload_xliff.po"
         post_dict = {
             'file': pocontent,
@@ -269,14 +295,17 @@ msgstr "resto"
             }
         response = self.client.post("/ar/tutorial/", post_dict)
 
-        # NOTE: this is what we do currently: any altered strings become suggestions.
-        # It may be a good idea to change this
-        mergedcontent = '#: test.c\nmsgid "test"\nmsgstr "rest"\n\n#: frog.c\nmsgid "tadpole"\nmsgstr "fish"\n'
-        store = Store.objects.get(pootle_path="/ar/tutorial/test_upload_xliff.po")
+        # NOTE: this is what we do currently: any altered strings
+        # become suggestions. It may be a good idea to change this
+        mergedcontent = '#: test.c\nmsgid "test"\nmsgstr "rest"\n\n' \
+                        '#: frog.c\nmsgid "tadpole"\nmsgstr "fish"\n'
+        store = Store.objects.get(
+            pootle_path="/ar/tutorial/test_upload_xliff.po")
         self.assertTrue(os.path.isfile(store.file.path))
         self.assertTrue(store.file.read().find(mergedcontent) >= 0)
 
-        suggestions = [str(sug) for sug in store.findunit('test').get_suggestions()]
+        suggestions = [
+            str(sug) for sug in store.findunit('test').get_suggestions()]
         self.assertTrue('rested' in suggestions)
 
     def test_submit_translation(self):
@@ -298,7 +327,9 @@ msgstr "resto"
 
     def test_submit_plural_translation(self):
         """Tests that we can submit a translation with plurals."""
-        pocontent = wStringIO.StringIO('msgid "singular"\nmsgid_plural "plural"\nmsgstr[0] ""\nmsgstr[1] ""\n\nmsgid "no fish"\nmsgstr ""\n')
+        pocontent = wStringIO.StringIO(
+            'msgid "singular"\nmsgid_plural "plural"\nmsgstr[0] ""\n' \
+            'msgstr[1] ""\n\nmsgid "no fish"\nmsgstr ""\n')
         pocontent.name = 'test_plural_submit.po'
 
         post_dict = {
@@ -323,8 +354,13 @@ msgstr "resto"
         self.assertContains(response, 'lots of fish')
 
     def test_submit_plural_to_singular_lang(self):
-        """Tests that we can submit a translation with plurals to a language without plurals."""
-        pocontent = wStringIO.StringIO('msgid "singular"\nmsgid_plural "plural"\nmsgstr[0] ""\nmsgstr[1] ""\n\nmsgid "no fish"\nmsgstr ""\n')
+        """
+        Tests that we can submit a translation with plurals to a
+        language without plurals.
+        """
+        pocontent = wStringIO.StringIO(
+            'msgid "singular"\nmsgid_plural "plural"\nmsgstr[0] ""\n' \
+            'msgstr[1] ""\n\nmsgid "no fish"\nmsgstr ""\n')
         pocontent.name = 'test_plural_submit.po'
         post_dict = {
             'file': pocontent,
@@ -344,7 +380,8 @@ msgstr "resto"
 
         self.assertContains(response, 'just fish')
 
-        expectedcontent = 'msgid "singular"\nmsgid_plural "plural"\nmsgstr[0] "just fish"\n'
+        expectedcontent = 'msgid "singular"\nmsgid_plural "plural"\n' \
+                          'msgstr[0] "just fish"\n'
         response = self.client.get(pootle_path+'/download')
         store = Store.objects.get(pootle_path=pootle_path)
         self.assertTrue(store.file.read().find(expectedcontent) >= 0)
@@ -378,7 +415,8 @@ msgstr "resto"
             }
         submit_dict.update(unit_d)
         response = self.client.post(pootle_path + "/translate", submit_dict)
-        # Fetch the page once more and check that the fuzzy checkbox is NOT checked.
+        # Fetch the page once more and check that the fuzzy checkbox
+        # is NOT checked.
         response = self.client.get(pootle_path + "/translate")
         self.assertFalse(store.units[0].isfuzzy())
 
@@ -393,7 +431,8 @@ msgstr "resto"
         submit_dict.update(unit_dict(pootle_path))
         response = self.client.post(pootle_path + "/translate", submit_dict)
         store = Store.objects.get(pootle_path=pootle_path)
-        self.assertEqual(store.units[0].getnotes(), 'goodbye\nand thanks for all the fish')
+        self.assertEqual(
+            store.units[0].getnotes(), 'goodbye\nand thanks for all the fish')
 
 
 class NonprivTests(PootleTestCase):
@@ -408,7 +447,8 @@ class NonprivTests(PootleTestCase):
 
     def test_upload_suggestions(self):
         """Tests that we can upload when we only have suggest rights."""
-        pocontent = wStringIO.StringIO('#: test.c\nmsgid "test"\nmsgstr "samaka"\n')
+        pocontent = wStringIO.StringIO(
+            '#: test.c\nmsgid "test"\nmsgstr "samaka"\n')
         pocontent.name = "pootle.po"
 
         post_dict = {
@@ -422,5 +462,6 @@ class NonprivTests(PootleTestCase):
         # We test with 'in' since the header is added
         store = Store.objects.get(pootle_path="/af/tutorial/pootle.po")
         self.assertFalse('msgstr "samaka"' in store.file.read())
-        suggestions = [str(sug) for sug in store.findunit('test').get_suggestions()]
+        suggestions = [
+            str(sug) for sug in store.findunit('test').get_suggestions()]
         self.assertTrue('samaka' in suggestions)
