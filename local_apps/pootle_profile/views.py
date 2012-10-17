@@ -42,7 +42,8 @@ from profiles.views import edit_profile
 
 def get_pootle_profile_form(request):
     """return a profile form suitable for creating/editing PootleProfile"""
-    can_view = check_profile_permission(get_profile(request.user), "view", Directory.objects.root)
+    can_view = check_profile_permission(
+        get_profile(request.user), "view", Directory.objects.root)
 
     if can_view:
         excluded = ('user',)
@@ -75,14 +76,17 @@ def edit_personal_info(request):
     else:
         user_form = UserForm(instance=request.user)
     template_vars = {"form": user_form}
-    response = render_to_response('profiles/edit_personal.html', template_vars, context_instance=RequestContext(request))
+    response = render_to_response(
+        'profiles/edit_personal.html', template_vars,
+        context_instance=RequestContext(request))
     return response
 
 
 def redirect_after_login(request):
     redirect_to = request.REQUEST.get(auth.REDIRECT_FIELD_NAME, None)
     if not redirect_to or '://' in redirect_to or ' ' in redirect_to:
-        redirect_to = iri_to_uri('/wikitrans/accounts/%s/' % urlquote(request.user.username))
+        redirect_to = iri_to_uri(
+            '/wikitrans/accounts/%s/' % urlquote(request.user.username))
     return redirect(redirect_to)
 
 def language_list(request):
@@ -97,19 +101,24 @@ def language_list(request):
 
 def login(request):
     class LangAuthenticationForm(AuthenticationForm):
-        language = forms.ChoiceField(label=_('Interface Language'), choices=language_list(request),
-                                     initial="", required=False)
+        language = forms.ChoiceField(
+            label=_('Interface Language'), choices=language_list(request),
+            initial="", required=False)
 
         def clean(self):
             username = self.cleaned_data.get('username')
             password = self.cleaned_data.get('password')
 
             if username and password:
-                self.user_cache = auth.authenticate(username=username, password=password)
+                self.user_cache = auth.authenticate(
+                    username=username, password=password)
                 if self.user_cache is None:
-                    raise forms.ValidationError(_("Please enter a correct username and password. Note that both fields are case-sensitive."))
+                    raise forms.ValidationError(
+                        _("Please enter a correct username and password. " \
+                          "Note that both fields are case-sensitive."))
                 elif not self.user_cache.is_active:
-                    raise forms.ValidationError(_("This account is inactive."))
+                    raise forms.ValidationError(
+                        _("This account is inactive."))
 
             return self.cleaned_data
 
@@ -133,7 +142,9 @@ def login(request):
         context = {
             'form': form,
             }
-        return render_to_response("index/login.html", context, context_instance=RequestContext(request))
+        return render_to_response(
+            "index/login.html", context,
+            context_instance=RequestContext(request))
 
 
 def logout(request):

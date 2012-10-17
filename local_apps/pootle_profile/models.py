@@ -32,25 +32,34 @@ from pootle_misc.baseurl import l
 
 
 class PootleUserManager(UserManager):
-    """A manager class which is meant to replace the manager class for the User model. This manager
-    hides the 'nobody' and 'default' users for normal queries, since they are special users. Code
-    that needs access to these users should use the methods get_default_user and get_nobody_user."""
+    """
+    A manager class which is meant to replace the manager class for
+    the User model. This manager hides the 'nobody' and 'default'
+    users for normal queries, since they are special users. Code that
+    needs access to these users should use the methods
+    get_default_user and get_nobody_user.
+    """
     def get_default_user(self):
-        return super(PootleUserManager, self).get_query_set().select_related(depth=1).get(username='default')
+        return super(PootleUserManager, self).get_query_set(). \
+               select_related(depth=1).get(username='default')
 
     def get_nobody_user(self):
-        return super(PootleUserManager, self).get_query_set().select_related(depth=1).get(username='nobody')
+        return super(PootleUserManager, self).get_query_set(). \
+               select_related(depth=1).get(username='nobody')
 
     def hide_defaults(self):
-        return super(PootleUserManager, self).get_query_set().exclude(username__in=('nobody', 'default'))
+        return super(PootleUserManager, self).get_query_set().exclude(
+            username__in=('nobody', 'default'))
 
-# Since PootleUserManager has no state, we can just replace the User manager's class with PootleUserManager
-# to get the desired functionality.
+# Since PootleUserManager has no state, we can just replace the User
+# manager's class with PootleUserManager to get the desired
+# functionality.
 User.objects.__class__ = PootleUserManager
 
 class PootleProfileManager(models.Manager):
     def get_query_set(self):
-        return super(PootleProfileManager, self).get_query_set().select_related(
+        return super(PootleProfileManager, self).get_query_set(). \
+               select_related(
             'languages', 'projects', 'alt_src_langs')
 
     def get_by_natural_key(self, username):
@@ -64,19 +73,26 @@ class PootleProfile(models.Model):
     # This is the only required field
     user = models.OneToOneField(User, unique=True, db_index=True)
 
-    unit_rows     = models.SmallIntegerField(default=9, verbose_name=_("Number of Rows"))
+    unit_rows = models.SmallIntegerField(
+        default=9, verbose_name=_("Number of Rows"))
     input_height  = models.SmallIntegerField(default=5, editable=False)
     languages     = models.ManyToManyField(
-        'pootle_language.Language', blank=True, limit_choices_to=~Q(code='templates'),
-        related_name="user_languages", verbose_name=_("Languages"), db_index=True)
+        'pootle_language.Language', blank=True,
+        limit_choices_to=~Q(code='templates'),
+        related_name="user_languages", verbose_name=_("Languages"),
+        db_index=True)
     projects      = models.ManyToManyField(
-        'pootle_project.Project', blank=True, db_index=True, verbose_name=_("Projects"))
+        'pootle_project.Project', blank=True, db_index=True,
+        verbose_name=_("Projects"))
     ui_lang       = models.CharField(
-        max_length=50, blank=True, null=True, choices=(choice for choice in lang_choices()),
+        max_length=50, blank=True, null=True,
+        choices=(choice for choice in lang_choices()),
         verbose_name=_('Interface Language'))
     alt_src_langs = models.ManyToManyField(
-        'pootle_language.Language', blank=True, db_index=True, limit_choices_to=~Q(code='templates'),
-        related_name="user_alt_src_langs", verbose_name=_("Alternative Source Languages"))
+        'pootle_language.Language', blank=True, db_index=True,
+        limit_choices_to=~Q(code='templates'),
+        related_name="user_alt_src_langs",
+        verbose_name=_("Alternative Source Languages"))
 
     def natural_key(self):
         return (self.user.username,)
@@ -108,10 +124,18 @@ class PootleProfile(models.Model):
     def getuserstatistics(self):
         """ get user statistics for user statistics links"""
         userstatistics = []
-        userstatistics.append({'text': _('Suggestions Accepted'), 'count': self.suggester.filter(state='accepted').count()})
-        userstatistics.append({'text': _('Suggestions Pending'), 'count': self.suggester.filter(state='pending').count()})
-        userstatistics.append({'text': _('Suggestions Reviewed'), 'count': self.reviewer.count()})
-        userstatistics.append({'text': _('Submissions Made'), 'count': self.submission_set.count()})
+        userstatistics.append(
+            {'text': _('Suggestions Accepted'),
+             'count': self.suggester.filter(state='accepted').count()})
+        userstatistics.append(
+            {'text': _('Suggestions Pending'),
+             'count': self.suggester.filter(state='pending').count()})
+        userstatistics.append(
+            {'text': _('Suggestions Reviewed'),
+             'count': self.reviewer.count()})
+        userstatistics.append(
+            {'text': _('Submissions Made'),
+             'count': self.submission_set.count()})
         return userstatistics
 
     def getquicklinks(self):
@@ -122,9 +146,12 @@ class PootleProfile(models.Model):
         for language in self.languages.iterator():
             langlinks = []
             if projects.count():
-                for translation_project in language.translationproject_set.filter(project__in=self.projects.iterator()).iterator():
-                    isprojectadmin = check_profile_permission(self, 'administrate',
-                                                              translation_project.directory)
+                for translation_project in \
+                        language.translationproject_set.filter(
+                    project__in=self.projects.iterator()).iterator():
+                    isprojectadmin = check_profile_permission(
+                        self, 'administrate',
+                        translation_project.directory)
 
                     langlinks.append({
                         'code': translation_project.project.code,
@@ -132,12 +159,14 @@ class PootleProfile(models.Model):
                         'isprojectadmin': isprojectadmin,
                         })
 
-            islangadmin = check_profile_permission(self, 'administrate', language.directory)
+            islangadmin = check_profile_permission(
+                self, 'administrate', language.directory)
             quicklinks.append({'code': language.code,
                                'name': language.localname(),
                                'islangadmin': islangadmin,
                                'projects': langlinks})
-            quicklinks.sort(cmp=locale.strcoll, key=lambda dict: dict['name'])
+            quicklinks.sort(
+                cmp=locale.strcoll, key=lambda dict: dict['name'])
         return quicklinks
 
 
@@ -163,5 +192,6 @@ def get_profile(user):
         # Return the PootleProfile associated with authenticated users
         return user.get_profile()
     else:
-        # Anonymous users get the PootleProfile associated with the 'nobody' user
+        # Anonymous users get the PootleProfile associated with the
+        # 'nobody' user
         return User.objects.get(username='nobody').get_profile()
