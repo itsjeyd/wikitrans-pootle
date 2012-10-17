@@ -66,7 +66,9 @@ def header(exception):
     <h1>%(title)s</h1>
     <p class="error">%(msg)s</p>
     """ % {'title': _('Pootle: Install'),
-           'msg': _('Error: "%s" while attempting to access the Pootle database, will try to initialize database.', exception)}
+           'msg': _(
+    'Error: "%s" while attempting to access the Pootle database, ' \
+    'will try to initialize database.', exception)}
     return text
 
 def syncdb():
@@ -87,21 +89,24 @@ def stats_start():
     text = u"""
     <p>%s</p>
     <ul>
-    """ % _('Calculating translation statistics, this will take a few minutes')
+    """ % _(
+    'Calculating translation statistics, this will take a few minutes')
     return text
 
 def stats_language(language):
     text = u"""
     <li>%s</li>
     """ % _('%(language)s is %(percent)d%% complete',
-            {'language': language.localname(), 'percent': language.translated_percentage()})
+    {'language': language.localname(),
+    'percent': language.translated_percentage()})
     return text
 
 def stats_project(project):
     text = u"""
     <li>%s</li>
     """ % _('Project %(project)s is %(percent)d%% complete',
-            {'project': project.fullname, 'percent': project.translated_percentage()})
+    {'project': project.fullname,
+    'percent': project.translated_percentage()})
     return text
 
 def stats_end():
@@ -116,7 +121,9 @@ def footer():
     <p>%(endmsg)s</p>
     <div><script>setTimeout("location.reload()", 10000)</script></div>
     </body></html>
-    """ % {'endmsg': _('Initialized database, you will be redirected to the front page in 10 seconds')}
+    """ % {'endmsg': _(
+    'Initialized database, you will be redirected to the front page ' \
+    'in 10 seconds')}
     return text
 
 def staggered_install(exception):

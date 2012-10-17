@@ -43,6 +43,7 @@ def m(path):
 
 def redirect(url, **kwargs):
     if len(kwargs) > 0:
-        return HttpResponseRedirect(l('%s?%s' % (url, urllib.urlencode(kwargs))))
+        return HttpResponseRedirect(
+            l('%s?%s' % (url, urllib.urlencode(kwargs))))
     else:
         return HttpResponseRedirect(l(url))

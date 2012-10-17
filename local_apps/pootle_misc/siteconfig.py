@@ -24,7 +24,8 @@
 from django.contrib.sites.models import Site
 
 from djblets.siteconfig.models import SiteConfiguration
-from djblets.siteconfig.django_settings import apply_django_settings, generate_defaults
+from djblets.siteconfig.django_settings import apply_django_settings, \
+     generate_defaults
 
 settings_map = {
     # siteconfig key    settings.py key

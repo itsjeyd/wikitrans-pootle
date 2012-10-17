@@ -44,7 +44,8 @@ class GroupedModelChoiceField(forms.ModelChoiceField):
                 for choice in super(GroupedModelChoiceField, self).choices:
                     yield choice
             else:
-                yield (title, [choice for choice in super(GroupedModelChoiceField, self).choices])
+                yield (title, [choice for choice in super(
+                    GroupedModelChoiceField, self).choices])
 
         self.queryset = orig_queryset
         self.empty_label = orig_empty_label
@@ -53,7 +54,8 @@ class GroupedModelChoiceField(forms.ModelChoiceField):
 
 class LiberalModelChoiceField(forms.ModelChoiceField):
     """
-    a ModelChoiceField that doesn't complain about choices not present in the queryset.
+    a ModelChoiceField that doesn't complain about choices not present
+    in the queryset.
 
     this is essentially a hack for admin pages. to be able to exclude
     currently used choices from dropdowns without failing validation.

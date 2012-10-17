@@ -76,9 +76,9 @@ def paginate(request, queryset, items=30, page=None, orphans=None):
 def nice_percentage(percentage):
     """Return an integer percentage, but avoid returning 0% or 100% if it
     might be misleading."""
-    # Let's try to be clever and make sure than anything above 0.0 and below 0.5
-    # will show as at least 1%, and anything above 99.5% and less than 100% will
-    # show as 99%.
+    # Let's try to be clever and make sure than anything above 0.0 and
+    # below 0.5 will show as at least 1%, and anything above 99.5% and
+    # less than 100% will show as 99%.
     if 99 < percentage < 100:
         return 99
     if 0 < percentage < 1:
@@ -87,11 +87,21 @@ def nice_percentage(percentage):
 
 def add_percentages(quick_stats):
     """Add percentages onto the raw stats dictionary."""
-    quick_stats['translatedpercentage'] = nice_percentage(100.0 * quick_stats['translatedsourcewords'] / max(quick_stats['totalsourcewords'], 1))
-    quick_stats['fuzzypercentage'] = nice_percentage(100.0 * quick_stats['fuzzysourcewords'] / max(quick_stats['totalsourcewords'], 1))
-    quick_stats['untranslatedpercentage'] = 100 - quick_stats['translatedpercentage'] - quick_stats['fuzzypercentage']
-    quick_stats['strtranslatedpercentage'] = nice_percentage(100.0 * quick_stats['translated'] / max(quick_stats['total'], 1))
-    quick_stats['strfuzzypercentage'] = nice_percentage(100.0 * quick_stats['fuzzy'] / max(quick_stats['total'], 1))
-    quick_stats['struntranslatedpercentage'] = 100 - quick_stats['strtranslatedpercentage'] - quick_stats['strfuzzypercentage']
+    quick_stats['translatedpercentage'] = nice_percentage(
+        100.0 * quick_stats['translatedsourcewords'] / max(
+            quick_stats['totalsourcewords'], 1))
+    quick_stats['fuzzypercentage'] = nice_percentage(
+        100.0 * quick_stats['fuzzysourcewords'] / max(
+            quick_stats['totalsourcewords'], 1))
+    quick_stats['untranslatedpercentage'] = (
+        100 - quick_stats['translatedpercentage'] -
+        quick_stats['fuzzypercentage'])
+    quick_stats['strtranslatedpercentage'] = nice_percentage(
+        100.0 * quick_stats['translated'] / max(quick_stats['total'], 1))
+    quick_stats['strfuzzypercentage'] = nice_percentage(
+        100.0 * quick_stats['fuzzy'] / max(quick_stats['total'], 1))
+    quick_stats['struntranslatedpercentage'] = (
+        100 - quick_stats['strtranslatedpercentage'] -
+        quick_stats['strfuzzypercentage'])
 
     return quick_stats
