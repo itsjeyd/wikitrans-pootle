@@ -22,6 +22,7 @@
 from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('pootle_language.views',
-    (r'^wikitrans/(?P<language_code>[^/]*)([/](index.html)?)?$', 'language_index'),
+    (r'^wikitrans/(?P<language_code>[^/]*)([/](index.html)?)?$',
+     'language_index'),
     (r'^wikitrans/(?P<language_code>[^/]*)/admin.html$', 'language_admin'),
 )

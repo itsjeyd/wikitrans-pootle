@@ -34,7 +34,8 @@ from pootle_statistics.models import Submission
 
 from pootle.i18n.gettext import tr_lang
 
-from pootle_app.models.permissions import get_matching_permissions, check_permission
+from pootle_app.models.permissions import get_matching_permissions, \
+     check_permission
 from pootle_app.views.admin.permissions import admin_permissions
 from pootle_profile.models import get_profile
 
@@ -43,7 +44,8 @@ def limit(query):
 
 def get_last_action(translation_project):
     try:
-        return Submission.objects.filter(translation_project=translation_project).latest()
+        return Submission.objects.filter(
+            translation_project=translation_project).latest()
     except Submission.DoesNotExist:
         return ''
 
@@ -64,32 +66,38 @@ def make_project_item(translation_project):
     }
     errors = projectstats.get('errors', 0)
     if errors:
-        info['errortooltip'] = ungettext('Error reading %d file', 'Error reading %d files', errors, errors)
+        info['errortooltip'] = ungettext(
+            'Error reading %d file', 'Error reading %d files', errors, errors)
     info.update(stats_descriptions(projectstats))
     return info
 
 def language_index(request, language_code):
     language = get_object_or_404(Language, code=language_code)
-    request.permissions = get_matching_permissions(get_profile(request.user), language.directory)
+    request.permissions = get_matching_permissions(
+        get_profile(request.user), language.directory)
 
     if not check_permission("view", request):
         raise PermissionDenied
 
     projects = language.translationproject_set.order_by('project__fullname')
     projectcount = len(projects)
-    items = (make_project_item(translate_project) for translate_project in projects.iterator())
+    items = (make_project_item(translate_project) for translate_project in
+             projects.iterator())
 
     totals = language.getquickstats()
-    average = nice_percentage(totals['translatedsourcewords'] * 100.0 / max(totals['totalsourcewords'], 1))
+    average = nice_percentage(
+        totals['translatedsourcewords'] * 100.0 / max(
+            totals['totalsourcewords'], 1))
     topstats = gentopstats_language(language)
 
     templatevars = {
         'language': {
           'code': language.code,
           'name': tr_lang(language.fullname),
-          'stats': ungettext('%(projects)d project, %(average)d%% translated',
-                             '%(projects)d projects, %(average)d%% translated',
-                             projectcount, {"projects": projectcount, "average": average}),
+          'stats': ungettext(
+                '%(projects)d project, %(average)d%% translated',
+                '%(projects)d projects, %(average)d%% translated',
+                projectcount, {"projects": projectcount, "average": average}),
         },
         'feed_path': '%s/' % language.code,
         'projects': items,
@@ -97,7 +105,9 @@ def language_index(request, language_code):
         'topstats': topstats,
         'instancetitle': pagelayout.get_title(),
         }
-    return render_to_response("language/language_index.html", templatevars, context_instance=RequestContext(request))
+    return render_to_response(
+        "language/language_index.html", templatevars,
+        context_instance=RequestContext(request))
 
 def language_admin(request, language_code):
     # Check if the user can access this view
@@ -105,11 +115,14 @@ def language_admin(request, language_code):
     request.permissions = get_matching_permissions(get_profile(request.user),
                                                    language.directory)
     if not check_permission('administrate', request):
-        raise PermissionDenied(_("You do not have rights to administer this language."))
+        raise PermissionDenied(_(
+            "You do not have rights to administer this language."))
 
     template_vars = {
         "language": language,
         "directory": language.directory,
         "feed_path": '%s/' % language.code,
     }
-    return admin_permissions(request, language.directory, "language/language_admin.html", template_vars)
+    return admin_permissions(
+        request, language.directory, "language/language_admin.html",
+        template_vars)
