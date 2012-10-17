@@ -20,7 +20,8 @@ else:
     notification = None
 
 @login_required
-def reviewable_article_list(request, template_name="wt_managing/reviewable_article_list.html"):
+def reviewable_article_list(
+    request, template_name="wt_managing/reviewable_article_list.html"):
     articles = user_compatible_translations(request.user)
 
     return render_to_response(template_name, {
@@ -28,7 +29,8 @@ def reviewable_article_list(request, template_name="wt_managing/reviewable_artic
     }, context_instance=RequestContext(request))
 
 @login_required
-def reviewable_sentence_list(request, template_name="wt_managing/reviewable_sentence_list.html"):
+def reviewable_sentence_list(
+    request, template_name="wt_managing/reviewable_sentence_list.html"):
 
     articles = user_compatible_translations(request.user)
 
@@ -37,9 +39,9 @@ def reviewable_sentence_list(request, template_name="wt_managing/reviewable_sent
     }, context_instance=RequestContext(request))
 
 @login_required
-def review_translatedarticle(request, source, target, title, aid,
-                             form_class=SentenceReviewForm,
-                             template_name="wt_managing/translate_form.html"):
+def review_translatedarticle(
+    request, source, target, title, aid, form_class=SentenceReviewForm,
+    template_name="wt_managing/translate_form.html"):
     """
     aid in this context is the translated article id
     """
@@ -56,8 +58,10 @@ def review_translatedarticle(request, source, target, title, aid,
     if request.method == "POST":
         formset = TranslatedSentenceSet(request.POST, request.FILES)
         if formset.is_valid():
-            articlereview_id = formset.forms[0].cleaned_data['articlereview']
-            articlereview, created = ArticleReview.objects.get_or_create(id=articlereview_id)
+            articlereview_id = formset.forms[0]. \
+                               cleaned_data['articlereview']
+            articlereview, created = ArticleReview.objects.get_or_create(
+                id=articlereview_id)
             for form, trans_sent in zip(formset.forms, ts_list):
                 accepted = form.cleaned_data['accepted']
                 segment_id = form.cleaned_data['segment_id']

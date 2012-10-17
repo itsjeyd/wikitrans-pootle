@@ -21,10 +21,12 @@ REVIEW_STATUSES = (
     (FINISHED, 'Finished'),
 )
 class ArticleReview(models.Model):
-    translated_by = models.CharField(_('Translated by'), blank=True, max_length=255)
+    translated_by = models.CharField(
+        _('Translated by'), blank=True, max_length=255)
     translated_article = models.ForeignKey(TranslatedArticle)
     start_date = models.DateTimeField(_('Start Date'))
-    finished_date = models.DateTimeField(_('Finished Date'), blank=True, null=True)
+    finished_date = models.DateTimeField(
+        _('Finished Date'), blank=True, null=True)
     status = models.IntegerField(_('Review Status'),
                                  choices=REVIEW_STATUSES,
                                  default=PENDING)
@@ -55,7 +57,8 @@ class SentenceReview(models.Model):
     translated_sentence = models.ForeignKey(TranslatedSentence)
     articlereview = models.ForeignKey(ArticleReview)
     accepted = models.BooleanField(_('Accepted'), default=False)
-    review_date = models.DateTimeField(_('Review Date'), null=True, default=datetime.now())
+    review_date = models.DateTimeField(
+        _('Review Date'), null=True, default=datetime.now())
     segment_id = models.IntegerField(_('Segment ID'))
     status = models.IntegerField(_('Review Status'),
                                  choices=REVIEW_STATUSES,
