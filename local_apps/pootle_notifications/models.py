@@ -29,7 +29,8 @@ class Notice(models.Model):
     directory = models.ForeignKey('pootle_app.Directory', db_index=True)
     message = models.TextField(_('Message'))
     #l10n: The date that the news item was written
-    added = models.DateTimeField(_('Added'), auto_now_add=True, null=True, db_index=True)
+    added = models.DateTimeField(
+        _('Added'), auto_now_add=True, null=True, db_index=True)
 
     def __unicode__(self):
         return self.message

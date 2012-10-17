@@ -25,7 +25,8 @@ from django.shortcuts import get_object_or_404
 
 from pootle_misc.baseurl import l
 from pootle_app.models import Directory
-from pootle_app.models.permissions import get_matching_permissions, check_permission
+from pootle_app.models.permissions import get_matching_permissions, \
+     check_permission
 from pootle_profile.models import get_profile
 
 from pootle_notifications.models import Notice
@@ -35,7 +36,8 @@ def view(request, path):
     pootle_path = '/%s' % path
     directory = get_object_or_404(Directory, pootle_path=pootle_path)
 
-    request.permissions = get_matching_permissions(get_profile(request.user), directory)
+    request.permissions = get_matching_permissions(
+        get_profile(request.user), directory)
     if not check_permission('view', request):
         raise PermissionDenied
 
@@ -61,9 +63,12 @@ class NoticeFeed(Feed):
 
     def items(self, directory):
         if self.recusrive:
-            return Notice.objects.filter(directory__pootle_path__startswith=directory.pootle_path).select_related('directory')[:30]
+            return Notice.objects.filter(
+                directory__pootle_path__startswith=directory.pootle_path). \
+                select_related('directory')[:30]
         else:
-            return Notice.objects.filter(directory=directory).select_related('directory')[:30]
+            return Notice.objects.filter(directory=directory).select_related(
+                'directory')[:30]
 
     def item_pubdate(self, item):
         return item.added

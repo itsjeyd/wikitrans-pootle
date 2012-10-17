@@ -29,7 +29,8 @@ from django.forms import ModelForm
 from pootle.i18n.gettext import tr_lang
 
 from pootle_app.models import Directory
-from pootle_app.models.permissions import get_matching_permissions, check_permission
+from pootle_app.models.permissions import get_matching_permissions, \
+     check_permission
 from pootle_app.views.language import navbar_dict
 from pootle_profile.models import get_profile
 
@@ -41,7 +42,8 @@ def view(request, path):
 
     directory = get_object_or_404(Directory, pootle_path=pootle_path)
 
-    request.permissions = get_matching_permissions(get_profile(request.user), directory)
+    request.permissions = get_matching_permissions(
+        get_profile(request.user), directory)
 
     if not check_permission('view', request):
         raise PermissionDenied
@@ -53,21 +55,27 @@ def view(request, path):
         template_vars['form'] = handle_form(request, directory)
         template_vars['title'] = directory_to_title(request, directory)
     if request.GET.get('all', False):
-        template_vars['notices'] = Notice.objects.filter(directory__pootle_path__startswith=directory.pootle_path).select_related('directory')[:30]
+        template_vars['notices'] = Notice.objects.filter(
+            directory__pootle_path__startswith=directory.pootle_path). \
+            select_related('directory')[:30]
     else:
-        template_vars['notices'] = Notice.objects.filter(directory=directory).select_related('directory')[:30]
+        template_vars['notices'] = Notice.objects.filter(
+            directory=directory).select_related('directory')[:30]
 
     if not directory.is_language() and not directory.is_project():
         try:
             request.translation_project = directory.get_translationproject()
-            template_vars['navitems'] = [navbar_dict.make_directory_navbar_dict(request, directory)]
+            template_vars['navitems'] = [
+                navbar_dict.make_directory_navbar_dict(request, directory)]
             template_vars['translation_project'] = request.translation_project
             template_vars['language'] = request.translation_project.language
             template_vars['project'] = request.translation_project.project
         except:
             pass
 
-    return render_to_response('notices.html', template_vars, context_instance=RequestContext(request))
+    return render_to_response(
+        'notices.html', template_vars,
+        context_instance=RequestContext(request))
 
 def directory_to_title(request, directory):
     """figures out if directory refers to a Language or
@@ -80,13 +88,16 @@ def directory_to_title(request, directory):
             }
         return _('News for %(language)s', trans_vars)
     elif directory.is_project():
-        return _('News for %(project)s', {'project': directory.project.fullname})
+        return _(
+            'News for %(project)s', {'project': directory.project.fullname})
     elif directory.is_translationproject():
         trans_vars = {
-            'language': tr_lang(directory.translationproject.language.fullname),
+            'language': tr_lang(
+                directory.translationproject.language.fullname),
             'project': directory.translationproject.project.fullname,
             }
-        return _('News for the %(project)s project in %(language)s', trans_vars)
+        return _(
+            'News for the %(project)s project in %(language)s', trans_vars)
     return _('News for %(path)s',
              {'path': directory.pootle_path})
 
