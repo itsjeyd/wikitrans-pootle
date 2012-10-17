@@ -7,10 +7,12 @@ from wt_translation.models import UnsupportedLanguagePair
 
 
 class Command(NoArgsCommand):
-    help = "Looks for completed translation requests from all Serverland hosts and updates their corresponding .po files."
+    help = "Looks for completed translation requests from all " \
+           "Serverland hosts and updates their corresponding .po files."
 
     def handle_error(self, host, error):
-        print "An error occurred with Serverland host '%s' (%s):" % (host.shortname, host.url)
+        print "An error occurred with Serverland host '%s' (%s):" % \
+              (host.shortname, host.url)
         print error
 
     def handle_noargs(self, **options):

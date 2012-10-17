@@ -14,8 +14,10 @@ from pootle_language.models import Language
 from pootle_store.models import Store
 from pootle_translationproject.models import TranslationProject
 from wt_translation import TRANSLATOR_TYPES, SERVERLAND
-from wt_translation import TRANSLATION_STATUSES, STATUS_PENDING, STATUS_IN_PROGRESS, STATUS_FINISHED, STATUS_ERROR
-from wt_translation import SERVERLAND_HOST_STATUSES, OK, INVALID_URL, INVALID_TOKEN, UNAVAILABLE, MISCONFIGURED_HOST
+from wt_translation import TRANSLATION_STATUSES, STATUS_PENDING, \
+     STATUS_IN_PROGRESS, STATUS_FINISHED, STATUS_ERROR
+from wt_translation import SERVERLAND_HOST_STATUSES, OK, INVALID_URL, \
+     INVALID_TOKEN, UNAVAILABLE, MISCONFIGURED_HOST
 
 # Serverland integration
 import xmlrpclib
@@ -66,9 +68,11 @@ class MachineTranslator(models.Model):
     supported_languages = models.ManyToManyField(LanguagePair)
     description = models.TextField(_('Description'))
     type = models.CharField(
-        _('Type'), max_length=32, choices=TRANSLATOR_TYPES, default='Serverland'
+        _('Type'), max_length=32, choices=TRANSLATOR_TYPES,
+        default='Serverland'
         )
-    timestamp = models.DateTimeField(_('Refresh Date'), default=datetime.now())
+    timestamp = models.DateTimeField(
+        _('Refresh Date'), default=datetime.now())
 
     def __unicode__(self):
         return u"%s :: %s" % (self.shortname, self.timestamp)
@@ -132,7 +136,8 @@ class ServerlandHost(models.Model):
         _('URL Location'), verify_exists=True, max_length=255, unique=True
         )
     token = models.CharField(_('Auth Token'), max_length=8)
-    timestamp = models.DateTimeField(_('Refresh Date'), default=datetime.now())
+    timestamp = models.DateTimeField(
+        _('Refresh Date'), default=datetime.now())
     status = models.CharField(
         _('Status'), max_length=1,
         choices=SERVERLAND_HOST_STATUSES, editable=False
@@ -192,9 +197,11 @@ class ServerlandHost(models.Model):
 
     def request_translation(self, trans_request):
         translator = trans_request.translator
-        source_lang = trans_request.translation_project.project.source_language
+        source_lang = trans_request.translation_project.project. \
+                      source_language
         target_lang = trans_request.translation_project.language
-        if not translator.is_language_pair_supported(source_lang, target_lang):
+        if not translator.is_language_pair_supported(
+            source_lang, target_lang):
             raise UnsupportedLanguagePair(
                 translator, source_lang, target_lang
                 )
@@ -256,9 +263,8 @@ class ServerlandHost(models.Model):
             for request in completed_requests:
                 shortname = request.findtext('shortname')
                 if shortname in in_progress_requests:
-                    trans_request = TranslationRequest.objects.get_by_external_id(
-                        shortname
-                        )
+                    trans_request = TranslationRequest.objects. \
+                                    get_by_external_id(shortname)
                     response = self.request(
                         self.url + 'results/{0}/?token={1}'.format(
                             shortname, self.token
@@ -266,7 +272,8 @@ class ServerlandHost(models.Model):
                         )
                     etree = utils.element_tree(response)
                     result = etree.findtext('result')
-                    result = re.sub('### (\[\[YAHOO_SPLITTER\]\]\n)?(### )?', '', result)
+                    result = re.sub(
+                        '### (\[\[YAHOO_SPLITTER\]\]\n)?(### )?', '', result)
                     result = re.sub('(<[A-Z]\[)?(\]>)?', '', result)
                     result_sentences = [
                         sentence.strip() for sentence in
@@ -315,7 +322,8 @@ class TranslationRequest(models.Model):
     external_id = models.CharField(
         _('External ID'), max_length=32, editable=False, null=True
         )
-    timestamp = models.DateTimeField(_('Last Updated'), default=datetime.now())
+    timestamp = models.DateTimeField(
+        _('Last Updated'), default=datetime.now())
 
     objects = TranslationRequestManager()
 
@@ -323,7 +331,8 @@ class TranslationRequest(models.Model):
         unique_together = ("translation_project", "translator")
 
     def __unicode__(self):
-        return u"%s - %s" % (self.translator.shortname, self.translation_project)
+        return u"%s - %s" % (
+            self.translator.shortname, self.translation_project)
 
     def save(self):
         super(TranslationRequest, self).save()
@@ -332,7 +341,8 @@ class TranslationRequest(models.Model):
 class UndefinedTranslator(Exception):
     def __init__(self, value):
         if isinstance(value, MachineTranslator):
-            self.value = "Machine Translator %s is not completely defined." % value
+            self.value = "Machine Translator %s " \
+                         "is not completely defined." % value
         else:
             self.value = "This Machine Translator is undefined. %s" % value
     def __str__(self):
@@ -341,7 +351,9 @@ class UndefinedTranslator(Exception):
 
 class UnsupportedLanguagePair(Exception):
     def __init__(self, translator, source_language, target_language):
-        self.value = "Machine Translator %s does not support the language pair (%s, %s)." % (translator, source_language.code, target_language.code)
+        self.value = "Machine Translator %s does not support the language " \
+                     "pair (%s, %s)." % (
+            translator, source_language.code, target_language.code)
 
     def __str__(self):
         return repr(self.value)
@@ -361,25 +373,33 @@ class ServerlandConfigError(TranslatorConfigError):
         self.error_code = UNAVAILABLE
 
         if isinstance(host, ServerlandHost):
-            # Inspect the XML-RPC error type. It can either be a Fault or a ProtocolError
+            # Inspect the XML-RPC error type. It can either be a Fault
+            # or a ProtocolError
             if isinstance(error, xmlrpclib.ProtocolError):
                 self.error_code = INVALID_URL
                 self.msg = "Invalid Serverland host URL: '%s'." % host.url
             elif isinstance(error, xmlrpclib.Fault):
-                # Inspect the faultCode and faultString to determine the error
-                if re.search("[Errno 111] Connection refused", error.faultString) != None:
+                # Inspect the faultCode and faultString to determine
+                # the error
+                if re.search("[Errno 111] Connection refused",
+                             error.faultString) != None:
                     self.error_code = INVALID_TOKEN
-                    self.msg = "Invalid authentication token for Serverland host '%s'." % host.shortname
-                elif re.search("[Errno 111] Connection refused", error.faultString) != None:
+                    self.msg = "Invalid authentication token for " \
+                               "Serverland host '%s'." % host.shortname
+                elif re.search("[Errno 111] Connection refused",
+                               error.faultString) != None:
                     self.error_code = UNAVAILABLE
-                elif re.search("takes exactly \d+ arguments", error.faultString) != None:
+                elif re.search("takes exactly \d+ arguments",
+                               error.faultString) != None:
                     self.error_code = MISCONFIGURED_HOST
-                    self.msg = "Serverland host '%s' is misconfigured." % host.shortname
+                    self.msg = "Serverland host '%s' is misconfigured." % \
+                               host.shortname
                 else:
                     self.msg = error.faultString
 
-#            if self.error_code == UNAVAILABLE:
-#                self.msg = "Serverland host '%s' is unavailable." % host.shortname
+           # if self.error_code == UNAVAILABLE:
+           #     self.msg = "Serverland host '%s' is unavailable." % \
+           #                host.shortname
 
             # TODO: Should updating the ServerlandHost instance go
             # here? And if the host is unavailable, should we update
@@ -394,7 +414,8 @@ def send_translation_requests():
     '''
     Sends a batch of machine translation requests.
     '''
-    pending_requests = TranslationRequest.objects.filter(status=STATUS_PENDING)
+    pending_requests = TranslationRequest.objects.filter(
+        status=STATUS_PENDING)
     serverland_host = ServerlandHost.objects.get(id=1)
     for request in pending_requests:
         serverland_host.request_translation(request)
