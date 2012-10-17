@@ -31,7 +31,8 @@ from translate.lang.data import langcode_re
 from pootle_store.util import absolute_real_path, statssum
 from pootle_misc.aggregate import max_column
 from pootle_store.models import Unit
-from pootle_store.filetypes import filetype_choices, factory_classes, is_monolingual
+from pootle_store.filetypes import filetype_choices, factory_classes, \
+     is_monolingual
 from pootle_misc.util import getfromcache
 from pootle_misc.baseurl import l
 from pootle_app.lib.util import RelatedManager
@@ -46,8 +47,12 @@ class Project(models.Model):
         ordering = ['code']
         db_table = 'pootle_app_project'
 
-    code_help_text = _('A short code for the project. This should only contain ASCII characters, numbers, and the underscore (_) character.')
-    description_help_text = _('A description of this project. This is useful to give more information or instructions. This field should be valid HTML.')
+    code_help_text = _(
+        'A short code for the project. This should only contain ASCII ' \
+        'characters, numbers, and the underscore (_) character.')
+    description_help_text = _(
+        'A description of this project. This is useful to give more ' \
+        'information or instructions. This field should be valid HTML.')
 
     checker_choices = [('standard', 'standard')]
     checkers = list(checks.projectcheckers.keys())
@@ -59,17 +64,32 @@ class Project(models.Model):
             ('auto', _('Automatic detection (slower)')),
             ('gnu', _('GNU style: files named by language code')),
             ('nongnu', _('Non-GNU: Each language in its own directory')),
-    )
+        )
 
-    code           = models.CharField(max_length=255, null=False, unique=True, db_index=True, verbose_name=_('Code'), help_text=code_help_text)
-    fullname       = models.CharField(max_length=255, null=False, verbose_name=_("Full Name"))
-    description    = models.TextField(blank=True, help_text=description_help_text)
-    checkstyle     = models.CharField(max_length=50, default='standard', null=False, choices=checker_choices, verbose_name=_('Quality Checks'))
-    localfiletype  = models.CharField(max_length=50, default="po", choices=local_choices, verbose_name=_('File Type'))
-    treestyle      = models.CharField(max_length=20, default='auto', choices=treestyle_choices, verbose_name=_('Project Tree Style'))
-    source_language  = models.ForeignKey('pootle_language.Language', db_index=True, verbose_name=_('Source Language'))
-    ignoredfiles   = models.CharField(max_length=255, blank=True, null=False, default="", verbose_name=_('Ignore Files'))
-    directory = models.OneToOneField('pootle_app.Directory', db_index=True, editable=False)
+    code           = models.CharField(
+        max_length=255, null=False, unique=True, db_index=True,
+        verbose_name=_('Code'), help_text=code_help_text)
+    fullname       = models.CharField(
+        max_length=255, null=False, verbose_name=_("Full Name"))
+    description    = models.TextField(
+        blank=True, help_text=description_help_text)
+    checkstyle     = models.CharField(
+        max_length=50, default='standard', null=False,
+        choices=checker_choices, verbose_name=_('Quality Checks'))
+    localfiletype  = models.CharField(
+        max_length=50, default="po", choices=local_choices,
+        verbose_name=_('File Type'))
+    treestyle      = models.CharField(
+        max_length=20, default='auto', choices=treestyle_choices,
+        verbose_name=_('Project Tree Style'))
+    source_language  = models.ForeignKey(
+        'pootle_language.Language', db_index=True,
+        verbose_name=_('Source Language'))
+    ignoredfiles   = models.CharField(
+        max_length=255, blank=True, null=False, default="",
+        verbose_name=_('Ignore Files'))
+    directory = models.OneToOneField(
+        'pootle_app.Directory', db_index=True, editable=False)
 
     def natural_key(self):
         return (self.code,)
@@ -84,7 +104,8 @@ class Project(models.Model):
         if not os.path.exists(project_path):
             os.makedirs(project_path)
         from pootle_app.models.directory import Directory
-        self.directory = Directory.objects.projects.get_or_make_subdir(self.code)
+        self.directory = Directory.objects.projects.get_or_make_subdir(
+            self.code)
 
         super(Project, self).save(*args, **kwargs)
 
@@ -95,14 +116,18 @@ class Project(models.Model):
 
     @getfromcache
     def get_mtime(self):
-        return max_column(Unit.objects.filter(store__translation_project__project=self), 'mtime', None)
+        return max_column(
+            Unit.objects.filter(store__translation_project__project=self),
+            'mtime', None)
 
     @getfromcache
     def getquickstats(self):
         return statssum(self.translationproject_set.iterator())
 
     def translated_percentage(self):
-        return int(100.0 * self.getquickstats()['translatedsourcewords'] / max(self.getquickstats()['totalsourcewords'], 1))
+        return int(
+            100.0 * self.getquickstats()['translatedsourcewords'] / max(
+                self.getquickstats()['totalsourcewords'], 1))
 
     def _get_pootle_path(self):
         return "/projects/" + self.code + "/"
@@ -121,7 +146,10 @@ class Project(models.Model):
             return self.localfiletype
 
     def get_file_class(self):
-        """returns the TranslationStore subclass required for parsing Project files"""
+        """
+        returns the TranslationStore subclass required for parsing
+        Project files
+        """
         return factory_classes[self.localfiletype]
 
     def is_monolingual(self):
@@ -134,7 +162,8 @@ class Project(models.Model):
         template filetype"""
 
         return filename.endswith(os.path.extsep + self.localfiletype) or \
-               match_templates and filename.endswith(os.path.extsep + self.get_template_filtetype())
+               match_templates and filename.endswith(
+            os.path.extsep + self.get_template_filtetype())
 
     def _detect_treestyle(self):
         try:
@@ -148,12 +177,14 @@ class Project(models.Model):
                     return "gnu"
             else:
                 # there are subdirectories
-                if filter(lambda dirname: dirname == 'templates' or langcode_re.match(dirname), dirnames):
+                if filter(lambda dirname: dirname == 'templates' or
+                          langcode_re.match(dirname), dirnames):
                     # found language dirs assume nongnu
                     return "nongnu"
                 else:
                     # no language subdirs found, look for any translation file
-                    for dirpath, dirnames, filenames in os.walk(self.get_real_path()):
+                    for dirpath, dirnames, filenames in os.walk(
+                        self.get_real_path()):
                         if filter(self.file_belongs_to_project, filenames):
                             return "gnu"
         except:
@@ -183,15 +214,18 @@ class Project(models.Model):
             return self.translationproject_set.get(language__code='templates')
         except ObjectDoesNotExist:
             try:
-                return self.translationproject_set.get(language=self.source_language_id)
+                return self.translationproject_set.get(
+                    language=self.source_language_id)
             except ObjectDoesNotExist:
                 pass
 
      #################
      # WikiTrans edits
      #################
-#    def language_exists(self, language):
-#        return len(TranslationProject.objects.filter(language = templates_language, id=self.id)) > 0
+     # def language_exists(self, language):
+     #     return len(
+     #         TranslationProject.objects.filter(
+     #             language=templates_language, id=self.id)) > 0
 
     def add_language(self, language):
         """
@@ -200,13 +234,15 @@ class Project(models.Model):
         import logging
 
         from pootle_translationproject.models import TranslationProject
-        logging.debug("Project ID: %s, language id: %s", self.id , language.id)
+        logging.debug(
+            "Project ID: %s, language id: %s", self.id , language.id)
         trans_proj = TranslationProject(project_id = self.id,
                                 language_id = language.id)
 
         trans_proj.save()
 
-        # Update the translation project files from the template, if it exists.
+        # Update the translation project files from the template, if
+        # it exists.
         trans_proj.update_from_templates()
 
         return trans_proj
