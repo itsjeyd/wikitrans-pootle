@@ -40,26 +40,26 @@ class PootleCommand(NoArgsCommand):
                     help='path prefix relative to translation project of files to refresh'),
         )
 
-    def do_translation_project(self, tp, pootle_path, **options):
+    def do_translation_project(self, trans_proj, pootle_path, **options):
         if hasattr(self, "handle_translation_project"):
-            logging.info(u"running %s over %s", self.name, tp)
+            logging.info(u"running %s over %s", self.name, trans_proj)
             try:
-                self.handle_translation_project(tp, **options)
+                self.handle_translation_project(trans_proj, **options)
             except Exception, e:
-                logging.error(u"failed to run %s over %s:\n%s", self.name, tp, e)
+                logging.error(u"failed to run %s over %s:\n%s", self.name, trans_proj, e)
                 return
 
         if not pootle_path and hasattr(self, "handle_all_stores"):
-            logging.info(u"running %s over %s's files", self.name, tp)
+            logging.info(u"running %s over %s's files", self.name, trans_proj)
             try:
-                self.handle_all_stores(tp, **options)
+                self.handle_all_stores(trans_proj, **options)
             except Exception, e:
-                logging.error(u"failed to run %s over %s's files", self.name, tp)
+                logging.error(u"failed to run %s over %s's files", self.name, trans_proj)
                 return
         elif hasattr(self, "handle_store"):
-            store_query = tp.stores.all()
+            store_query = trans_proj.stores.all()
             if pootle_path:
-                pootle_path = tp.pootle_path + pootle_path
+                pootle_path = trans_proj.pootle_path + pootle_path
                 store_query = store_query.filter(pootle_path__startswith=pootle_path)
             for store in store_query.iterator():
                 logging.info(u"running %s over %s", self.name, store.pootle_path)
@@ -133,8 +133,8 @@ class PootleCommand(NoArgsCommand):
             if template_tp:
                 self.do_translation_project(template_tp, path, **options)
 
-            for tp in tp_query.iterator():
-                if tp == template_tp:
+            for trans_proj in tp_query.iterator():
+                if trans_proj == template_tp:
                     continue
-                self.do_translation_project(tp, path, **options)
+                self.do_translation_project(trans_proj, path, **options)
 
