@@ -45,18 +45,18 @@ def add_trailing_slash(path):
         return path + os.sep
 
 
-def relative_real_path(p):
-    if p.startswith(settings.PODIRECTORY):
-        return p[len(add_trailing_slash(settings.PODIRECTORY)):]
+def relative_real_path(path):
+    if path.startswith(settings.PODIRECTORY):
+        return path[len(add_trailing_slash(settings.PODIRECTORY)):]
     else:
-        return p
+        return path
 
 
-def absolute_real_path(p):
-    if not p.startswith(settings.PODIRECTORY):
-        return os.path.join(settings.PODIRECTORY, p)
+def absolute_real_path(path):
+    if not path.startswith(settings.PODIRECTORY):
+        return os.path.join(settings.PODIRECTORY, path)
     else:
-        return p
+        return path
 
 
 empty_quickstats = {'fuzzy': 0,

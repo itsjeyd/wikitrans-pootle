@@ -75,8 +75,8 @@ def export_as_xliff(request, pootle_path):
         ensure_target_dir_exists(abs_export_path)
         outputstore = store.convert(PoXliffFile)
         outputstore.switchfile(store.name, createifmissing=True)
-        fd, tempstore = tempfile.mkstemp(prefix=store.name, suffix='.xlf')
-        os.close(fd)
+        file_desc, tempstore = tempfile.mkstemp(prefix=store.name, suffix='.xlf')
+        os.close(file_desc)
         outputstore.savefile(tempstore)
         shutil.move(tempstore, abs_export_path)
         cache.set(key, store.get_mtime(), settings.OBJECT_CACHE_TIMEOUT)
@@ -103,9 +103,9 @@ def export_as_type(request, pootle_path, filetype):
             os.path.isfile(abs_export_path)):
         ensure_target_dir_exists(abs_export_path)
         outputstore = store.convert(klass)
-        fd, tempstore = tempfile.mkstemp(
+        file_desc, tempstore = tempfile.mkstemp(
             prefix=store.name, suffix=os.path.extsep + filetype)
-        os.close(fd)
+        os.close(file_desc)
         outputstore.savefile(tempstore)
         shutil.move(tempstore, abs_export_path)
         cache.set(key, store.get_mtime(), settings.OBJECT_CACHE_TIMEOUT)

@@ -73,9 +73,9 @@ class MultiStringField(models.Field):
                 plural = True
             else:
                 plural = len(strings) > 1
-            ms = multistring(strings, encoding="UTF-8")
-            ms.plural = plural
-            return ms
+            multi_str = multistring(strings, encoding="UTF-8")
+            multi_str.plural = plural
+            return multi_str
         elif isinstance(value, dict):
             return multistring(
                 [val for key, val in sorted(value.items())],
