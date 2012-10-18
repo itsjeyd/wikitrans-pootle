@@ -64,14 +64,6 @@ def create_default_projects():
 
     en = require_english()
 
-    #pootle = Project(code=u"pootle", source_language=en)
-    #pootle.fullname = u"Pootle"
-    #pootle.description = "<div dir='ltr' lang='en'>Interface translations for Pootle. <br /> See the <a href='http://pootle.locamotion.org'>official Pootle server</a> for the translations of Pootle.</div>"
-    #pootle.checkstyle = "standard"
-    #pootle.localfiletype = "po"
-    #pootle.treestyle = "auto"
-    #pootle.save()
-
     tutorial = Project(code=u"tutorial", source_language=en)
     tutorial.fullname = u"Tutorial"
     tutorial.description = "<div dir='ltr' lang='en'>Tutorial project where users can play with Pootle and learn more about translation and localisation.<br />For more help on localisation, visit the <a href='http://translate.sourceforge.net/wiki/guide/start'>localisation guide</a>.</div>"
