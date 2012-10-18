@@ -39,12 +39,12 @@ def lazy(result_name):
             return self.name + ' ' + self.surname
     """
 
-    def lazify(f):
+    def lazify(func):
         def evaluator(self):
             try:
                 return getattr(self, result_name)
             except AttributeError:
-                result = f(self)
+                result = func(self)
                 setattr(self, result_name, result)
                 return result
         return evaluator
