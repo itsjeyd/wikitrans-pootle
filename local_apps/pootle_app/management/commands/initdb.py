@@ -66,7 +66,12 @@ def create_default_projects():
 
     tutorial = Project(code=u"tutorial", source_language=en)
     tutorial.fullname = u"Tutorial"
-    tutorial.description = "<div dir='ltr' lang='en'>Tutorial project where users can play with Pootle and learn more about translation and localisation.<br />For more help on localisation, visit the <a href='http://translate.sourceforge.net/wiki/guide/start'>localisation guide</a>.</div>"
+    tutorial.description = "<div dir='ltr' lang='en'>Tutorial project " \
+                           "where users can play with Pootle and learn " \
+                           "more about translation and localisation." \
+                           "<br />For more help on localisation, visit " \
+                           "the <a href='http://translate.sourceforge.net/" \
+                           "wiki/guide/start'>localisation guide</a>.</div>"
     tutorial.checkstyle = "standard"
     tutorial.localfiletype = "po"
     tutorial.treestyle = "auto"
@@ -125,7 +130,8 @@ def create_default_languages():
     wo.save()
 
     # 简体中文
-    # Simplified Chinese (China mainland used below, but also used in Singapore and Malaysia)
+    # Simplified Chinese
+    # (China mainland used below, but also used in Singapore and Malaysia)
     zh_CN = Language(code="zh_CN")
     zh_CN.fullname = u'Chinese (China)'
     zh_CN.nplurals = '1'
@@ -134,7 +140,8 @@ def create_default_languages():
     zh_CN.save()
 
     # 繁體中文
-    # Traditional Chinese (Hong Kong used below, but also used in Taiwan and Macau)
+    # Traditional Chinese
+    # (Hong Kong used below, but also used in Taiwan and Macau)
     zh_HK = Language(code="zh_HK")
     zh_HK.fullname = u'Chinese (Hong Kong)'
     zh_HK.nplurals = '1'
@@ -143,7 +150,8 @@ def create_default_languages():
     zh_HK.save()
 
     # 繁體中文
-    # Traditional Chinese (Taiwan used below, but also used in Hong Kong and Macau)
+    # Traditional Chinese
+    # (Taiwan used below, but also used in Hong Kong and Macau)
     zh_TW = Language(code="zh_TW")
     zh_TW.fullname = u'Chinese (Taiwan)'
     zh_TW.nplurals = '1'
@@ -171,7 +179,8 @@ def create_default_languages():
     gd = Language(code='gd')
     gd.fullname = u'Gaelic; Scottish Gaelic'
     gd.nplurals = '4'
-    gd.pluralequation = '(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : (n > 2 && n < 20) ? 2 : 3'
+    gd.pluralequation = '(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : ' \
+                        '(n > 2 && n < 20) ? 2 : 3'
     gd.specialchars = u'àòùèìÀÈÌÒÙ'
     gd.save()
 
@@ -179,16 +188,20 @@ def create_default_languages():
     from translate.lang import data
     for code, props in data.languages.items():
         try:
-            lang, created = Language.objects.get_or_create(code=code, fullname=props[0],
-                                             nplurals=props[1], pluralequation=props[2])
+            lang, created = Language.objects.get_or_create(
+                code=code, fullname=props[0],
+                nplurals=props[1], pluralequation=props[2])
         except:
             pass
 
 
 def create_default_admin():
-    """Create the default user(s) for Pootle. You definitely want to change
-    the admin account so that your default install is not accessible with the
-    default credentials. The users 'noboby' and 'default' should be left as is."""
+    """
+    Create the default user(s) for Pootle. You definitely want to change the
+    admin account so that your default install is not accessible with the
+    default credentials. The users 'noboby' and 'default' should be left as
+    is.
+    """
     admin = User(username=u"admin",
                 first_name=u"Administrator",
                 is_active=True,
