@@ -39,7 +39,10 @@ from pootle.__version__ import build as code_buildversion
 from translate.__version__ import build as code_tt_buildversion
 
 def create_essential_users():
-    """Create default and nobody User instances required for pootle permission system"""
+    """
+    Create default and nobody User instances required for pootle
+    permission system
+    """
     # The nobody user is used to represent an anonymous user in cases where
     # we need to associate model information with such a user. An example is
     # in the permission system: we need a way to store rights for anonymous
@@ -67,29 +70,40 @@ def create_essential_users():
 
 def create_pootle_permissions():
     """define Pootle's directory level permissions"""
-    pootle_content_type, created = ContentType.objects.get_or_create(app_label="pootle_app", model="directory")
+    pootle_content_type, created = ContentType.objects.get_or_create(
+        app_label="pootle_app", model="directory")
     pootle_content_type.name = 'pootle'
     pootle_content_type.save()
-    view, created = Permission.objects.get_or_create(name=_("Can view a translation project"),
-                                                     content_type=pootle_content_type, codename="view")
-    suggest, created = Permission.objects.get_or_create(name=_("Can make a suggestion for a translation"),
-                                               content_type=pootle_content_type, codename="suggest")
-    translate, created = Permission.objects.get_or_create(name=_("Can submit a translation"),
-                                                 content_type=pootle_content_type, codename="translate")
-    overwrite, created = Permission.objects.get_or_create(name=_("Can overwrite translations on uploading files"),
-                                                 content_type=pootle_content_type, codename="overwrite")
-    review, created = Permission.objects.get_or_create(name=_("Can review translations"),
-                                                       content_type=pootle_content_type, codename="review")
-    archive, created = Permission.objects.get_or_create(name=_("Can download archives of translation projects"),
-                                                        content_type=pootle_content_type, codename="archive")
-    administrate, created = Permission.objects.get_or_create(name=_("Can administrate a translation project"),
-                                                    content_type=pootle_content_type, codename="administrate")
-    commit, created = Permission.objects.get_or_create(name=_("Can commit to version control"),
-                                                       content_type=pootle_content_type, codename="commit")
+    view, created = Permission.objects.get_or_create(
+        name=_("Can view a translation project"),
+        content_type=pootle_content_type, codename="view")
+    suggest, created = Permission.objects.get_or_create(
+        name=_("Can make a suggestion for a translation"),
+        content_type=pootle_content_type, codename="suggest")
+    translate, created = Permission.objects.get_or_create(
+        name=_("Can submit a translation"),
+        content_type=pootle_content_type, codename="translate")
+    overwrite, created = Permission.objects.get_or_create(
+        name=_("Can overwrite translations on uploading files"),
+        content_type=pootle_content_type, codename="overwrite")
+    review, created = Permission.objects.get_or_create(
+        name=_("Can review translations"),
+        content_type=pootle_content_type, codename="review")
+    archive, created = Permission.objects.get_or_create(
+        name=_("Can download archives of translation projects"),
+        content_type=pootle_content_type, codename="archive")
+    administrate, created = Permission.objects.get_or_create(
+        name=_("Can administrate a translation project"),
+        content_type=pootle_content_type, codename="administrate")
+    commit, created = Permission.objects.get_or_create(
+        name=_("Can commit to version control"),
+        content_type=pootle_content_type, codename="commit")
 
 def create_pootle_permission_sets():
-    """Create the default permission set for the anonymous (non-logged in) user
-    ('nobody') and for the logged in user ('default')."""
+    """
+    Create the default permission set for the anonymous (non-logged in) user
+    ('nobody') and for the logged in user ('default').
+    """
     nobody = PootleProfile.objects.get(user__username='nobody')
     default = PootleProfile.objects.get(user__username='default')
 
@@ -100,51 +114,65 @@ def create_pootle_permission_sets():
 
     # Default permissions for tree root
     root = Directory.objects.root
-    permission_set, created = PermissionSet.objects.get_or_create(profile=nobody, directory=root)
+    permission_set, created = PermissionSet.objects.get_or_create(
+        profile=nobody, directory=root)
     if created:
         permission_set.positive_permissions = [view, suggest]
         permission_set.save()
 
-    permission_set, created = PermissionSet.objects.get_or_create(profile=default, directory=root)
+    permission_set, created = PermissionSet.objects.get_or_create(
+        profile=default, directory=root)
     if created:
-        permission_set.positive_permissions = [view, suggest, translate, archive]
+        permission_set.positive_permissions = [view, suggest,
+                                               translate, archive]
         permission_set.save()
 
     # Default permissions for templates language
     templates = Directory.objects.get(pootle_path="/templates/")
 
     #override with no permissions for templates language
-    permission_set, created = PermissionSet.objects.get_or_create(profile=nobody, directory=templates)
+    permission_set, created = PermissionSet.objects.get_or_create(
+        profile=nobody, directory=templates)
     if created:
         permission_set.positive_permissions = [view]
         permission_set.save()
 
-    permission_set, created = PermissionSet.objects.get_or_create(profile=default, directory=templates)
+    permission_set, created = PermissionSet.objects.get_or_create(
+        profile=default, directory=templates)
     if created:
         permission_set.positive_permissions = [view]
         permission_set.save()
 
 def require_english():
-    en, created = Language.objects.get_or_create(code="en", fullname=u"English",
-                                                 nplurals=2, pluralequation="(n != 1)")
-    return en
+    english, created = Language.objects.get_or_create(
+        code="en", fullname=u"English",
+        nplurals=2, pluralequation="(n != 1)")
+    return english
 
 def create_root_directory():
     """Create root Directory item."""
     root, created = Directory.objects.get_or_create(name='')
-    projects, created = Directory.objects.get_or_create(name='projects', parent=root)
+    projects, created = Directory.objects.get_or_create(
+        name='projects', parent=root)
 
 def create_template_language():
-    """template language is used to give users access to the untranslated template files"""
-    templates, created = Language.objects.get_or_create(code="templates", fullname=u'Templates')
+    """
+    template language is used to give users access to the untranslated
+    template files
+    """
+    templates, created = Language.objects.get_or_create(
+        code="templates", fullname=u'Templates')
     require_english()
 
 
 def create_terminology_project():
-    """terminology project is used to display terminology suggestions while translating"""
+    """
+    terminology project is used to display terminology suggestions while
+    translating
+    """
     en = require_english()
-    terminology, created = Project.objects.get_or_create(code="terminology", fullname=u"Terminology",
-                                                         source_language=en)
+    terminology, created = Project.objects.get_or_create(
+        code="terminology", fullname=u"Terminology", source_language=en)
 
 def post_syncdb_handler(sender, created_models, **kwargs):
     try:
@@ -176,13 +204,16 @@ def fix_permission_content_type_pre(sender, instance, **kwargs):
     if instance.name == 'pootle' and instance.model == "":
         logging.debug("Fixing permissions content types")
         global permission_queryset
-        permission_queryset = [permission for permission in Permission.objects.filter(content_type=instance)]
+        permission_queryset = [
+            permission for permission in Permission.objects.filter(
+                content_type=instance)]
 pre_delete.connect(fix_permission_content_type_pre, sender=ContentType)
 
 def fix_permission_content_type_post(sender, instance, **kwargs):
     global permission_queryset
     if permission_queryset is not None:
-        dir_content_type = ContentType.objects.get(app_label='pootle_app', model='directory')
+        dir_content_type = ContentType.objects.get(
+            app_label='pootle_app', model='directory')
         dir_content_type.name = 'pootle'
         dir_content_type.save()
         for permission in permission_queryset:
