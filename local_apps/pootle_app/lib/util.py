@@ -62,4 +62,5 @@ class RelatedManager(models.Manager):
     """Model manager that always does full joins on relations, saves
     us lots of database queries later"""
     def get_query_set(self):
-        return super(RelatedManager, self).get_query_set().select_related(depth=1)
+        return super(
+            RelatedManager, self).get_query_set().select_related(depth=1)

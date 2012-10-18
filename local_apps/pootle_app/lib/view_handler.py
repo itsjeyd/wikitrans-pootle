@@ -18,7 +18,8 @@ class View(object):
         if len(action_names) == 1:
             return action_names[0]
         else:
-            raise SubmitError('Only one submit action may be handled per POST')
+            raise SubmitError(
+                'Only one submit action may be handled per POST')
 
     def find_handlers(self, forms):
         handlers = {}
@@ -27,7 +28,9 @@ class View(object):
                 if action_name not in handlers:
                     handlers[action_name] = form
                 else:
-                    raise HandlerError('More than one form defines the handler %s' % action_name)
+                    raise HandlerError(
+                        'More than one form defines the handler %s' %
+                        action_name)
         return handlers
 
     def __init__(self, forms):
@@ -43,8 +46,10 @@ class View(object):
                 template_vars[form_name] = None
         if request.method == 'POST':
             action = self.find_post_handler_action(request)
-            form = self.handlers[action](request, data=request.POST, files=request.FILES)
-            template_vars.update(form.dispatch(action, request, *args, **kwargs))
+            form = self.handlers[action](
+                request, data=request.POST, files=request.FILES)
+            template_vars.update(
+                form.dispatch(action, request, *args, **kwargs))
         return self.GET(template_vars, request, *args, **kwargs)
 
     def GET(self, template_vars, request, *args, **kwargs):
@@ -70,8 +75,10 @@ class Handler(object):
     def render_submits(self):
         output = u""
         for action in self.actions:
-            output += u'<input type="submit" name="%(action_name)s" value="%(action_value)s" />' % \
-                      {'action_name': action[0], 'action_value': unicode(action[1])}
+            output += u'<input type="submit" name="%(action_name)s" ' \
+                      'value="%(action_value)s" />' % \
+                      {'action_name': action[0],
+                       'action_value': unicode(action[1])}
         return mark_safe(output)
 
     def as_p(self):
