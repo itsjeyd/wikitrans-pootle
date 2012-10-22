@@ -64,18 +64,18 @@ class Command(PootleCommand):
             id__in=project.translationproject_set.values_list(
                 'language', flat=True))
         for language in lang_query.iterator():
-            tp = create_translation_project(language, project)
-            if tp:
-                logging.info(u"Created %s", tp)
+            trans_proj = create_translation_project(language, project)
+            if trans_proj:
+                logging.info(u"Created %s", trans_proj)
 
     def handle_language(self, language, **options):
         project_query = Project.objects.exclude(
             id__in=language.translationproject_set.values_list(
                 'project', flat=True))
         for project in project_query.iterator():
-            tp = create_translation_project(language, project)
-            if tp:
-                logging.info(u"Created %s", tp)
+            trans_proj = create_translation_project(language, project)
+            if trans_proj:
+                logging.info(u"Created %s", trans_proj)
 
     def handle_translation_project(
         self, translation_project, **options):
