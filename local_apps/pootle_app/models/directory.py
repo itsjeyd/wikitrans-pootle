@@ -21,7 +21,8 @@
 
 from django.db import models
 
-from pootle_store.util import empty_quickstats, empty_completestats, statssum, completestatssum
+from pootle_store.util import empty_quickstats, empty_completestats, \
+     statssum, completestatssum
 from pootle_store.models import Suggestion, Unit
 
 from pootle_misc.util import getfromcache, dictsum
@@ -32,7 +33,8 @@ class DirectoryManager(models.Manager):
     def get_query_set(self):
         # ForeignKey fields with null=True are not selected by
         # select_related unless explicitly specified
-        return super(DirectoryManager, self).get_query_set().select_related('parent')
+        return super(DirectoryManager, self).get_query_set().select_related(
+            'parent')
 
     def _get_root(self):
         return self.get(pootle_path='/')
@@ -50,7 +52,8 @@ class Directory(models.Model):
     is_dir = True
 
     name        = models.CharField(max_length=255, null=False)
-    parent      = models.ForeignKey('Directory', related_name='child_dirs', null=True, db_index=True)
+    parent      = models.ForeignKey(
+        'Directory', related_name='child_dirs', null=True, db_index=True)
     pootle_path = models.CharField(max_length=255, null=False, db_index=True)
 
     objects = DirectoryManager()
@@ -86,7 +89,10 @@ class Directory(models.Model):
 
     @getfromcache
     def get_mtime(self):
-        return max_column(Unit.objects.filter(store__pootle_path__startswith=self.pootle_path), 'mtime', None)
+        return max_column(
+            Unit.objects.filter(
+                store__pootle_path__startswith=self.pootle_path), 'mtime',
+            None)
 
     def _get_stores(self):
         """queryset with all descending stores"""
@@ -96,7 +102,8 @@ class Directory(models.Model):
     stores = property(_get_stores)
 
     def get_or_make_subdir(self, child_name):
-        child_dir, created = Directory.objects.get_or_create(name=child_name, parent=self)
+        child_dir, created = Directory.objects.get_or_create(
+            name=child_name, parent=self)
         return child_dir
 
     def __unicode__(self):
@@ -119,7 +126,9 @@ class Directory(models.Model):
         stats = dictsum(file_result, dir_result)
         return stats
 
-        #return calculate_stats(Unit.objects.filter(store__pootle_path__startswith=self.pootle_path))
+        # return calculate_stats(
+        #     Unit.objects.filter(
+        #         store__pootle_path__startswith=self.pootle_path))
 
     @getfromcache
     def getcompletestats(self):
@@ -129,11 +138,16 @@ class Directory(models.Model):
         dir_result  = completestatssum(self.child_dirs.iterator())
         stats = dictsum(file_result, dir_result)
         return stats
-        #queryset = QualityCheck.objects.filter(unit__store__pootle_path__startswith=self.pootle_path, false_positive=False)
+        # queryset = QualityCheck.objects.filter(
+        #     unit__store__pootle_path__startswith=self.pootle_path,
+        #     false_positive=False)
         #return group_by_count(queryset, 'name')
 
     def trail(self, only_dirs=True):
-        """return list of ancestor directories excluding TranslationProject and above"""
+        """
+        return list of ancestor directories excluding TranslationProject and
+        above
+        """
         path_parts = self.pootle_path.split('/')
         parents = []
         if only_dirs:
@@ -146,25 +160,30 @@ class Directory(models.Model):
             path = '/'.join(path_parts[:i]) + '/'
             parents.append(path)
         if parents:
-            return Directory.objects.filter(pootle_path__in=parents).order_by('pootle_path')
+            return Directory.objects.filter(pootle_path__in=parents).order_by(
+                'pootle_path')
         return Directory.objects.none()
 
     def has_suggestions(self):
         """check if any child store has suggestions"""
-        return Suggestion.objects.filter(unit__store__pootle_path__startswith=self.pootle_path).count() > 0
+        return Suggestion.objects.filter(
+            unit__store__pootle_path__startswith=self.pootle_path).count() > 0
 
     def is_language(self):
         """does this directory point at a language"""
         return self.pootle_path.count('/') == 2
 
     def is_project(self):
-        return self.pootle_path.startswith('/projects/') and self.pootle_path.count('/') == 3
+        return self.pootle_path.startswith('/projects/') and \
+               self.pootle_path.count('/') == 3
 
     def is_translationproject(self):
         """does this directory point at a translation project"""
-        return self.pootle_path.count('/') == 3 and not self.pootle_path.startswith('/projects/')
+        return self.pootle_path.count('/') == 3 and not \
+               self.pootle_path.startswith('/projects/')
 
-    is_template_project = property(lambda self: self.pootle_path.startswith('/templates/'))
+    is_template_project = property(
+        lambda self: self.pootle_path.startswith('/templates/'))
 
     def get_translationproject(self):
         """returns the translation project belonging to this directory."""
@@ -191,5 +210,6 @@ class Directory(models.Model):
             return translation_project.real_path
 
         if translation_project:
-            path_prefix = self.pootle_path[len(translation_project.pootle_path)-1:-1]
+            path_prefix = self.pootle_path[
+                len(translation_project.pootle_path)-1:-1]
             return translation_project.real_path + path_prefix
