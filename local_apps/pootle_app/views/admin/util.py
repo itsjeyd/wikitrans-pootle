@@ -33,28 +33,28 @@ from pootle_app.models.permissions import get_matching_permissions, \
 from pootle_profile.models import get_profile
 
 
-def user_is_admin(f):
-    def decorated_f(request, *args, **kwargs):
+def user_is_admin(function):
+    def decorated_function(request, *args, **kwargs):
         if not request.user.is_superuser:
             raise PermissionDenied(
                 _("You do not have rights to administer Pootle."))
         else:
-            return f(request, *args, **kwargs)
-    return decorated_f
+            return function(request, *args, **kwargs)
+    return decorated_function
 
 def has_permission(permission_code):
-    def wrap_f(f):
-        def decorated_f(request, path_obj, *args, **kwargs):
+    def wrap_function(function):
+        def decorated_function(request, path_obj, *args, **kwargs):
             request.permissions = get_matching_permissions(
                 get_profile(request.user), path_obj.directory)
             if check_permission(permission_code, request):
-                return f(request, path_obj, *args, **kwargs)
+                return function(request, path_obj, *args, **kwargs)
             else:
                 raise PermissionDenied(
                     _("You do not have rights to administer %s.",
                       path_obj.fullname))
-        return decorated_f
-    return wrap_f
+        return decorated_function
+    return wrap_function
 
 
 def form_set_as_table(formset, link=None, linkfield='code'):
