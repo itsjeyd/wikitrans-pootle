@@ -32,9 +32,13 @@ def view(request):
     model_args['title'] = _("Users")
     model_args['submitname'] = "changeusers"
     model_args['formid'] = "users"
-    return util.edit(request, 'admin/admin_general_users.html', User, model_args,
-               fields=('username', 'first_name', 'last_name', 'email', 'is_active', 'is_superuser'),
-               formset=BaseUserFormSet, queryset=User.objects.hide_defaults().order_by('username'), can_delete=True)
+    return util.edit(
+        request, 'admin/admin_general_users.html', User, model_args,
+        fields=('username', 'first_name', 'last_name', 'email', 'is_active',
+                'is_superuser'),
+        formset=BaseUserFormSet,
+        queryset=User.objects.hide_defaults().order_by('username'),
+        can_delete=True)
 
 class BaseUserFormSet(BaseModelFormSet):
     """This formset deals with user admininistration. We have to add a
@@ -49,7 +53,8 @@ class BaseUserFormSet(BaseModelFormSet):
 
     def add_fields(self, form, index):
         super(BaseUserFormSet, self).add_fields(form, index)
-        form.fields["set_password"] = forms.CharField(required=False, label=_("Password"), widget=forms.PasswordInput())
+        form.fields["set_password"] = forms.CharField(
+            required=False, label=_("Password"), widget=forms.PasswordInput())
 
     def del_field(self, form):
         password = form['set_password'].data
@@ -57,7 +62,9 @@ class BaseUserFormSet(BaseModelFormSet):
         return password
 
     def save_extra(self, instance, password, commit=True):
-        """process fields that require behavior different from model default"""
+        """
+        process fields that require behavior different from model default
+        """
         changed = False
         # don't store plain text password, use set_password method to
         # set encrypted password
@@ -77,8 +84,10 @@ class BaseUserFormSet(BaseModelFormSet):
 
     def save_existing(self, form, instance, commit=True):
         password = self.del_field(form)
-        return self.save_extra(super(BaseUserFormSet, self).save_existing(form, instance, commit), password, commit)
+        return self.save_extra(super(BaseUserFormSet, self).save_existing(
+            form, instance, commit), password, commit)
 
     def save_new(self, form, commit=True):
         password = self.del_field(form)
-        return self.save_extra(super(BaseUserFormSet, self).save_new(form, commit), password, commit)
+        return self.save_extra(super(BaseUserFormSet, self).save_new(
+            form, commit), password, commit)

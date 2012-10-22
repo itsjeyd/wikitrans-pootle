@@ -28,14 +28,16 @@ from django.forms.util import ErrorList
 
 from pootle_misc.baseurl import l
 from pootle_misc.util import paginate
-from pootle_app.models.permissions import get_matching_permissions, check_permission
+from pootle_app.models.permissions import get_matching_permissions, \
+     check_permission
 from pootle_profile.models import get_profile
 
 
 def user_is_admin(f):
     def decorated_f(request, *args, **kwargs):
         if not request.user.is_superuser:
-            raise PermissionDenied(_("You do not have rights to administer Pootle."))
+            raise PermissionDenied(
+                _("You do not have rights to administer Pootle."))
         else:
             return f(request, *args, **kwargs)
     return decorated_f
@@ -43,11 +45,14 @@ def user_is_admin(f):
 def has_permission(permission_code):
     def wrap_f(f):
         def decorated_f(request, path_obj, *args, **kwargs):
-            request.permissions = get_matching_permissions(get_profile(request.user), path_obj.directory)
+            request.permissions = get_matching_permissions(
+                get_profile(request.user), path_obj.directory)
             if check_permission(permission_code, request):
                 return f(request, path_obj, *args, **kwargs)
             else:
-                raise PermissionDenied(_("You do not have rights to administer %s.", path_obj.fullname))
+                raise PermissionDenied(
+                    _("You do not have rights to administer %s.",
+                      path_obj.fullname))
         return decorated_f
     return wrap_f
 
@@ -94,7 +99,8 @@ def form_set_as_table(formset, link=None, linkfield='code'):
                 result.append(form['id'].as_hidden())
 
             """
-            'link' indicates whether we put the first field as a link or as widget
+            'link' indicates whether we put the first field as a link or as
+            widget
             """
             if field == linkfield and linkfield in form.initial and link:
                 if callable(link):
@@ -102,7 +108,8 @@ def form_set_as_table(formset, link=None, linkfield='code'):
                     result.append(form[field].as_hidden())
                 else:
                     link = l(link % form.initial[linkfield])
-                    result.append("<a href='"+link+"'>"+form.initial[linkfield]+"</a>")
+                    result.append(
+                        "<a href='"+link+"'>"+form.initial[linkfield]+"</a>")
                     result.append(form[field].as_hidden())
             else:
                 result.append(form[field].as_widget())
@@ -132,17 +139,20 @@ def form_set_as_table(formset, link=None, linkfield='code'):
     return u''.join(result)
 
 def process_modelformset(request, model_class, queryset, **kwargs):
-    """With the Django model class 'model_class' and the Django form class 'form_class',
-    construct a Django formset which can manipulate """
+    """
+    With the Django model class 'model_class' and the Django form class
+    'form_class', construct a Django formset which can manipulate
+    """
 
-    # Create a formset class for the model 'model_class' (i.e. it will contain forms whose
-    # contents are based on the fields of 'model_class'); parameters for the construction
-    # of the forms used in the formset should be in kwargs. In Django 1.0, the interface
-    # to modelformset_factory is
-    # def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
-    #                          formset=BaseModelFormSet,
-    #                          extra=1, can_delete=False, can_order=False,
-    #                          max_num=0, fields=None, exclude=None)
+    # Create a formset class for the model 'model_class' (i.e. it will contain
+    # forms whose contents are based on the fields of 'model_class');
+    # parameters for the construction of the forms used in the formset should
+    # be in kwargs. In Django 1.0, the interface to modelformset_factory is
+    # def modelformset_factory(
+    #     model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
+    #     formset=BaseModelFormSet,
+    #     extra=1, can_delete=False, can_order=False,
+    #     max_num=0, fields=None, exclude=None)
     formset_class = modelformset_factory(model_class, **kwargs)
 
     if queryset is None:
@@ -151,8 +161,8 @@ def process_modelformset(request, model_class, queryset, **kwargs):
 
     # If the request is a POST, we want to possibly update our data
     if request.method == 'POST' and request.POST:
-        # Create a formset from all the 'model_class' instances whose values will
-        # be updated using the contents of request.POST
+        # Create a formset from all the 'model_class' instances whose values
+        # will be updated using the contents of request.POST
         objects = paginate(request, queryset)
         formset = formset_class(request.POST, queryset=objects.object_list)
         # Validate all the forms in the formset
@@ -161,7 +171,8 @@ def process_modelformset(request, model_class, queryset, **kwargs):
             formset.save()
         else:
             # Otherwise, complain to the user that something went wrong
-            return formset, _("There are errors in the form. Please review the problems below."), objects
+            return formset, _("There are errors in the form. Please review " \
+                              "the problems below."), objects
 
         # hack to force reevaluation of same query
         queryset = queryset.filter()
@@ -174,10 +185,12 @@ def edit(request, template, model_class,
          model_args={'title': '', 'formid': '', 'submitname': ''},
          link=None, linkfield='code', queryset=None, **kwargs):
 
-    formset, msg, objects = process_modelformset(request, model_class, queryset=queryset, **kwargs)
+    formset, msg, objects = process_modelformset(
+        request, model_class, queryset=queryset, **kwargs)
     #FIXME: title should differ depending on model_class
     template_vars = {
-            "formset_text": mark_safe(form_set_as_table(formset, link, linkfield)),
+            "formset_text": mark_safe(
+            form_set_as_table(formset, link, linkfield)),
             "formset": formset,
             "objects": objects,
             "text": {
@@ -191,7 +204,8 @@ def edit(request, template, model_class,
     }
     #FIXME: this should be done through an extra context argument
     if 'translation_project' in model_args:
-        template_vars['translation_project'] = model_args['translation_project']
+        template_vars['translation_project'] = \
+                                             model_args['translation_project']
     if 'project' in model_args:
         template_vars["project"] = model_args['project']
     if 'language' in model_args:
@@ -204,4 +218,5 @@ def edit(request, template, model_class,
         template_vars["navitems"] = model_args['navitems']
     if 'feed_path' in model_args:
         template_vars["feed_path"] = model_args['feed_path']
-    return render_to_response(template, template_vars, context_instance=RequestContext(request))
+    return render_to_response(
+        template, template_vars, context_instance=RequestContext(request))
