@@ -70,13 +70,13 @@ def get_permissions_by_username(username, directory):
             None, permissionset.directory.pootle_path.split('/'))) < 2):
                 # active permission at language level or higher, check project
                 # level permission
-                try:
-                    project_path = '/projects/%s/' % path_parts[1]
-                    permissionset = PermissionSet.objects.get(
-                        directory__pootle_path=project_path,
-                        profile__user__username=username)
-                except PermissionSet.DoesNotExist:
-                    pass
+            try:
+                project_path = '/projects/%s/' % path_parts[1]
+                permissionset = PermissionSet.objects.get(
+                    directory__pootle_path=project_path,
+                    profile__user__username=username)
+            except PermissionSet.DoesNotExist:
+                pass
 
         if permissionset:
             permissions_cache[pootle_path] = permissionset.to_dict()
