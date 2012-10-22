@@ -37,7 +37,8 @@ class PootleCommand(NoArgsCommand):
         make_option('--language', action='append', dest='languages',
                     help='language to refresh'),
         make_option('--path-prefix', action='store', dest='path',
-                    help='path prefix relative to translation project of files to refresh'),
+                    help='path prefix relative to translation project ' \
+                    'of files to refresh'),
         )
 
     def do_translation_project(self, trans_proj, pootle_path, **options):
@@ -46,7 +47,9 @@ class PootleCommand(NoArgsCommand):
             try:
                 self.handle_translation_project(trans_proj, **options)
             except Exception, e:
-                logging.error(u"failed to run %s over %s:\n%s", self.name, trans_proj, e)
+                logging.error(
+                    u"failed to run %s over %s:\n%s", self.name,
+                    trans_proj, e)
                 return
 
         if not pootle_path and hasattr(self, "handle_all_stores"):
@@ -54,19 +57,25 @@ class PootleCommand(NoArgsCommand):
             try:
                 self.handle_all_stores(trans_proj, **options)
             except Exception, e:
-                logging.error(u"failed to run %s over %s's files", self.name, trans_proj)
+                logging.error(
+                    u"failed to run %s over %s's files", self.name,
+                    trans_proj)
                 return
         elif hasattr(self, "handle_store"):
             store_query = trans_proj.stores.all()
             if pootle_path:
                 pootle_path = trans_proj.pootle_path + pootle_path
-                store_query = store_query.filter(pootle_path__startswith=pootle_path)
+                store_query = store_query.filter(
+                    pootle_path__startswith=pootle_path)
             for store in store_query.iterator():
-                logging.info(u"running %s over %s", self.name, store.pootle_path)
+                logging.info(
+                    u"running %s over %s", self.name, store.pootle_path)
                 try:
                     self.handle_store(store, **options)
                 except Exception, e:
-                    logging.error(u"failed to run %s over %s:\n%s", self.name, store.pootle_path, e)
+                    logging.error(
+                        u"failed to run %s over %s:\n%s", self.name,
+                        store.pootle_path, e)
 
     def handle_noargs(self, **options):
         # reduce size of parse pool early on
@@ -106,7 +115,8 @@ class PootleCommand(NoArgsCommand):
                 try:
                     self.handle_language(lang, **options)
                 except Exception, e:
-                    logging.error(u"failed to run %s over %s:\n%s", self.name, lang, e)
+                    logging.error(
+                        u"failed to run %s over %s:\n%s", self.name, lang, e)
 
         project_query = Project.objects.all()
         if projects:
@@ -118,11 +128,14 @@ class PootleCommand(NoArgsCommand):
                 try:
                     self.handle_project(project, **options)
                 except Exception, e:
-                    logging.error(u"failed to run %s over %s:\n%s", self.name, project, e)
+                    logging.error(
+                        u"failed to run %s over %s:\n%s", self.name,
+                        project, e)
                     continue
 
             template_tp = project.get_template_translationproject()
-            tp_query = project.translationproject_set.order_by('language__code')
+            tp_query = project.translationproject_set.order_by(
+                'language__code')
 
             if languages:
                 if template_tp and template_tp.language.code not in languages:

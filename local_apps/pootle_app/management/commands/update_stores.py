@@ -27,16 +27,22 @@ from pootle_app.management.commands import PootleCommand
 
 class Command(PootleCommand):
     option_list = PootleCommand.option_list + (
-        make_option('--keep', action='store_true', dest='keep', default=False,
-                    help="keep existing translations, just update untranslated units and add new units."),
+        make_option(
+            '--keep', action='store_true', dest='keep', default=False,
+            help="keep existing translations, just update " \
+            "untranslated units and add new units."),
         )
     help = "Update database stores from files."
 
-    def handle_translation_project(self, translation_project, **options):
-        logging.info(u"Scanning for new files in %s", translation_project)
+    def handle_translation_project(
+        self, translation_project, **options):
+        logging.info(
+            u"Scanning for new files in %s", translation_project)
         translation_project.scan_files()
 
     def handle_store(self, store, **options):
         keep = options.get('keep', False)
         # update new translations
-        store.update(update_translation=not keep, conservative=keep, update_structure=True)
+        store.update(
+            update_translation=not keep, conservative=keep,
+            update_structure=True)

@@ -41,9 +41,15 @@ def update_db():
     config = siteconfig.load_site_config()
     db_buildversion = config.get('BUILDVERSION', DEFAULT_BUILDVERSION)
     if db_buildversion < code_buildversion:
-        logging.info("Upgrading database from schema version %d to %d", db_buildversion, code_buildversion)
+        logging.info(
+            "Upgrading database from schema version %d to %d",
+            db_buildversion, code_buildversion)
         for i in staggered_update(db_buildversion, sys.maxint):
             pass
-        logging.info("Database upgrade done, current schema version %d", code_buildversion)
+        logging.info(
+            "Database upgrade done, current schema version %d",
+            code_buildversion)
     else:
-        logging.info("No database upgrades required, current schema version %d", db_buildversion)
+        logging.info(
+            "No database upgrades required, current schema " \
+            "version %d", db_buildversion)

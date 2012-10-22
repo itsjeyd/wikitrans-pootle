@@ -44,10 +44,14 @@ def does_not_exists(path):
 
 class Command(PootleCommand):
     option_list = PootleCommand.option_list + (
-        make_option('--cleanup', action='store_true', dest='clean', default=False,
-                    help="delete projects and translation projects that ceased to exist (handle with care)."),
+        make_option(
+            '--cleanup', action='store_true', dest='clean',
+            default=False,
+            help="delete projects and translation projects that " \
+            "ceased to exist (handle with care)."),
         )
-    help = "Detects new translation projects in the file system and adds them to database."
+    help = "Detects new translation projects in the file system " \
+           "and adds them to database."
 
     def handle_project(self, project, **options):
         clean = options.get('clean', False)
@@ -56,22 +60,28 @@ class Command(PootleCommand):
             project.delete()
             return
 
-        lang_query = Language.objects.exclude(id__in=project.translationproject_set.values_list('language', flat=True))
+        lang_query = Language.objects.exclude(
+            id__in=project.translationproject_set.values_list(
+                'language', flat=True))
         for language in lang_query.iterator():
             tp = create_translation_project(language, project)
             if tp:
                 logging.info(u"Created %s", tp)
 
     def handle_language(self, language, **options):
-        project_query = Project.objects.exclude(id__in=language.translationproject_set.values_list('project', flat=True))
+        project_query = Project.objects.exclude(
+            id__in=language.translationproject_set.values_list(
+                'project', flat=True))
         for project in project_query.iterator():
             tp = create_translation_project(language, project)
             if tp:
                 logging.info(u"Created %s", tp)
 
-    def handle_translation_project(self, translation_project, **options):
+    def handle_translation_project(
+        self, translation_project, **options):
         clean = options.get('clean', False)
-        if clean and does_not_exists(translation_project.abs_real_path):
+        if clean and does_not_exists(
+            translation_project.abs_real_path):
             logging.info(u"Deleting %s", translation_project)
             translation_project.delete()
 

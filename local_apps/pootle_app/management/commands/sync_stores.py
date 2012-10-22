@@ -26,8 +26,10 @@ from pootle_app.management.commands import PootleCommand
 
 class Command(PootleCommand):
     option_list = PootleCommand.option_list + (
-        make_option('--overwrite', action='store_true', dest='overwrite', default=False,
-                    help="don't just save translations, but overwrite files to reflect state in database"),
+        make_option(
+            '--overwrite', action='store_true', dest='overwrite',
+            default=False, help="don't just save translations, but ' \
+            'overwrite files to reflect state in database"),
         )
     help = "Save new translations to disk manually."
 
@@ -37,4 +39,6 @@ class Command(PootleCommand):
 
     def handle_store(self, store, **options):
         overwrite = options.get('overwrite', False)
-        store.sync(update_translation=True, conservative=not overwrite, update_structure=overwrite)
+        store.sync(
+            update_translation=True, conservative=not overwrite,
+            update_structure=overwrite)
