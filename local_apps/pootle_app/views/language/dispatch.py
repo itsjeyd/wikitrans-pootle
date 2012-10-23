@@ -21,18 +21,18 @@
 
 from pootle_app import url_state, url_manip
 
-################################################################################
+##############################################################################
 
 class CommonState(url_state.State):
     """Stores state common to project index pages and translation pages."""
     editing       = url_state.BooleanValue('editing')
 
-################################################################################
+##############################################################################
 
 class ProjectIndexState(CommonState):
     show_checks   = url_state.BooleanValue('show_checks')
 
-################################################################################
+##############################################################################
 
 class TranslatePageState(CommonState):
     # Search state
@@ -50,7 +50,7 @@ def get_store(request):
     else:
         return request.path_info
 
-################################################################################
+##############################################################################
 
 def translate(request, path, **kwargs):
     params = TranslatePageState(request.GET, **kwargs)

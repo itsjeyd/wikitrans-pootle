@@ -28,14 +28,16 @@ from pootle_app import url_manip
 from pootle_app.models.permissions import check_permission
 from pootle_app.views.language import dispatch
 from pootle_app.views.language import item_dict
-from pootle_app.views.language.item_dict import directory_translate_links, directory_review_links
+from pootle_app.views.language.item_dict import directory_translate_links, \
+     directory_review_links
 
 
 def make_directory_pathlinks(request, project_url, url, links):
     if url != project_url:
         links.append({'href': dispatch.show_directory(request, url),
                       'text': url_manip.basename(url)})
-        return make_directory_pathlinks(request, project_url, url_manip.parent(url), links)
+        return make_directory_pathlinks(
+            request, project_url, url_manip.parent(url), links)
     else:
         return list(reversed(links))
 
@@ -49,8 +51,10 @@ def make_directory_actions(request, links_required=None):
 def make_navbar_path_dict(request, path_links=None):
     def make_admin(request):
         if check_permission('admin', request):
-            return {'href': dispatch.translation_project_admin(request.translation_project),
-                    'text': _('Admin')}
+            return {
+                'href': dispatch.translation_project_admin(
+                    request.translation_project),
+                'text': _('Admin')}
         else:
             return None
 
@@ -60,14 +64,17 @@ def make_navbar_path_dict(request, path_links=None):
         'admin':     make_admin(request),
         'language':  {'href': dispatch.open_language(request, language.code),
                       'text': tr_lang(language.fullname)},
-        'project':   {'href': dispatch.open_translation_project(request, language.code, project.code),
-                      'text': project.fullname},
+        'project':   {
+            'href': dispatch.open_translation_project(
+                request, language.code, project.code),
+            'text': project.fullname},
         'pathlinks': path_links}
 
 def make_directory_navbar_dict(request, directory, links_required=None):
     result = item_dict.make_directory_item(request, directory, links_required)
     project_url = request.translation_project.directory.pootle_path
-    path_links = make_directory_pathlinks(request, project_url, directory.pootle_path, [])
+    path_links = make_directory_pathlinks(
+        request, project_url, directory.pootle_path, [])
     if links_required:
         actions = make_directory_actions(request, links_required)
     else:

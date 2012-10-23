@@ -30,23 +30,26 @@ from pootle_store.models               import Store
 from pootle_app.views.language         import dispatch
 from pootle_misc.util import add_percentages
 
-################################################################################
+##############################################################################
 
 def get_item_summary(request, quick_stats, path_obj):
     translated_words = quick_stats['translatedsourcewords']
     total_words      = quick_stats['totalsourcewords']
-    num_stores       = Store.objects.filter(pootle_path__startswith=path_obj.pootle_path).count()
+    num_stores       = Store.objects.filter(
+        pootle_path__startswith=path_obj.pootle_path).count()
     file_stats = ungettext("%d file", "%d files", num_stores, num_stores)
     # The translated word counts
-    word_stats = _("%(translated)d/%(total)d words (%(translatedpercent)d%%) translated",
-                   {"translated": translated_words,
-                    "total": total_words,
-                    "translatedpercent": quick_stats['translatedpercentage']})
+    word_stats = _(
+        "%(translated)d/%(total)d words (%(translatedpercent)d%%) translated",
+        {"translated": translated_words,
+         "total": total_words,
+         "translatedpercent": quick_stats['translatedpercentage']})
     # The translated unit counts
     string_stats_text = _("%(translated)d/%(total)d strings",
                           {"translated": quick_stats['translated'],
                            "total": quick_stats['total']})
-    string_stats = '<span class="string-statistics">[%s]</span>' % string_stats_text
+    string_stats = '<span class="string-statistics">[%s]</span>' % \
+                   string_stats_text
     # The whole string of stats
     return '%s %s %s' % (file_stats, word_stats, string_stats)
 
@@ -72,18 +75,24 @@ def getcheckdetails(request, path_obj):
         for checkname in keys:
             checkcount = property_stats[checkname]
             if total and checkcount:
-                stats = ungettext('%(checks)d string (%(checkspercent)d%%) failed',
-                                  '%(checks)d strings (%(checkspercent)d%%) failed', checkcount,
-                                  {"checks": checkcount, "checkspercent": (checkcount * 100) / total})
-                checklink = {'href': dispatch.translate(request, path_obj.pootle_path, matchnames=[checkname]),
-                             'text': checkname,
-                             'stats': stats}
+                stats = ungettext(
+                    '%(checks)d string (%(checkspercent)d%%) failed',
+                    '%(checks)d strings (%(checkspercent)d%%) failed',
+                    checkcount,
+                    {"checks": checkcount,
+                     "checkspercent": (checkcount * 100) / total})
+                checklink = {
+                    'href': dispatch.translate(
+                        request, path_obj.pootle_path,
+                        matchnames=[checkname]),
+                    'text': checkname,
+                    'stats': stats}
                 checklinks += [checklink]
     except IOError:
         pass
     return checklinks
 
-################################################################################
+##############################################################################
 
 def review_link(request, path_obj):
     try:
@@ -93,20 +102,25 @@ def review_link(request, path_obj):
             else:
                 text = _('View Suggestions')
             return {
-                    'href': dispatch.translate(request, path_obj.pootle_path, matchnames=['hassuggestion']),
+                    'href': dispatch.translate(
+                    request, path_obj.pootle_path,
+                    matchnames=['hassuggestion']),
                     'text': text}
     except IOError:
         pass
 
 def quick_link(request, path_obj):
     try:
-        if path_obj.getquickstats()['translated'] < path_obj.getquickstats()['total']:
+        if path_obj.getquickstats()['translated'] < \
+               path_obj.getquickstats()['total']:
             if check_permission('translate', request):
                 text = _('Quick Translate')
             else:
                 text = _('View Untranslated')
             return {
-                    'href': dispatch.translate(request, path_obj.pootle_path, unitstates=['fuzzy', 'untranslated']),
+                    'href': dispatch.translate(
+                    request, path_obj.pootle_path,
+                    unitstates=['fuzzy', 'untranslated']),
                     'text': text}
     except IOError:
         pass
@@ -114,7 +128,8 @@ def quick_link(request, path_obj):
 def translate_all_link(request, path_obj):
     #FIXME: what permissions to check for here?
     return {
-        'href': dispatch.translate(request, path_obj.pootle_path, matchnames=[]),
+        'href': dispatch.translate(
+            request, path_obj.pootle_path, matchnames=[]),
         'text': _('Translate All')}
 
 def terminology_link(request, path_obj):
@@ -168,7 +183,8 @@ def download_link(request, path_obj):
             }
 
 def commit_link(request, path_obj):
-    if path_obj.abs_real_path and check_permission('commit', request) and versioncontrol.hasversioning(path_obj.abs_real_path):
+    if path_obj.abs_real_path and check_permission('commit', request) and \
+           versioncontrol.hasversioning(path_obj.abs_real_path):
         link = dispatch.commit(request, path_obj)
         text = _('Commit to VCS')
         return {
@@ -178,7 +194,8 @@ def commit_link(request, path_obj):
         }
 
 def update_link(request, path_obj):
-    if path_obj.abs_real_path and check_permission('commit', request) and versioncontrol.hasversioning(path_obj.abs_real_path):
+    if path_obj.abs_real_path and check_permission('commit', request) and \
+           versioncontrol.hasversioning(path_obj.abs_real_path):
         link = dispatch.update(request, path_obj)
         text = _('Update from VCS')
         return {
@@ -197,24 +214,29 @@ def _gen_link_list(request, path_obj, linkfuncs):
 
 def store_translate_links(request, path_obj):
     """returns a list of links for store items in translate tab"""
-    linkfuncs = [quick_link, translate_all_link, update_link, commit_link, download_link, xliff_link]
+    linkfuncs = [
+        quick_link, translate_all_link, update_link, commit_link,
+        download_link, xliff_link]
     return _gen_link_list(request, path_obj, linkfuncs)
 
 def store_review_links(request, path_obj):
     """returns a list of links for store items in review tab"""
-    linkfuncs = [review_link, update_link, commit_link, download_link, xliff_link]
+    linkfuncs = [
+        review_link, update_link, commit_link, download_link, xliff_link]
     return _gen_link_list(request, path_obj, linkfuncs)
 
 def directory_translate_links(request, path_obj):
     """returns a list of links for directory items in translate tab"""
-    return _gen_link_list(request, path_obj, [quick_link, translate_all_link, zip_link, terminology_link])
+    return _gen_link_list(
+        request, path_obj, [quick_link, translate_all_link, zip_link,
+                            terminology_link])
 
 def directory_review_links(request, path_obj):
     """returns a list of links for directory items in review tab"""
     return _gen_link_list(request, path_obj, [review_link, zip_link])
 
 
-################################################################################
+##############################################################################
 
 
 def stats_descriptions(quick_stats):
@@ -228,8 +250,11 @@ def stats_descriptions(quick_stats):
             "%d words need attention", todo_words, todo_words)
 
     todo_tooltip = u""
-    untranslated_tooltip = ungettext("%d word untranslated", "%d words untranslated", untranslated, untranslated)
-    fuzzy_tooltip = ungettext("%d word needs review", "%d words need review", fuzzy, fuzzy)
+    untranslated_tooltip = ungettext(
+        "%d word untranslated", "%d words untranslated", untranslated,
+        untranslated)
+    fuzzy_tooltip = ungettext(
+        "%d word needs review", "%d words need review", fuzzy, fuzzy)
     # Firefox and Opera doesn't actually support newlines in tooltips, so we
     # add some extra space to keep things readable
     todo_tooltip = u"  \n".join([untranslated_tooltip, fuzzy_tooltip])
@@ -242,7 +267,8 @@ def stats_descriptions(quick_stats):
 def make_generic_item(request, path_obj, action, show_checks=False):
     """Template variables for each row in the table.
 
-    make_directory_item() and make_store_item() will add onto these variables."""
+    make_directory_item() and make_store_item() will add onto these variables.
+    """
     try:
         quick_stats = add_percentages(path_obj.getquickstats())
         info = {
@@ -251,11 +277,14 @@ def make_generic_item(request, path_obj, action, show_checks=False):
             'tooltip': _('%(percentage)d%% complete' %
                          {'percentage': quick_stats['translatedpercentage']}),
             'title':   path_obj.name,
-            'stats':   get_item_stats(request, quick_stats, path_obj, show_checks),
+            'stats':   get_item_stats(
+                request, quick_stats, path_obj, show_checks),
             }
         errors = quick_stats.get('errors', 0)
         if errors:
-            info['errortooltip'] = ungettext('Error reading %d file', 'Error reading %d files', errors, errors)
+            info['errortooltip'] = ungettext(
+                'Error reading %d file', 'Error reading %d files', errors,
+                errors)
         info.update(stats_descriptions(quick_stats))
     except IOError, e:
         info = {
