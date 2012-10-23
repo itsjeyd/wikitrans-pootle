@@ -33,7 +33,8 @@ def render_latest_news(context, path, num):
 
         directory = Directory.objects.get(pootle_path='/%s' % path)
         user = context['user']
-        can_view = check_profile_permission(get_profile(user), "view", directory)
+        can_view = check_profile_permission(
+            get_profile(user), "view", directory)
         if not can_view:
             directory = None
     except Directory.DoesNotExist:

@@ -39,10 +39,13 @@ register = template.Library()
 def find_altsrcs(unit, alt_src_langs, store=None, project=None):
     store = store or unit.store
     project = project or store.translation_project.project
-    altsrcs = Unit.objects.filter(unitid_hash=unit.unitid_hash,
-                                 store__translation_project__project=project,
-                                 store__translation_project__language__in=alt_src_langs,
-                                 state=TRANSLATED).select_related('store', 'store__translation_project', 'store__translation_project__language')
+    altsrcs = Unit.objects.filter(
+        unitid_hash=unit.unitid_hash,
+        store__translation_project__project=project,
+        store__translation_project__language__in=alt_src_langs,
+        state=TRANSLATED).select_related(
+        'store', 'store__translation_project',
+        'store__translation_project__language')
     if project.get_treestyle() == 'nongnu':
         altsrcs = altsrcs.filter(store__name=store.name)
     return altsrcs
@@ -71,13 +74,16 @@ def highlight_diffs(old, new):
         if tag == 'equal':
             textdiff += fancy_escape(old[i1:i2])
         if tag == "insert":
-            textdiff += '<span class="translate-diff-insert">%s</span>' % fancy_escape(new[j1:j2])
+            textdiff += '<span class="translate-diff-insert">%s</span>' % \
+                        fancy_escape(new[j1:j2])
         if tag == "delete":
-            textdiff += '<span class="translate-diff-delete">%s</span>' % fancy_escape(old[i1:i2])
+            textdiff += '<span class="translate-diff-delete">%s</span>' % \
+                        fancy_escape(old[i1:i2])
         if tag == "replace":
             # We don't show text that was removed as part of a change:
             #textdiff += "<span>%s</span>" % fance_escape(a[i1:i2])}
-            textdiff += '<span class="translate-diff-replace">%s</span>' % fancy_escape(new[j1:j2])
+            textdiff += '<span class="translate-diff-replace">%s</span>' % \
+                        fancy_escape(new[j1:j2])
     return mark_safe(textdiff)
 
 def get_sugg_list(unit):
@@ -88,28 +94,34 @@ def get_sugg_list(unit):
     # and might fail on livetranslation
     sugg_list = []
     for i, sugg in enumerate(unit.get_suggestions().iterator()):
-        title = _(u"Suggestion %(i)d by %(user)s:", {'i': i+1, 'user': sugg.user})
+        title = _(
+            u"Suggestion %(i)d by %(user)s:", {'i': i+1, 'user': sugg.user})
         sugg_list.append((sugg, title))
     if len(sugg_list) == 1:
         sugg = sugg_list[0][0]
-        sugg_list = [(sugg, _(u"Suggestion by %(user)s", {'user': sugg.user}))]
+        sugg_list = [
+            (sugg, _(u"Suggestion by %(user)s", {'user': sugg.user}))]
     return sugg_list
 
 @register.filter('stat_summary')
 def stat_summary(store):
     stats = add_percentages(store.getquickstats())
     # The translated word counts
-    word_stats = _("Words Translated: %(translated)d/%(total)d - %(translatedpercent)d%%",
-                   {"translated": stats['translatedsourcewords'],
-                    "total": stats['totalsourcewords'],
-                    "translatedpercent": stats['translatedpercentage']})
+    word_stats = _(
+        "Words Translated: " \
+        "%(translated)d/%(total)d - %(translatedpercent)d%%",
+        {"translated": stats['translatedsourcewords'],
+         "total": stats['totalsourcewords'],
+         "translatedpercent": stats['translatedpercentage']})
     word_stats = '<span class="word-statistics">%s</span>' % word_stats
 
     # The translated unit counts
-    string_stats = _("Strings Translated: %(translated)d/%(total)d - %(translatedpercent)d%%",
-                          {"translated": stats['translated'],
-                           "total": stats['total'],
-                          "translatedpercent": stats['strtranslatedpercentage']})
+    string_stats = _(
+        "Strings Translated: " \
+        "%(translated)d/%(total)d - %(translatedpercent)d%%",
+        {"translated": stats['translated'],
+         "total": stats['total'],
+         "translatedpercent": stats['strtranslatedpercentage']})
     string_stats = '<span class="string-statistics">%s</span>' % string_stats
     # The whole string of stats
     return mark_safe('%s &nbsp;&nbsp; %s' % (word_stats, string_stats))
@@ -119,9 +131,13 @@ def pluralize_source(unit):
     if unit.hasplural():
         count = len(unit.source.strings)
         if count == 1:
-            return [(0, unit.source.strings[0], "%s+%s" % (_('Singular'), _('Plural')))]
+            return [
+                (0, unit.source.strings[0],
+                 "%s+%s" % (_('Singular'), _('Plural')))]
         elif count == 2:
-            return [(0, unit.source.strings[0], _('Singular')), (1, unit.source.strings[1], _('Plural'))]
+            return [
+                (0, unit.source.strings[0], _('Singular')),
+                (1, unit.source.strings[1], _('Plural'))]
         else:
             forms = []
             for i, source in enumerate(unit.source.strings):
@@ -160,12 +176,18 @@ def pluralize_diff_sugg(sugg):
         forms = []
         for i, target in enumerate(sugg.target.strings):
             if i < len(unit.target.strings):
-                forms.append((i, target, call_highlight(unit.target.strings[i], target), _('Plural Form %d', i)))
+                forms.append(
+                    (i, target, call_highlight(
+                        unit.target.strings[i], target),
+                     _('Plural Form %d', i)))
             else:
-                forms.append((i, target, call_highlight('', target), _('Plural Form %d', i)))
+                forms.append(
+                    (i, target, call_highlight('', target),
+                     _('Plural Form %d', i)))
         return forms
     else:
-        return [(0, sugg.target, call_highlight(unit.target, sugg.target), None)]
+        return [
+            (0, sugg.target, call_highlight(unit.target, sugg.target), None)]
 
 
 @register.inclusion_tag('unit/edit.html', takes_context=True)
@@ -185,7 +207,8 @@ def render_unit_edit(context, form):
                      'cantranslate': context['cantranslate'],
                      'cansuggest': context['cansuggest'],
                      'canreview': context['canreview'],
-                     'altsrcs': find_altsrcs(unit, alt_src_langs, store=store, project=project),
+                     'altsrcs': find_altsrcs(
+                         unit, alt_src_langs, store=store, project=project),
                      "suggestions": get_sugg_list(unit),
                      }
     return template_vars
