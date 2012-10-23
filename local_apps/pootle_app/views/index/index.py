@@ -30,7 +30,8 @@ from pootle_app.models import Directory
 from pootle_statistics.models import Submission
 from pootle_language.models import Language
 from pootle_project.models import Project
-from pootle_app.models.permissions import get_matching_permissions, check_permission
+from pootle_app.models.permissions import get_matching_permissions, \
+     check_permission
 from pootle_app.views import pagelayout
 from pootle_app.views.top_stats import gentopstats_root
 from pootle.i18n.gettext import tr_lang
@@ -61,8 +62,9 @@ def get_items(request, model, get_last_action, name_func):
             'transper': stats["translatedpercentage"],
             'fuzzyper': stats["fuzzypercentage"],
             'untransper': stats["untranslatedpercentage"],
-            'completed_title': _("%(percentage)d%% complete",
-                                 {'percentage': stats['translatedpercentage']}),
+            'completed_title': _(
+                "%(percentage)d%% complete",
+                {'percentage': stats['translatedpercentage']}),
             })
     items.sort(lambda x, y: locale.strcoll(x['name'], y['name']))
     return items
@@ -70,7 +72,8 @@ def get_items(request, model, get_last_action, name_func):
 def getlanguages(request):
     def get_last_action(item):
         try:
-            return Submission.objects.filter(translation_project__language=item).latest()
+            return Submission.objects.filter(
+                translation_project__language=item).latest()
         except Submission.DoesNotExist:
             return ''
 
@@ -79,7 +82,8 @@ def getlanguages(request):
 def getprojects(request):
     def get_last_action(item):
         try:
-            return Submission.objects.filter(translation_project__project=item).latest()
+            return Submission.objects.filter(
+                translation_project__project=item).latest()
         except Submission.DoesNotExist:
             return ''
 
@@ -87,7 +91,8 @@ def getprojects(request):
 
 
 def view(request):
-    request.permissions = get_matching_permissions(get_profile(request.user), Directory.objects.root)
+    request.permissions = get_matching_permissions(
+        get_profile(request.user), Directory.objects.root)
 
     topstats = gentopstats_root()
 
@@ -109,13 +114,16 @@ def view(request):
         'projects': getprojects(request),
         'topstats': topstats,
         'instancetitle': pagelayout.get_title(),
-        'translationlegend': {'translated': _('Translations are complete'),
-                              'fuzzy': _('Translations need to be checked (they are marked fuzzy)'),
-                              'untranslated': _('Untranslated')},
+        'translationlegend': {
+            'translated': _('Translations are complete'),
+            'fuzzy': _(
+                'Translations need to be checked (they are marked fuzzy)'),
+            'untranslated': _('Untranslated')},
         'permissions': request.permissions,
         }
     visible_langs = [l for l in templatevars['languages'] if l['total'] != 0]
     templatevars['moreprojects'] = len(templatevars['projects']) >\
                                    len(visible_langs)
 
-    return render_to_response('index/index.html', templatevars, RequestContext(request))
+    return render_to_response(
+        'index/index.html', templatevars, RequestContext(request))
