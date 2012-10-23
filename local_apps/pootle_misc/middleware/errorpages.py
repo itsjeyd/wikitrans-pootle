@@ -54,8 +54,8 @@ class ErrorPagesMiddleware(object):
                     '403.html', templatevars, RequestContext(request)))
         else:
             #FIXME: implement better 500
-            tb = traceback.format_exc()
-            print >> sys.stderr, tb
+            trace = traceback.format_exc()
+            print >> sys.stderr, trace
             if not settings.DEBUG:
                 try:
                     templatevars = {}
@@ -79,7 +79,7 @@ class ErrorPagesMiddleware(object):
                     except:
                         request_repr = "Request repr() unavailable"
                     message = "%s\n\n%s\n\n%s" % (
-                        unicode(exception.args[0]), tb, request_repr)
+                        unicode(exception.args[0]), trace, request_repr)
                     mail_admins(subject, message, fail_silently=True)
                     return HttpResponseServerError(
                         render_to_string(
