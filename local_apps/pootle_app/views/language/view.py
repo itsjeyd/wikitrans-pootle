@@ -53,23 +53,24 @@ def get_stats_headings():
         "summary":                _("Summary"),
         }
 
-def get_translation_project(f):
-    def decorated_f(request, language_code, project_code, *args, **kwargs):
+def get_translation_project(function):
+    def decorated_function(
+        request, language_code, project_code, *args, **kwargs):
         translation_project = get_object_or_404(
             TranslationProject, language__code=language_code,
             project__code=project_code)
-        return f(request, translation_project, *args, **kwargs)
-    return decorated_f
+        return function(request, translation_project, *args, **kwargs)
+    return decorated_function
 
-def set_request_context(f):
-    def decorated_f(request, translation_project, *args, **kwargs):
+def set_request_context(function):
+    def decorated_function(request, translation_project, *args, **kwargs):
         # For now, all permissions in a translation project are
         # relative to the root of that translation project.
         request.permissions = get_matching_permissions(
             get_profile(request.user), translation_project.directory)
         request.translation_project = translation_project
-        return f(request, translation_project, *args, **kwargs)
-    return decorated_f
+        return function(request, translation_project, *args, **kwargs)
+    return decorated_function
 
 ##############################################################################
 
