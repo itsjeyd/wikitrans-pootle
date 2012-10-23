@@ -44,11 +44,14 @@ class ErrorPagesMiddleware(object):
             if len(exception.args) > 0:
                 templatevars['permission_error'] = unicode(exception)
             if not request.user.is_authenticated():
-                login_msg = _('You need to <a href="%(login_link)s">login</a> to access this page.',
-                              {'login_link': l("/accounts/login/")})
+                login_msg = _(
+                    'You need to <a href="%(login_link)s">login</a> ' \
+                    'to access this page.',
+                    {'login_link': l("/accounts/login/")})
                 templatevars["login_message"] = login_msg
-            return HttpResponseForbidden(render_to_string('403.html', templatevars,
-                                      RequestContext(request)))
+            return HttpResponseForbidden(
+                render_to_string(
+                    '403.html', templatevars, RequestContext(request)))
         else:
             #FIXME: implement better 500
             tb = traceback.format_exc()
@@ -60,19 +63,28 @@ class ErrorPagesMiddleware(object):
                         templatevars['exception'] = unicode(exception.args[0])
 
                     if hasattr(exception, 'filename'):
-                        templatevars['fserror'] = _('Error accessing %(filename)s, Filesystem sent error: %(errormsg)s',
-                                                    {'filename': exception.filename, 'errormsg': exception.strerror})
+                        templatevars['fserror'] = _(
+                            'Error accessing %(filename)s, Filesystem sent ' \
+                            'error: %(errormsg)s',
+                            {'filename': exception.filename,
+                             'errormsg': exception.strerror})
 
                     # send email to admins with details about exception
-                    subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
+                    subject = 'Error (%s IP): %s' % (
+                        (request.META.get('REMOTE_ADDR') in
+                         settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'),
+                        request.path)
                     try:
                         request_repr = repr(request)
                     except:
                         request_repr = "Request repr() unavailable"
-                    message = "%s\n\n%s\n\n%s" % (unicode(exception.args[0]), tb, request_repr)
+                    message = "%s\n\n%s\n\n%s" % (
+                        unicode(exception.args[0]), tb, request_repr)
                     mail_admins(subject, message, fail_silently=True)
-                    return HttpResponseServerError(render_to_string('500.html', templatevars,
-                                                                    RequestContext(request)))
+                    return HttpResponseServerError(
+                        render_to_string(
+                            '500.html', templatevars,
+                            RequestContext(request)))
                 except:
                     # let's not confuse things by throwing an exception here
                     pass

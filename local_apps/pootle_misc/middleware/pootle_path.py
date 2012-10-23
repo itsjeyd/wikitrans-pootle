@@ -30,21 +30,27 @@ class PootlePathMiddleware(object):
         path_length = len(path_fragments)
         context = {}
         # Language
-        if path_length > 0 and path_fragments[0] not in ['admin', 'accounts', 'projects'] and not path_fragments[0].endswith('.html'):
+        if path_length > 0 and path_fragments[0] not in \
+               ['admin', 'accounts', 'projects'] and not \
+               path_fragments[0].endswith('.html'):
             try:
-                context['language'] = Language.objects.get(code=path_fragments[0])
+                context['language'] = Language.objects.get(
+                    code=path_fragments[0])
             except Language.DoesNotExist:
                 pass
         # Project
-        if path_length > 1 and ('language' in context or path_fragments[0] == 'projects'):
+        if path_length > 1 and \
+               ('language' in context or path_fragments[0] == 'projects'):
             try:
-                context['project'] = Project.objects.get(code=path_fragments[1])
+                context['project'] = Project.objects.get(
+                    code=path_fragments[1])
             except Project.DoesNotExist:
                 pass
         # TranslationProject
         if 'language' in context and 'project' in context:
             try:
-                context['translation_project'] = TranslationProject.objects.get(
+                context['translation_project'] = \
+                                               TranslationProject.objects.get(
                     language=context['language'], project=context['project'])
             except TranslationProject.DoesNotExist:
                 pass

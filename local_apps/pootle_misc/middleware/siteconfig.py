@@ -59,30 +59,39 @@ class SiteConfigMiddleware(object):
 
     """
     def process_request(self, request):
-        """load site config, return a dummy response if database seems uninitialized"""
+        """
+        load site config, return a dummy response if database seems
+        uninitialized
+        """
         #FIXME: can't we find a more efficient method?
         try:
             response = HttpResponse()
             response.status_code = UPDATE_STATUS_CODE
 
             config = siteconfig.load_site_config()
-            db_buildversion = int(config.get('BUILDVERSION', DEFAULT_BUILDVERSION))
+            db_buildversion = int(config.get(
+                'BUILDVERSION', DEFAULT_BUILDVERSION))
             if db_buildversion < code_buildversion:
                 response.db_buildversion = db_buildversion
                 response.tt_buildversion = sys.maxint
             else:
                 response.db_buildversion = sys.maxint
 
-            db_tt_buildversion = int(config.get('TT_BUILDVERSION', DEFAULT_TT_BUILDVERSION))
+            db_tt_buildversion = int(config.get(
+                'TT_BUILDVERSION', DEFAULT_TT_BUILDVERSION))
             if db_tt_buildversion < code_tt_buildversion:
-                """Toolkit build version changed. clear stale quality checks data"""
-                logging.info("New Translate Toolkit version, flushing quality checks")
+                """
+                Toolkit build version changed. clear stale quality checks data
+                """
+                logging.info(
+                    "New Translate Toolkit version, flushing quality checks")
                 dbupdate.flush_quality_checks()
                 config.set('TT_BUILDVERSION', code_tt_buildversion)
                 config.save()
                 response.tt_buildversion = db_tt_buildversion
 
-            if (response.db_buildversion, response.tt_buildversion) != (sys.maxint, sys.maxint):
+            if (response.db_buildversion, response.tt_buildversion) != (
+                sys.maxint, sys.maxint):
                 return response
 
         except Exception, e:
@@ -92,7 +101,8 @@ class SiteConfigMiddleware(object):
             # duck typing I will call this
             # poking-the-duck-until-it-quacks-like-a-duck-test
 
-            if e.__class__.__name__ in ('OperationalError', 'ProgrammingError', 'DatabaseError'):
+            if e.__class__.__name__ in (
+                'OperationalError', 'ProgrammingError', 'DatabaseError'):
                 # we can't build the database here cause caching
                 # middleware won't allow progressive loading of
                 # response so instead return an empty response marked
@@ -112,6 +122,7 @@ class SiteConfigMiddleware(object):
         if response.status_code == INSTALL_STATUS_CODE:
             return HttpResponse(dbinit.staggered_install(response.exception))
         elif response.status_code == UPDATE_STATUS_CODE:
-            return HttpResponse(dbupdate.staggered_update(response.db_buildversion, response.tt_buildversion))
+            return HttpResponse(dbupdate.staggered_update(
+                response.db_buildversion, response.tt_buildversion))
         else:
             return response
