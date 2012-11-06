@@ -118,29 +118,37 @@ class RegistrationManager(models.Manager):
 
         if send_email:
             current_site = Site.objects.get_current()
-            subject = render_to_string('registration/activation_email_subject.txt',
-                                       { 'site': current_site })
+            subject = render_to_string(
+                'registration/activation_email_subject.txt',
+                {'site': current_site})
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
-            text_message = render_to_string('registration/activation_email.txt',
-                                       { 'activation_key': registration_profile.activation_key,
-                                         'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-                                         'site': current_site })
+            text_message = render_to_string(
+                'registration/activation_email.txt',
+                {'activation_key': registration_profile.activation_key,
+                 'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                 'site': current_site })
             if not settings.EMAIL_SEND_HTML:
                 from django.core.mail import send_mail
-                send_mail(subject, text_message, settings.DEFAULT_FROM_EMAIL, [new_user.email])
+                send_mail(
+                    subject, text_message, settings.DEFAULT_FROM_EMAIL,
+                    [new_user.email])
             else:
                 from django.core.mail import EmailMultiAlternatives
-                html_message = render_to_string("registration/activation_email.html",
-                                        { 'activation_key': registration_profile.activation_key,
-                                          'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-                                          'site': current_site })
-                msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [new_user.email])
+                html_message = render_to_string(
+                    "registration/activation_email.html",
+                    {'activation_key': registration_profile.activation_key,
+                     'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                     'site': current_site })
+                msg = EmailMultiAlternatives(
+                    subject, text_message, settings.DEFAULT_FROM_EMAIL,
+                    [new_user.email])
                 msg.attach_alternative(html_message, "text/html")
                 msg.send()
         user_registered.send(sender=self.model, user=new_user)
         return new_user
-    create_inactive_user = transaction.commit_on_success(create_inactive_user)
+    create_inactive_user = transaction.commit_on_success(
+        create_inactive_user)
 
     def create_profile(self, user):
         """
@@ -256,7 +264,9 @@ class RegistrationProfile(models.Model):
            method returns ``True``.
 
         """
-        expiration_date = datetime.timedelta(days=settings.ACCOUNT_ACTIVATION_DAYS)
+        expiration_date = datetime.timedelta(
+            days=settings.ACCOUNT_ACTIVATION_DAYS)
         return self.activation_key == self.ACTIVATED or \
-               (self.user.date_joined + expiration_date <= datetime.datetime.now())
+               (self.user.date_joined + expiration_date <=
+                datetime.datetime.now())
     activation_key_expired.boolean = True

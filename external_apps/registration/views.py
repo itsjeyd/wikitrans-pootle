@@ -60,17 +60,19 @@ def activate(request, activation_key,
     registration/activate.html or ``template_name`` keyword argument.
 
     """
-    activation_key = activation_key.lower() # Normalize before trying anything with it.
+    # Normalize before trying anything with it.
+    activation_key = activation_key.lower()
     account = RegistrationProfile.objects.activate_user(activation_key)
     if extra_context is None:
         extra_context = {}
     context = RequestContext(request)
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
-    return render_to_response(template_name,
-                              { 'account': account,
-                                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS },
-                              context_instance=context)
+    return render_to_response(
+        template_name,
+        {'account': account,
+         'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS},
+        context_instance=context)
 
 
 def register(request, success_url=None,
@@ -135,11 +137,12 @@ def register(request, success_url=None,
         form = form_class(data=request.POST, files=request.FILES)
         if form.is_valid():
             new_user = form.save()
-            # success_url needs to be dynamically generated here; setting a
-            # a default value using reverse() will cause circular-import
-            # problems with the default URLConf for this application, which
-            # imports this file.
-            return HttpResponseRedirect(success_url or reverse('registration_complete'))
+            # success_url needs to be dynamically generated here;
+            # setting a a default value using reverse() will cause
+            # circular-import problems with the default URLConf for
+            # this application, which imports this file.
+            return HttpResponseRedirect(
+            success_url or reverse('registration_complete'))
     else:
         form = form_class()
 
