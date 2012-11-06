@@ -192,7 +192,8 @@ def edit_profile(request, form_class=None, success_url=None,
     if form_class is None:
         form_class = utils.get_profile_form()
     if request.method == 'POST':
-        form = form_class(data=request.POST, files=request.FILES, instance=profile_obj)
+        form = form_class(
+            data=request.POST, files=request.FILES, instance=profile_obj)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(success_url)
